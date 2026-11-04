@@ -1,7 +1,8 @@
 // 車内の読み物の1話を、X に載せる画像（1080×1350、最大4枚）にします。
 // 使い方：node scripts/story-images.mjs kakueki 01
-// できる場所：brand/x/stories/（GitHub には送りません）
-//   kakueki-01-1.png, kakueki-01-2.png … と、投稿文（kakueki-01.txt）
+// できる場所：brand/x/stories/<投稿する日>/（GitHub には送りません）
+//   投稿する日＝その話の公開日（pubDate）。例：brand/x/stories/2026-11-05/
+//   その中に kakueki-03-1.png, kakueki-03-2.png … と、投稿文（kakueki-03.txt）
 // Microsoft Edge を使って画像にします。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,6 +19,7 @@ const src = path.join(root, 'src/content/stories', train, `${no}.md`);
 const md = fs.readFileSync(src, 'utf8').replace(/\r\n/g, '\n');
 const m = md.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 const data = parse(m[1]);
+const pub = data.pubDate instanceof Date ? data.pubDate.toISOString().slice(0, 10) : String(data.pubDate).slice(0, 10);
 const paras = m[2]
   .split(/\n\s*\n/)
   .map((p) => p.trim())
@@ -71,7 +73,7 @@ body{background:#f7f6f2;color:#1a1d24;font-family:'Yu Mincho','YuMincho','Hiragi
 .foot .brand{display:flex;align-items:center;gap:12px}
 .foot .mark{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#1f2a44;color:#fff;font-weight:800}
 `;
-const outDir = path.join(root, 'brand/x/stories');
+const outDir = path.join(root, 'brand/x/stories', pub);
 fs.mkdirSync(outDir, { recursive: true });
 const edge = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => fs.existsSync(p));
 const files = [];
@@ -96,7 +98,7 @@ const post = `【${t.kind}】${t.title} 第${data.no}話「${data.title}」\n${d
 const reply = `サイトでは、この話で出てきた言葉をくわしく解説した記事も読めます👇\n${url}`;
 const intent = `https://x.com/intent/post?text=${encodeURIComponent(post)}`;
 const weight = (s) => [...s].reduce((n, ch) => n + (ch.codePointAt(0) < 0x1100 ? 1 : 2), 0);
-const txt = `■ 本文（画像${files.length}枚をつけて投稿）※${weight(post)}/280\n${post}\n\n■ 投稿画面を開くリンク（画像は自分でつけてください）\n${intent}\n\n■ 自分の投稿へのリプライ\n${reply}\n`;
+const txt = `■ 投稿する日時：${pub} 6:00（予約投稿）\n\n■ 本文（画像${files.length}枚をつけて投稿）※${weight(post)}/280\n${post}\n\n■ 投稿画面を開くリンク（画像は自分でつけてください）\n${intent}\n\n■ 自分の投稿へのリプライ\n${reply}\n`;
 fs.writeFileSync(path.join(outDir, `${train}-${no}.txt`), txt);
 console.log(files.map((f) => path.relative(root, f)).join('\n'));
 console.log(`投稿文：${path.relative(root, path.join(outDir, `${train}-${no}.txt`))}（${weight(post)}/280）`);
