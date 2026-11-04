@@ -31,7 +31,7 @@ export const TAG_GROUPS = [
     title: '図面・資料',
     tags: [
       { id: 'kouzu', name: '公図', glossary: 'kouzu' },
-      { id: 'chizu14', name: '14条地図', glossary: 'chizu14' },
+      { id: 'chizu14', name: '14条1項地図', glossary: 'chizu14' },
       { id: 'sokuryozu', name: '地積測量図', glossary: 'sokuryozu' },
       { id: 'kanmin', name: '官民境界', glossary: 'kanmin' },
       { id: 'fudosantokiho', name: '不動産登記法' },
