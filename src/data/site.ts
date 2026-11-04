@@ -19,7 +19,7 @@ export const STATIONS = [
   { href: '/', label: 'トップ', ready: true },
   { href: '/news/', label: 'ニュース', ready: true },
   { href: '/kiso/', label: '基礎解説', ready: true },
-  { href: '/shiken/', label: '試験', ready: true },
+  { href: '/shiken/', label: '調査士試験', ready: true },
   { href: '/annai/', label: '逆引き案内所', ready: true },
   { href: '/tsutatsu/', label: '通達ナビ', ready: false },
   { href: '/links/', label: 'リンク集', ready: false },
