@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import ListControls from '../components/ListControls.astro';
 import LineBadge from '../components/LineBadge.astro';
 import { LINES } from '../data/lines';
 import { getPublishedArticles, isKiso } from '../data/articles';
@@ -25,7 +26,8 @@ const newsLines = LINES.filter((l) => !l.isKiso);
     ))}
   </ul>
 
-  <h2>新しい順</h2>
+  <h2>記事</h2>
+  <ListControls />
   {news.length > 0 ? (
     <ul class="card-list">
       {news.map((a) => <ArticleCard article={a} />)}

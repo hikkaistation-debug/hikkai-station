@@ -1,0 +1,73 @@
+---
+// 記事一覧の「対象でしぼりこむ」「ならび順」
+// 同じページ（main の中）にある記事一覧（.card-list）すべてに効きます。
+// 一覧の各記事には data-level（easy / normal / expert）と data-date（YYYY-MM-DD）が必要です。
+---
+<div class="list-controls" data-list-controls>
+  <div class="list-controls__group" role="group" aria-label="対象でしぼりこむ">
+    <span class="list-controls__label" aria-hidden="true">対象</span>
+    <button type="button" data-level="all" aria-pressed="true">すべて</button>
+    <button type="button" data-level="easy" aria-pressed="false">やさしい</button>
+    <button type="button" data-level="normal" aria-pressed="false">ふつう</button>
+    <button type="button" data-level="expert" aria-pressed="false">専門</button>
+  </div>
+  <label class="list-controls__sort">
+    <span class="list-controls__label">ならび順</span>
+    <select data-sort>
+      <option value="new">新しい順</option>
+      <option value="easy">やさしい順</option>
+      <option value="expert">専門的な順</option>
+    </select>
+  </label>
+  <p class="visually-hidden" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  const RANK: Record<string, number> = { easy: 0, normal: 1, expert: 2 };
+
+  function apply(box: HTMLElement) {
+    const scope = box.closest('main') ?? document;
+    const level = box.querySelector<HTMLButtonElement>('button[aria-pressed="true"]')?.dataset.level ?? 'all';
+    const sort = box.querySelector<HTMLSelectElement>('[data-sort]')!.value;
+    let total = 0;
+    scope.querySelectorAll<HTMLElement>('.card-list').forEach((list) => {
+      const items = Array.from(list.querySelectorAll<HTMLElement>(':scope > li[data-level]'));
+      if (items.length === 0) return;
+      items.sort((a, b) => {
+        const byDate = (b.dataset.date ?? '').localeCompare(a.dataset.date ?? '');
+        if (sort === 'new') return byDate;
+        const diff = (RANK[a.dataset.level!] ?? 1) - (RANK[b.dataset.level!] ?? 1);
+        return (sort === 'easy' ? diff : -diff) || byDate;
+      });
+      let shown = 0;
+      for (const li of items) {
+        const hit = level === 'all' || li.dataset.level === level;
+        li.hidden = !hit;
+        if (hit) shown++;
+        list.append(li); // 並べ替え
+      }
+      total += shown;
+      let empty = list.querySelector<HTMLElement>(':scope > .filter-empty');
+      if (!empty) {
+        empty = document.createElement('li');
+        empty.className = 'filter-empty empty';
+        empty.textContent = 'この対象の記事はありません。';
+        list.append(empty);
+      }
+      empty.hidden = shown > 0;
+    });
+    box.querySelector('[data-status]')!.textContent = `${total}件を表示`;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-list-controls]').forEach((box) => {
+    box.querySelectorAll<HTMLButtonElement>('button[data-level]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        box.querySelectorAll('button[data-level]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        apply(box);
+      });
+    });
+    box.querySelector('[data-sort]')!.addEventListener('change', () => apply(box));
+    // 検索結果など、あとから一覧が書きかわったときにも効かせる
+    document.addEventListener('cards-updated', () => apply(box));
+  });
+</script>

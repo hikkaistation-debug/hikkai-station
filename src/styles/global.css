@@ -303,3 +303,21 @@ main { padding-bottom: 1rem; }
   .header-actions { gap: 0.35rem; }
   .header-search, .menu-toggle { padding: 0.3rem 0.5rem; font-size: 0.9rem; }
 }
+
+/* ---------- 記事一覧の絞り込み・並べ替え ---------- */
+.list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.2rem; margin: 1rem 0; padding: 0.7rem 0.9rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.list-controls__group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+.list-controls__label { font-size: 0.85rem; font-weight: 800; color: var(--ink-soft); margin-right: 0.2rem; }
+.list-controls button {
+  font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  padding: 0.25rem 0.75rem; border-radius: 999px; border: 2px solid var(--navy); background: #fff; color: var(--navy);
+}
+.list-controls button[aria-pressed='true'] { background: var(--navy); color: #fff; }
+.list-controls__sort { display: flex; align-items: center; gap: 0.3rem; }
+.list-controls select { font: inherit; font-size: 0.9rem; padding: 0.25rem 0.5rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; }
+.card-list > li[hidden] { display: none; }
+
+/* ---------- 検索結果 ---------- */
+.search-related { font-size: 0.9rem; color: var(--ink-soft); background: #fff8db; border-radius: 8px; padding: 0.3rem 0.7rem; display: inline-block; }
+.search-related[hidden] { display: none; }
+.search-cat { font-size: 0.82rem; font-weight: 700; border: 2px solid var(--c); border-radius: 8px; padding: 0 0.5rem; line-height: 1.6; }

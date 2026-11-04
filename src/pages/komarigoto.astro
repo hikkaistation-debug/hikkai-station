@@ -5,6 +5,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import ListControls from '../components/ListControls.astro';
 import { getPublishedArticles, type Article } from '../data/articles';
 
 const all = (await getPublishedArticles()).filter((a) => a.data.level !== 'expert');
@@ -39,6 +40,8 @@ const sections = [
     隣の土地との境目や、相続した土地のことで困っている方向けに、読みやすい記事を困りごと別に集めました。
     気になるところから読んでみてください。
   </p>
+
+  <ListControls />
 
   <nav aria-label="このページの目次">
     <ol class="route-map">

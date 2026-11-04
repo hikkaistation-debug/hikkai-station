@@ -3,6 +3,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import ListControls from '../components/ListControls.astro';
 import { getLine } from '../data/lines';
 import { getPublishedArticles } from '../data/articles';
 
@@ -76,6 +77,7 @@ const officialLinks = [
   </div>
 
   <h2>試験に関する記事</h2>
+  <ListControls />
   {articles.length > 0 ? (
     <ul class="card-list">
       {articles.map((a) => <ArticleCard article={a} />)}

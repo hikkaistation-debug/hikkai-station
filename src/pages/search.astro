@@ -1,35 +1,57 @@
 ---
 // サイト内検索（ブラウザの中だけで動く、かんたんな検索）
+// ・記事はタイトル・要約・ひとこと・タグに加えて、本文の中身も探します。
+// ・用語さくいんの言葉とよみを「関連ワード」として使います（「ぶんぴつ」→「分筆」を含む記事も出ます）。
 // 記事が増えたら、Pagefind などの本格的な検索に切り替えを検討します。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import ListControls from '../components/ListControls.astro';
 ---
-<BaseLayout title="サイト内検索" description="サイト内の記事をキーワードでさがせます。">
+<BaseLayout title="サイト内検索" description="サイト内の記事や用語を、キーワードでさがせます。">
   <StationSign kicker="SEARCH" title="サイト内検索" />
 
   <form class="search-box" action="/search/" method="get" role="search" id="search-form">
     <label for="q" class="visually-hidden">キーワード</label>
-    <input id="q" name="q" type="search" placeholder="例：相続登記、筆界特定" />
+    <input id="q" name="q" type="search" placeholder="例：相続登記、筆界特定、ぶんぴつ" />
     <button type="submit">さがす</button>
   </form>
 
   <p id="search-status" aria-live="polite"></p>
-  <ul class="card-list" id="search-results"></ul>
+  <p id="search-related" class="search-related" hidden></p>
+
+  <section id="term-section" hidden aria-labelledby="term-h">
+    <h2 id="term-h">用語さくいん</h2>
+    <ul class="card-list" id="term-results"></ul>
+  </section>
+
+  <section id="article-section" hidden aria-labelledby="article-h">
+    <h2 id="article-h">記事</h2>
+    <ListControls />
+    <ul class="card-list" id="search-results"></ul>
+  </section>
 </BaseLayout>
 
 <script>
-  type Item = { url: string; title: string; summary: string; comment: string; tags: string[]; category: string; date: string };
+  type Term = { url: string; title: string; summary: string; text: string };
+  type Article = Term & { category: string; level: string; color: string; date: string; dateISO: string };
+  type Data = { terms: Term[]; articles: Article[]; synonyms: { words: string[] }[] };
+
+  const LEVEL: Record<string, string> = { easy: 'やさしい', normal: 'ふつう', expert: '専門' };
 
   const input = document.getElementById('q') as HTMLInputElement;
   const form = document.getElementById('search-form') as HTMLFormElement;
   const status = document.getElementById('search-status')!;
-  const results = document.getElementById('search-results')!;
+  const related = document.getElementById('search-related')!;
+  const termSection = document.getElementById('term-section')!;
+  const termList = document.getElementById('term-results')!;
+  const articleSection = document.getElementById('article-section')!;
+  const articleList = document.getElementById('search-results')!;
 
   // 全角・半角、大文字・小文字、カタカナ・ひらがなの違いを気にせず探せるようにする
   const normalize = (s: string) =>
     s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
-  let items: Item[] = [];
+  let data: Data = { terms: [], articles: [], synonyms: [] };
 
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
     const e = document.createElement(tag);
@@ -38,28 +60,67 @@ import StationSign from '../components/StationSign.astro';
     return e;
   }
 
+  // 入力した言葉ごとに、関連ワード（用語とそのよみ）も候補にする
+  function expand(word: string) {
+    const set = new Set([word]);
+    for (const s of data.synonyms) {
+      const norms = s.words.map(normalize);
+      if (norms.some((n) => n === word || (word.length >= 2 && n.includes(word)))) norms.forEach((n) => set.add(n));
+    }
+    return [...set];
+  }
+
+  function card(it: Term | Article, isArticle: boolean) {
+    const li = el('li', 'article-card');
+    const a = it as Article;
+    li.style.setProperty('--c', isArticle ? a.color : '#1f2a44');
+    if (isArticle) {
+      li.dataset.level = a.level;
+      li.dataset.date = a.dateISO;
+      const badges = el('div', 'badges');
+      badges.append(el('span', 'search-cat', a.category), el('span', `level-badge level-badge--${a.level}`, LEVEL[a.level] ?? ''));
+      li.append(badges);
+    }
+    const h = el('h3', 'article-card__title');
+    const link = el('a', undefined, it.title);
+    link.href = it.url;
+    h.append(link);
+    li.append(h, el('p', 'article-card__summary', it.summary));
+    if (isArticle) li.append(el('p', 'article-card__meta', a.date));
+    return li;
+  }
+
   function run(q: string) {
-    results.replaceChildren();
+    termList.replaceChildren();
+    articleList.replaceChildren();
+    related.hidden = true;
     const words = normalize(q).split(/\s+/).filter(Boolean);
     if (words.length === 0) {
       status.textContent = 'キーワードを入れて「さがす」を押してください。';
+      termSection.hidden = articleSection.hidden = true;
       return;
     }
-    const hits = items.filter((it) => {
-      const text = normalize([it.title, it.summary, it.comment, it.category, ...it.tags].join(' '));
-      return words.every((w) => text.includes(w));
-    });
-    status.textContent = `「${q}」の検索結果：${hits.length}件`;
-    for (const it of hits) {
-      const li = el('li', 'article-card');
-      li.style.setProperty('--c', '#1f2a44');
-      const h = el('h3', 'article-card__title');
-      const a = el('a', undefined, it.title);
-      a.href = it.url;
-      h.append(a);
-      li.append(el('p', 'article-card__meta', it.category), h, el('p', 'article-card__summary', it.summary), el('p', 'article-card__meta', it.date));
-      results.append(li);
+    const groups = words.map(expand);
+    const match = (text: string) => {
+      const t = normalize(text);
+      return groups.every((alts) => alts.some((w) => t.includes(w)));
+    };
+    // 言葉そのものが一致する用語を先に出す
+    const inTitle = (t: Term) => (groups.some((alts) => alts.some((w) => normalize(t.title).includes(w))) ? 0 : 1);
+    const terms = data.terms.filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b));
+    const articles = data.articles.filter((a) => match(a.text));
+
+    const extra = [...new Set(groups.flat())].filter((w) => !words.includes(w));
+    if (extra.length > 0) {
+      related.textContent = `関連ワード「${extra.join('」「')}」でもさがしました。`;
+      related.hidden = false;
     }
+    status.textContent = `「${q}」の検索結果：用語 ${terms.length}件・記事 ${articles.length}件`;
+    termSection.hidden = terms.length === 0;
+    articleSection.hidden = articles.length === 0;
+    terms.forEach((t) => termList.append(card(t, false)));
+    articles.forEach((a) => articleList.append(card(a, true)));
+    document.dispatchEvent(new Event('cards-updated'));
   }
 
   form.addEventListener('submit', (e) => {
@@ -74,8 +135,8 @@ import StationSign from '../components/StationSign.astro';
   status.textContent = '読み込み中…';
   fetch('/search-index.json')
     .then((r) => r.json())
-    .then((data: Item[]) => {
-      items = data;
+    .then((d: Data) => {
+      data = d;
       run(initial);
     })
     .catch(() => {

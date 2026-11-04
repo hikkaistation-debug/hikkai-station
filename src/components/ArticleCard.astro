@@ -11,7 +11,7 @@ const { article } = Astro.props;
 const { data } = article;
 const line = getLine(data.category);
 ---
-<li class="article-card" style={`--c:${line.color}`}>
+<li class="article-card" style={`--c:${line.color}`} data-level={data.level} data-date={isoDate(data.pubDate)}>
   <div class="badges">
     <LineBadge id={data.category} short />
     <LevelBadge level={data.level} />
