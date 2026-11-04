@@ -46,7 +46,7 @@ const todayJst = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slic
 
 // 公開する話を、話の順に取り出す
 //   draft: true は出さない
-//   公開日が未来の話は出さない（毎朝7時の自動公開で、その日の話が出ます）。
+//   公開日が未来の話は出さない（毎朝6時ごろの自動公開で、その日の話が出ます）。
 //   ただし手元の確認用サーバー（npm run dev）では、未来の話も表示します。
 export async function getPublishedStories(train?: TrainId): Promise<Story[]> {
   const today = todayJst();

@@ -6,9 +6,9 @@ on:
     branches: [main]
   workflow_dispatch: # GitHubの画面から手動でも実行できるようにする
   schedule:
-    # 毎朝7時15分（日本時間）にも組み立てなおす。
+    # 毎朝5時50分（日本時間）にも組み立てなおす（6時には出ているように）。
     # 「車内の読み物」で、公開日が今日になった話を自動で出すため。
-    - cron: '15 22 * * *'
+    - cron: '50 20 * * *'
 
 permissions:
   contents: read
