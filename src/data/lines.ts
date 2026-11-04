@@ -5,7 +5,7 @@
 //   code   : 駅ナンバリング風の記号（アルファベット1文字）
 //   mark   : 色が見分けにくい人のための形の記号（境界標がモチーフ。形は src/components/LineMark.astro）
 //   color  : 路線カラー（色だけに頼らず、code と mark も必ず一緒に表示します）
-//   isKiso : true なら「基礎解説」コーナーに並びます
+//   isKiso : true なら「基礎知識」のページに並びます
 export const LINES = [
   { id: 'kyokai', name: '境界について', short: '境界', code: 'K', mark: 'stake', color: '#c4122f', isKiso: false },
   { id: 'toki', name: '登記について', short: '登記', code: 'R', mark: 'plate', color: '#0a7d3e', isKiso: false },
@@ -13,7 +13,7 @@ export const LINES = [
   { id: 'kiki', name: '測量ツールについて', short: 'ツール', code: 'E', mark: 'byo', color: '#be185d', isKiso: false },
   { id: 'seido', name: '制度・法改正について', short: '制度', code: 'H', mark: 'yajirushi', color: '#0b62b4', isKiso: false },
   { id: 'shiken', name: '調査士試験について', short: '調査士試験', code: 'T', mark: 'shinchu', color: '#0f766e', isKiso: false },
-  { id: 'kiso', name: '基礎解説', short: '基礎', code: 'B', mark: 'kokuin', color: '#6d28a8', isKiso: true },
+  { id: 'kiso', name: '基礎知識について', short: '基礎', code: 'B', mark: 'kokuin', color: '#6d28a8', isKiso: true },
 ] as const;
 
 export type LineId = (typeof LINES)[number]['id'];
