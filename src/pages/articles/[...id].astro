@@ -7,26 +7,42 @@ import LineBadge from '../../components/LineBadge.astro';
 import LevelBadge from '../../components/LevelBadge.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { getLine } from '../../data/lines';
-import { getPublishedArticles, formatDate, isoDate, isKiso, type Article } from '../../data/articles';
+import { getPublishedArticles, buildTracks, formatDate, isoDate, isKiso, type Article } from '../../data/articles';
 
 export async function getStaticPaths() {
   const articles = await getPublishedArticles(); // 新しい順
+  const tracks = buildTracks(articles);
   return articles.map((article) => {
-    // となりの駅：左＝ターミナル側（1つ新しい記事。いちばん新しい記事なら路線のページ）、右＝1つ古い記事（いちばん古い記事なら終点）
-    const same = articles.filter((a) => a.data.category === article.data.category);
-    const i = same.findIndex((a) => a.id === article.id);
-    const older = same[i + 1];
-    const newer = same[i - 1];
-    return { params: { id: article.id }, props: { article, older, newer } };
+    // となりの駅
+    //   本線の記事：左＝1つ新しい記事（いちばん新しい記事なら路線のページ）、右＝1つ古い記事（いちばん古い記事は終点）
+    //   支線の記事：左＝支線の1つ前（いちばん最初なら分かれ元の記事）、右＝支線の次
+    let toward: Article | undefined; // 左（ターミナル側）
+    let away: Article | undefined; // 右（先へ進む）
+    const parent = tracks.parentOf(article);
+    if (parent) {
+      const branch = tracks.branchOf(parent.id);
+      const i = branch.findIndex((a) => a.id === article.id);
+      toward = i === 0 ? parent : branch[i - 1];
+      away = branch[i + 1];
+    } else {
+      const main = tracks.main(article.data.category);
+      const i = main.findIndex((a) => a.id === article.id);
+      toward = main[i - 1];
+      away = main[i + 1];
+    }
+    const branchStart = tracks.branchOf(article.id)[0]; // この記事から分かれる支線の最初の駅
+    return { params: { id: article.id }, props: { article, toward, away, branchStart, parent } };
   });
 }
 
 interface Props {
   article: Article;
-  older?: Article;
-  newer?: Article;
+  toward?: Article;
+  away?: Article;
+  branchStart?: Article;
+  parent?: Article;
 }
-const { article, older, newer } = Astro.props;
+const { article, toward, away, branchStart, parent } = Astro.props;
 const toNb = (a?: Article) => (a ? { label: a.data.title, href: `/articles/${a.id}/` } : undefined);
 const { data } = article;
 const line = getLine(data.category);
@@ -38,7 +54,14 @@ const isKiki = data.category === 'kiki' && data.product;
 const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 ---
 <BaseLayout title={data.title} description={data.summary} type="article">
-  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} prev={toNb(newer) ?? { label: line.name, href: `/category/${line.id}/` }} next={toNb(older)} />
+  <StationSign
+    kicker={parent ? `${line.code}線 ${line.short}｜支線` : `${line.code}線 ${line.short}`}
+    title={data.title}
+    color={line.color}
+    prev={toNb(toward) ?? { label: line.name, href: `/category/${line.id}/` }}
+    next={toNb(away)}
+    branch={toNb(branchStart)}
+  />
 
   {data.sample && (
     <aside class="notice notice--sample">

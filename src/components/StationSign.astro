@@ -1,6 +1,7 @@
 ---
 // 駅名標（駅の看板）風の見出し
 // 左右の「となりの駅」は、href を付けると押して移動できます。
+// branch を渡すと、その駅から分かれる「支線」の案内を出します。
 export type Neighbor = string | { label: string; href?: string };
 
 interface Props {
@@ -11,8 +12,9 @@ interface Props {
   prev?: Neighbor; // 左の「となりの駅」
   next?: Neighbor; // 右の「となりの駅」
   bars?: string[]; // 帯を複数の色に分けるとき（ターミナル駅のトップで使う）
+  branch?: { label: string; href: string }; // この駅から分かれる支線の最初の駅
 }
-const { title, kicker, sub, color, prev, next, bars } = Astro.props;
+const { title, kicker, sub, color, prev, next, bars, branch } = Astro.props;
 const norm = (n?: Neighbor) => (n === undefined ? undefined : typeof n === 'string' ? { label: n } : n);
 const p = norm(prev);
 const n = norm(next);
@@ -43,5 +45,11 @@ const n = norm(next);
           : <span aria-hidden="true">{n.label} →</span>)}
       </span>
     </nav>
+  )}
+  {branch && (
+    <p class="station-sign__branch">
+      <span class="station-sign__branch-label">支線</span>
+      <a href={branch.href}><span class="visually-hidden">支線の駅：</span>{branch.label}<span aria-hidden="true"> ↘</span></a>
+    </p>
   )}
 </header>

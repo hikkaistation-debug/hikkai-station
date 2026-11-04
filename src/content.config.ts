@@ -20,6 +20,10 @@ const articles = defineCollection({
       comment: z.string(), // 一言コメント
       tags: z.array(z.string()).default([]), // タグ（任意）
       relatedLines: z.array(z.enum(LINE_IDS)).default([]), // 関連する駅（路線）（任意）
+      station: z.string().optional(), // 路線図に出す短い駅名（任意。なければタイトルを短くして使う）
+      // ▼ 支線：ある記事から枝分かれしたシリーズ記事にするとき（任意）
+      branchFrom: z.string().optional(), // 分かれ元の記事のファイル名（.md を除く）
+      branchOrder: z.number().optional(), // 支線の中での順番（1, 2, 3…。なければ公開日の古い順）
       // ▼ 測量ツール（category: kiki）の記事だけ書く項目
       product: z
         .object({

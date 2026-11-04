@@ -381,3 +381,63 @@ main { padding-bottom: 1rem; }
 .site-map__group h3 { margin: 0.8rem 0 0.2rem; font-size: 1rem; }
 .site-map .route-map a { align-items: center; }
 .site-map__lines { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+/* ---------- 駅名標の「支線」 ---------- */
+.station-sign__branch {
+  display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; min-width: 0;
+  margin: 0; padding: 0.35rem 0.4rem; border-top: 1px dashed var(--line); font-size: 0.85rem;
+}
+.station-sign__branch-label {
+  flex: none; font-size: 0.75rem; font-weight: 800; color: #fff; background: var(--navy); border-radius: 4px; padding: 0 0.4rem;
+}
+.station-sign__branch a {
+  color: var(--ink); font-weight: 800; text-decoration: underline dotted; text-underline-offset: 0.25em;
+  padding: 0.15rem 0.35rem; border-radius: 6px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.station-sign__branch a:hover { background: var(--sign-yellow); color: var(--navy); }
+
+/* ---------- 路線図 ---------- */
+.rosen { margin: 1.5rem 0; }
+.rosen__terminal {
+  text-align: center; background: var(--navy); color: #fff; border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0.9rem 1rem 0; position: relative;
+}
+.rosen__terminal a { color: #fff; font-size: 1.4rem; font-weight: 900; letter-spacing: 0.08em; text-decoration: none; }
+.rosen__terminal a:hover { color: var(--sign-yellow); }
+.rosen__terminal span { display: block; font-size: 0.8rem; color: var(--sign-yellow); font-weight: 700; letter-spacing: 0.2em; margin: 0.1rem 0 0.7rem; }
+.rosen__terminal-bar { display: flex; height: 10px; margin: 0 -1rem; }
+.rosen__terminal-bar i { flex: 1; }
+.rosen__lines {
+  display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  background: var(--card); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--radius) var(--radius); padding: 1rem;
+}
+.rosen-line__head { margin: 0 0 0.4rem; font-size: 1rem; }
+.rosen-track { list-style: none; margin: 0; padding: 0 0 0 1.7rem; position: relative; }
+.rosen-stop { position: relative; padding: 0.3rem 0; line-height: 1.5; }
+/* 駅と駅のあいだの線（最後の駅＝終点からは線を出さない） */
+.rosen-stop::after {
+  content: ''; position: absolute; left: -1.27rem; top: 0.9rem; bottom: -0.65rem; width: 7px; background: var(--c); z-index: 0;
+}
+.rosen-stop:last-child::after { display: none; }
+.rosen-stop::before {
+  content: ''; position: absolute; left: -1.43rem; top: 0.55rem; width: 0.85rem; height: 0.85rem; z-index: 1;
+  background: #fff; border: 3px solid var(--c); border-radius: 50%;
+}
+.rosen-stop > a { color: var(--ink); font-weight: 700; text-decoration: none; font-size: 0.92rem; }
+.rosen-stop > a:hover { text-decoration: underline; }
+.rosen-stop--gate > a { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--c); font-weight: 800; }
+.rosen-stop--gate::before { border-radius: 3px; background: var(--c); }
+.rosen-stop--end::before { width: 1rem; height: 1rem; left: -1.5rem; border-width: 4px; }
+.rosen-stop--soon span { color: var(--ink-soft); font-size: 0.85rem; }
+.rosen-stop--soon::before { border-style: dashed; }
+.rosen-end { white-space: nowrap; margin-left: 0.4rem; font-size: 0.72rem; font-weight: 800; color: #fff; background: var(--c); border-radius: 4px; padding: 0 0.35rem; }
+/* 支線：駅から右下へ枝分かれ */
+.rosen-branch { position: relative; margin: 0.3rem 0 0.2rem 0.4rem; padding-left: 0.2rem; }
+.rosen-branch::before {
+  content: ''; position: absolute; left: -1.2rem; top: -0.55rem; width: 1.5rem; height: 1rem;
+  border-left: 4px solid var(--c); border-bottom: 4px solid var(--c); border-bottom-left-radius: 10px;
+}
+.rosen-branch__label { display: inline-block; font-size: 0.72rem; font-weight: 800; color: var(--c); border: 2px solid var(--c); border-radius: 4px; padding: 0 0.35rem; margin-left: 0.4rem; }
+.rosen-track--branch { margin-top: 0.2rem; }
+.rosen-track--branch .rosen-stop::after { width: 4px; left: -1.1rem; }
+.rosen-track--branch .rosen-stop::before { width: 0.7rem; height: 0.7rem; left: -1.33rem; border-width: 2.5px; }

@@ -7,7 +7,7 @@ import ArticleCard from '../../components/ArticleCard.astro';
 import ListControls from '../../components/ListControls.astro';
 import LineBadge from '../../components/LineBadge.astro';
 import { LINES, getLine } from '../../data/lines';
-import { getPublishedArticles } from '../../data/articles';
+import { getPublishedArticles, buildTracks } from '../../data/articles';
 import { TERMINAL } from '../../data/site';
 
 export function getStaticPaths() {
@@ -18,8 +18,8 @@ const { id } = Astro.params;
 const line = getLine(id!);
 const all = await getPublishedArticles();
 const articles = all.filter((a) => a.data.category === line.id);
-// となりの駅：左＝ターミナル（筆界ステーション）、右＝この路線のいちばん新しい記事
-const newest = articles[0];
+// となりの駅：左＝ターミナル（筆界ステーション）、右＝この路線の本線でいちばん新しい記事
+const newest = buildTracks(all).main(line.id)[0];
 const relatedKiki =
   line.id === 'kiki' ? [] : all.filter((a) => a.data.category === 'kiki' && a.data.relatedLines.includes(line.id));
 ---

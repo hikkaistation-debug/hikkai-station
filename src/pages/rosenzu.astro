@@ -1,0 +1,68 @@
+---
+// 路線図：ターミナル（筆界ステーション）から、路線ごとに記事（駅）がつながる様子を表示します。
+// 本線は新しい記事から古い記事へ、支線は分かれ元の記事から枝分かれして表示します。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import LineBadge from '../components/LineBadge.astro';
+import LineMark from '../components/LineMark.astro';
+import { LINES } from '../data/lines';
+import { TERMINAL } from '../data/site';
+import { getPublishedArticles, buildTracks, stationName, articleHref, type Article } from '../data/articles';
+
+const all = await getPublishedArticles();
+const tracks = buildTracks(all);
+const lines = LINES.map((l) => ({ line: l, main: tracks.main(l.id) }));
+const branchOf = (a: Article) => tracks.branchOf(a.id);
+---
+<BaseLayout title="路線図" description="筆界ステーションの記事が、路線ごとにどうつながっているかを、駅の路線図のように表示します。">
+  <StationSign kicker="駅の施設" title="路線図" sub="ROUTE MAP" prev={TERMINAL} />
+
+  <p>
+    筆界ステーションから出ている路線と、その駅（記事）のつながりです。ターミナルに近いほど新しい記事、先へ進むほど古い記事です。
+    枝分かれしている線は「支線」で、ひとつの話題をくわしく続けた記事のまとまりです。駅名を押すと、その記事へ移動します。
+  </p>
+
+  <div class="rosen">
+    <div class="rosen__terminal">
+      <a href="/">筆界ステーション</a>
+      <span>ターミナル駅</span>
+      <div class="rosen__terminal-bar" aria-hidden="true">
+        {LINES.map((l) => <i style={`background:${l.color}`}></i>)}
+      </div>
+    </div>
+
+    <div class="rosen__lines">
+      {lines.map(({ line, main }) => (
+        <section class="rosen-line" style={`--c:${line.color}`} aria-label={`${line.name}の路線図`}>
+          <h2 class="rosen-line__head"><LineBadge id={line.id} link /></h2>
+          <ol class="rosen-track">
+            <li class="rosen-stop rosen-stop--gate">
+              <a href={`/category/${line.id}/`}><LineMark mark={line.mark} /> {line.short}の入口</a>
+            </li>
+            {main.length === 0 && (
+              <li class="rosen-stop rosen-stop--soon"><span>準備中</span></li>
+            )}
+            {main.map((a, i) => (
+              <li class={`rosen-stop${i === main.length - 1 ? ' rosen-stop--end' : ''}`}>
+                <a href={articleHref(a)} title={a.data.title}>{stationName(a, 14)}</a>
+                {i === main.length - 1 && <small class="rosen-end">終点</small>}
+                {branchOf(a).length > 0 && (
+                  <div class="rosen-branch">
+                    <span class="rosen-branch__label">支線</span>
+                    <ol class="rosen-track rosen-track--branch">
+                      {branchOf(a).map((b, j, arr) => (
+                        <li class={`rosen-stop${j === arr.length - 1 ? ' rosen-stop--end' : ''}`}>
+                          <a href={articleHref(b)} title={b.data.title}>{stationName(b, 14)}</a>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
