@@ -1,0 +1,291 @@
+---
+// X 投稿チェックのページ（手元の確認用画面だけ。本物のサイトには作られません）
+// アドレス：http://localhost:4321/x-check/
+// 小説の投稿文（brand/x/stories/<日付>/kakueki-NN.txt）と画像を並べ、
+// 「投稿済み」「投稿文・画像のチェック（OK／直してほしい＋メモ）」を review/x-check.json に自動保存します
+// （astro.config.mjs の xCheck）。
+import fs from 'node:fs';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { p: undefined } }] : [];
+}
+
+const dir = new URL('../../../brand/x/stories/', import.meta.url);
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+const stories = (await getCollection('stories', ({ data }) => data.train === 'kakueki' && !data.draft)).sort(
+  (a, b) => a.data.no - b.data.no,
+);
+const items = stories.map((s) => {
+  const pub = s.data.pubDate.toISOString().slice(0, 10);
+  const nn = String(s.data.no).padStart(2, '0');
+  const folder = new URL(`${pub}/`, dir);
+  const txtUrl = new URL(`kakueki-${nn}.txt`, folder);
+  let body = '';
+  let imgs: string[] = [];
+  if (fs.existsSync(txtUrl)) {
+    const t = fs.readFileSync(txtUrl, 'utf8').replace(/\r\n/g, '\n');
+    body = (t.split(/■ 本文[^\n]*\n/)[1] ?? '').split('\n\n■')[0].trim();
+    imgs = fs
+      .readdirSync(folder)
+      .filter((f) => f.startsWith(`kakueki-${nn}-`) && f.endsWith('.png'))
+      .sort();
+  }
+  const [y, m, d] = pub.split('-').map(Number);
+  const wd = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  return { id: s.id, no: s.data.no, title: s.data.title, pub, date: `${m}/${d}（${wd}）`, body, imgs };
+});
+---
+<BaseLayout title="X投稿チェック（手元だけ）" description="X の投稿文の確認用ページ">
+  <StationSign kicker="手元だけのページ" title="X投稿チェック" sub="X POST CHECK" color="#4d7c0f" prev={TERMINAL} />
+
+  <aside class="notice notice--sample">
+    <p class="notice__title">このページは、手元の確認用画面だけにあります</p>
+    <p>各駅停車の投稿文と画像です。「コピー」で本文をコピーして、画像（同じ日付のフォルダ）をつけて予約投稿してください。予約・投稿したら「Xに予約・投稿した」にチェックを入れると、次からは隠れます。投稿文や画像を直してほしいときは「直してほしい」を選んでメモを書き、下の「ここまでを Claude に渡す」を押してください。選んだ結果は、このパソコンの中に自動で保存されます。</p>
+  </aside>
+
+  <div class="xc-top">
+    <p class="xc-summary" id="xc-summary">全{items.length}話</p>
+    <label class="xc-showall"><input type="checkbox" id="xc-showall" /> 投稿済みも表示する</label>
+  </div>
+
+  <ol class="xc-list">
+    {items.map((it) => (
+      <li class="xc-item" data-id={it.id} data-no={it.no} data-title={it.title}>
+        <div class="xc-head">
+          <span class="xc-date">{it.date} 6:00</span>
+          <span class="xc-next" hidden>次に投稿</span>
+          <h2 class="xc-title">第{it.no}話「{it.title}」</h2>
+          <a href={`/yomimono/${it.id}/`} target="_blank" rel="noopener" class="xc-read">サイトで読む</a>
+        </div>
+        {it.body ? (
+          <>
+            <pre class="xc-body">{it.body}</pre>
+            <div class="xc-actions">
+              <button type="button" class="xc-copy">コピー</button>
+              <span class="xc-folder">画像{it.imgs.length}枚：brand/x/stories/{it.pub}/</span>
+            </div>
+            <div class="xc-imgs">
+              {it.imgs.map((f) => (
+                <a href={`/__xstories/${it.pub}/${f}`} target="_blank" rel="noopener">
+                  <img src={`/__xstories/${it.pub}/${f}`} alt={f} loading="lazy" width="108" height="135" />
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p class="xc-missing">投稿文と画像がまだありません（Claude に「第{it.no}話のX用画像を作って」と頼んでください）。</p>
+        )}
+        <label class="xc-posted"><input type="checkbox" class="xc-posted-box" /> Xに予約・投稿した</label>
+        <fieldset class="xc-status">
+          <legend>投稿文・画像のチェック</legend>
+          <label><input type="radio" name={`s-${it.id}`} value="" checked /> まだ</label>
+          <label><input type="radio" name={`s-${it.id}`} value="ok" /> OK</label>
+          <label><input type="radio" name={`s-${it.id}`} value="fix" /> 直してほしい</label>
+        </fieldset>
+        <label class="xc-note">
+          直してほしいところ（任意）
+          <textarea rows="2" placeholder="例：1行目を「〇〇」に／2枚目の画像の文字が…"></textarea>
+        </label>
+      </li>
+    ))}
+  </ol>
+
+  <div class="xc-bar">
+    <p class="xc-saved" id="xc-saved" aria-live="polite"></p>
+    <button type="button" class="xc-handoff-btn" id="xc-handoff-btn">ここまでを Claude に渡す</button>
+  </div>
+
+  <section class="xc-handoff" id="xc-handoff" hidden aria-live="polite">
+    <p class="xc-handoff__result" id="xc-handoff-result"></p>
+    <label class="xc-handoff__label">
+      Claude に送る文（チャットに貼り付けて送ってください）
+      <textarea id="xc-handoff-text" rows="7" readonly></textarea>
+    </label>
+  </section>
+</BaseLayout>
+
+<style>
+  .xc-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .xc-summary { font-weight: 700; margin: 0; }
+  .xc-showall { font-weight: 700; cursor: pointer; }
+  .xc-list { list-style: none; padding: 0; display: grid; gap: 0.9rem; margin-top: 0.8rem; }
+  .xc-item { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .xc-item[data-status='ok'] { border-left-color: #1a7f37; }
+  .xc-item[data-status='fix'] { border-left-color: #c4122f; }
+  .xc-item[data-posted='true'] { opacity: 0.6; }
+  .xc-item[data-hide='true'] { display: none; }
+  .xc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; }
+  .xc-date { font-weight: 800; color: #c4122f; }
+  .xc-next { background: #4d7c0f; color: #fff; font-size: 0.8rem; font-weight: 700; border-radius: 999px; padding: 0.1rem 0.6rem; }
+  .xc-title { font-size: 1.05rem; margin: 0; }
+  .xc-read { font-size: 0.85rem; }
+  .xc-body { white-space: pre-wrap; background: #f7f6f2; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; font: inherit; font-size: 0.95rem; line-height: 1.7; margin: 0.6rem 0 0.4rem; color: #1a1d24; }
+  .xc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; }
+  .xc-copy { font: inherit; font-weight: 700; color: #fff; background: #1f2a44; border: 0; border-radius: 999px; padding: 0.4rem 1.2rem; cursor: pointer; }
+  .xc-copy.is-done { background: #1a7f37; }
+  .xc-folder { font-size: 0.8rem; color: var(--ink-soft); }
+  .xc-imgs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .xc-imgs img { display: block; width: 108px; height: auto; border: 1px solid var(--line); border-radius: 4px; }
+  .xc-missing { color: #c4122f; font-weight: 700; }
+  .xc-posted { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.6rem; font-weight: 800; cursor: pointer; }
+  .xc-status { border: 0; padding: 0; margin: 0.4rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; }
+  .xc-status legend { font-size: 0.85rem; color: var(--ink-soft); padding: 0; margin-bottom: 0.2rem; }
+  .xc-status label { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 700; cursor: pointer; }
+  .xc-note { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+  .xc-note textarea, .xc-handoff__label textarea { display: block; width: 100%; margin-top: 0.25rem; font: inherit; font-size: 0.95rem; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0.45rem 0.6rem; box-sizing: border-box; }
+  .xc-bar { position: sticky; bottom: 0.5rem; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.4rem 0.8rem; margin-top: 1rem; padding: 0.5rem 0.7rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); }
+  .xc-saved { margin: 0; font-size: 0.85rem; color: var(--ink-soft); }
+  .xc-handoff-btn { font: inherit; font-weight: 700; color: #fff; background: #1f2a44; border: 0; border-radius: 999px; padding: 0.5rem 1.1rem; cursor: pointer; }
+  .xc-handoff { margin-top: 0.8rem; background: var(--card); border: 1px solid var(--line); border-left: 8px solid #1f2a44; border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .xc-handoff[data-ok='false'] { border-left-color: #c4122f; }
+  .xc-handoff__result { font-weight: 700; margin: 0 0 0.5rem; white-space: pre-line; }
+  .xc-handoff__label { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+</style>
+
+<script>
+  type Entry = { no: number; title: string; posted: boolean; status: '' | 'ok' | 'fix'; note: string; updated: string };
+  const items = [...document.querySelectorAll<HTMLLIElement>('.xc-item')];
+  const savedEl = document.getElementById('xc-saved')!;
+  const summaryEl = document.getElementById('xc-summary')!;
+  const showAll = document.getElementById('xc-showall') as HTMLInputElement;
+  let state: Record<string, Entry> = {};
+
+  const read = (li: HTMLLIElement): Entry => ({
+    no: Number(li.dataset.no),
+    title: li.dataset.title ?? '',
+    posted: li.querySelector<HTMLInputElement>('.xc-posted-box')!.checked,
+    status: (li.querySelector<HTMLInputElement>('input[type=radio]:checked')?.value ?? '') as Entry['status'],
+    note: li.querySelector<HTMLTextAreaElement>('.xc-note textarea')!.value.trim(),
+    updated: new Date().toISOString(),
+  });
+
+  const paint = () => {
+    let posted = 0, ok = 0, fix = 0, nextMarked = false;
+    for (const li of items) {
+      const e = read(li);
+      li.dataset.status = e.status;
+      li.dataset.posted = String(e.posted);
+      li.dataset.hide = String(e.posted && !showAll.checked);
+      const next = !e.posted && !nextMarked;
+      if (next) nextMarked = true;
+      li.querySelector<HTMLElement>('.xc-next')!.hidden = !next;
+      if (e.posted) posted++;
+      else if (e.status === 'ok') ok++;
+      else if (e.status === 'fix') fix++;
+    }
+    const rest = items.length - posted;
+    summaryEl.textContent = `全${items.length}話：投稿済み ${posted}話／まだ投稿していない ${rest}話（OK ${ok}・直してほしい ${fix}・チェックまだ ${rest - ok - fix}）`;
+  };
+
+  const post = () => fetch('/__xcheck', { method: 'POST', body: JSON.stringify(state) });
+  let timer: number | undefined;
+  const save = () => {
+    window.clearTimeout(timer);
+    savedEl.textContent = '保存中…';
+    timer = window.setTimeout(async () => {
+      try {
+        const res = await post();
+        savedEl.textContent = res.ok ? `保存しました（${new Date().toLocaleTimeString('ja-JP')}）` : '保存できませんでした';
+      } catch {
+        savedEl.textContent = '保存できませんでした（確認用画面が止まっているかもしれません）';
+      }
+    }, 500);
+  };
+  const onChange = (li: HTMLLIElement) => {
+    state[li.dataset.id!] = read(li);
+    paint();
+    save();
+  };
+
+  // コピー
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('.xc-copy')) {
+    btn.addEventListener('click', async () => {
+      const text = btn.closest('.xc-item')!.querySelector('.xc-body')!.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = 'コピーしました';
+        btn.classList.add('is-done');
+        window.setTimeout(() => {
+          btn.textContent = 'コピー';
+          btn.classList.remove('is-done');
+        }, 2500);
+      } catch {
+        btn.textContent = 'コピーできませんでした（本文をなぞってコピー）';
+      }
+    });
+  }
+
+  showAll.addEventListener('change', paint);
+
+  // 「ここまでを Claude に渡す」
+  const handoffBtn = document.getElementById('xc-handoff-btn') as HTMLButtonElement;
+  const handoffBox = document.getElementById('xc-handoff')!;
+  const handoffResult = document.getElementById('xc-handoff-result')!;
+  const handoffText = document.getElementById('xc-handoff-text') as HTMLTextAreaElement;
+  handoffBtn.addEventListener('click', async () => {
+    window.clearTimeout(timer);
+    for (const li of items) state[li.dataset.id!] = read(li);
+    let saved: Record<string, Entry> = {};
+    try {
+      if (!(await post()).ok) throw new Error();
+      saved = await (await fetch('/__xcheck', { cache: 'no-store' })).json();
+    } catch {
+      handoffBox.hidden = false;
+      handoffBox.dataset.ok = 'false';
+      handoffResult.textContent = '保存できませんでした。確認用画面（npm run dev）が止まっているかもしれません。';
+      return;
+    }
+    savedEl.textContent = `保存しました（${new Date().toLocaleTimeString('ja-JP')}）`;
+    const lines: string[] = [];
+    const mismatch: string[] = [];
+    for (const li of items) {
+      const e = read(li);
+      const f = saved[li.dataset.id!];
+      if (!f || f.posted !== e.posted || f.status !== e.status || (f.note ?? '') !== e.note) mismatch.push(`第${e.no}話`);
+      if (e.status === 'fix') lines.push(`・第${e.no}話「${e.title}」→ 直してほしい${e.note ? `：${e.note.replace(/\s+/g, ' ')}` : ''}`);
+    }
+    const posted = items.filter((li) => read(li).posted).map((li) => li.dataset.no);
+    handoffText.value = [
+      'X投稿チェックの結果です。review/x-check.json を見て、「直してほしい」を直してください。',
+      `投稿済み：${posted.length ? `第${posted.join('・')}話` : 'なし'}`,
+      ...(lines.length ? lines : ['（直してほしいものはありません）']),
+    ].join('\n');
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(handoffText.value);
+      copied = true;
+    } catch {}
+    handoffBox.hidden = false;
+    handoffBox.dataset.ok = String(mismatch.length === 0);
+    handoffResult.textContent =
+      (mismatch.length === 0 ? '✓ ファイルに保存されていることを確かめました。' : `⚠ 画面とファイルが一致しません：${mismatch.join('、')}。もう一度押してください。`) +
+      '\n' +
+      (copied ? '送る文をコピーしました。Claude のチャットに貼り付けて送ってください。' : '下の欄の文をコピーして、Claude のチャットに貼り付けてください。');
+    handoffText.select();
+  });
+
+  (async () => {
+    try {
+      state = await (await fetch('/__xcheck')).json();
+    } catch {
+      state = {};
+    }
+    for (const li of items) {
+      const e = state[li.dataset.id!];
+      if (e) {
+        li.querySelector<HTMLInputElement>('.xc-posted-box')!.checked = !!e.posted;
+        const r = li.querySelector<HTMLInputElement>(`input[type=radio][value="${e.status ?? ''}"]`);
+        if (r) r.checked = true;
+        li.querySelector<HTMLTextAreaElement>('.xc-note textarea')!.value = e.note ?? '';
+      }
+      li.querySelector('.xc-posted-box')!.addEventListener('change', () => onChange(li));
+      li.querySelectorAll('input[type=radio]').forEach((r) => r.addEventListener('change', () => onChange(li)));
+      li.querySelector('.xc-note textarea')!.addEventListener('input', () => onChange(li));
+    }
+    paint();
+  })();
+</script>
