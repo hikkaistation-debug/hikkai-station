@@ -617,3 +617,11 @@ main { padding-bottom: 1rem; }
   .coord-table .c-name { width: 4em; }
   .coord-table .c-x, .coord-table .c-y { width: 6.5em; }
 }
+/* 法令ナビ・通達ナビの絞り込み */
+.navi-filter__q { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 1rem 0 0.6rem; }
+.navi-filter__q label { font-weight: 800; }
+.navi-filter__q input { font: inherit; font-size: 1.05rem; padding: 0.4rem 0.7rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; flex: 1; min-width: 14em; max-width: 30em; }
+.law-num { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); margin-left: 0.3rem; }
+.tsutatsu__links { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0.4rem 0 0; font-size: 0.92rem; font-weight: 700; }
+.tsutatsu:target { box-shadow: 0 0 0 3px var(--sign-yellow); border-color: var(--navy); }
+.tsutatsu { scroll-margin-top: 1rem; }

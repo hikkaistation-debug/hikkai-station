@@ -4,10 +4,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
 import { TERMINAL } from '../../data/site';
-import { sortedTsutatsu, TSUTATSU_FIELDS, wareki } from '../../data/tsutatsu';
+import NaviFilter from '../../components/NaviFilter.astro';
+import { sortedTsutatsu, wareki } from '../../data/tsutatsu';
 
 const list = sortedTsutatsu();
-const fields = TSUTATSU_FIELDS.filter((f) => list.some((t) => t.fields.includes(f)));
+const used = [...new Set(list.flatMap((t) => t.fields))];
 ---
 <BaseLayout title="通達ナビ" description="登記に関する法務省の通達を、分野やキーワードで探せるコーナーです。名称・日付・番号と公式の本文へのリンクをまとめています。">
   <StationSign title="通達ナビ" sub="CIRCULARS" prev={TERMINAL} />
@@ -17,22 +18,11 @@ const fields = TSUTATSU_FIELDS.filter((f) => list.some((t) => t.fields.includes(
     本文は転載せず、公式の資料（法務省など）へのリンクで紹介します。少しずつ増やしていきます。
   </p>
 
-  <div class="list-controls" id="tsutatsu-controls">
-    <div class="list-controls__group" role="group" aria-label="分野でしぼりこむ">
-      <span class="list-controls__label">分野</span>
-      <button type="button" data-field="" aria-pressed="true">すべて</button>
-      {fields.map((f) => <button type="button" data-field={f} aria-pressed="false">{f}</button>)}
-    </div>
-    <div class="list-controls__group">
-      <label class="list-controls__label" for="tsutatsu-q">キーワード</label>
-      <input type="search" id="tsutatsu-q" placeholder="例）相続人申告、住所" />
-    </div>
-  </div>
-  <p id="tsutatsu-count" aria-live="polite">{list.length}件</p>
+  <NaviFilter used={used} />
 
-  <ul class="tsutatsu-list">
+  <ul class="tsutatsu-list navi-list">
     {list.map((t) => (
-      <li class="tsutatsu" data-fields={t.fields.join('|')} data-text={`${t.title} ${t.number} ${t.summary} ${t.laws.join(' ')} ${t.fields.join(' ')}`.normalize('NFKC')}>
+      <li class="tsutatsu" data-fields={t.fields.join('|')} data-text={[t.title, t.number, wareki(t.date), t.date.slice(0, 4), t.summary, ...t.laws, ...t.fields, ...t.keywords].join(' ')}>
         <p class="tsutatsu__meta">{wareki(t.date)}付け　{t.number}</p>
         <h2 class="tsutatsu__title"><a href={`/tsutatsu/${t.id}/`}>{t.title}</a></h2>
         <p class="tsutatsu__summary">{t.summary}</p>
@@ -50,30 +40,7 @@ const fields = TSUTATSU_FIELDS.filter((f) => list.some((t) => t.fields.includes(
     <p class="tool__note">
       掲載している説明は、このサイトがまとめたものです。正確な内容は、必ずリンク先の本文でご確認ください。改正されていることもあります。
     </p>
+    <p>条文は <a href="/hourei/">法令ナビ</a> で、条文・通達・記事・用語をまとめて探すときは <a href="/search/">さがす</a> をどうぞ。</p>
   </div>
 
-  <script>
-    const items = [...document.querySelectorAll<HTMLElement>('.tsutatsu-list > li')];
-    const btns = [...document.querySelectorAll<HTMLButtonElement>('#tsutatsu-controls [data-field]')];
-    const q = document.getElementById('tsutatsu-q') as HTMLInputElement;
-    const count = document.getElementById('tsutatsu-count')!;
-    let field = '';
-    function apply() {
-      const words = q.value.normalize('NFKC').trim().split(/\s+/).filter(Boolean);
-      let n = 0;
-      items.forEach((li) => {
-        const okF = !field || li.dataset.fields!.split('|').includes(field);
-        const okQ = words.every((w) => li.dataset.text!.includes(w));
-        li.hidden = !(okF && okQ);
-        if (!li.hidden) n++;
-      });
-      count.textContent = `${n}件`;
-    }
-    btns.forEach((b) => b.addEventListener('click', () => {
-      field = b.dataset.field!;
-      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      apply();
-    }));
-    q.addEventListener('input', apply);
-  </script>
 </BaseLayout>

@@ -1,9 +1,12 @@
 // サイト内検索用のデータ
 // ・用語さくいん（言葉・よみ・説明）
 // ・記事（タイトル・要約・ひとこと・タグ・カテゴリ・本文）
+// ・法令ナビの条文、通達ナビの通達（名称・説明・分野・キーワード）
 import { getLine } from '../data/lines';
 import { getPublishedArticles, formatDate, isoDate } from '../data/articles';
 import { GLOSSARY } from '../data/glossary';
+import { HOUREI, LAWS, houreiTitle } from '../data/hourei';
+import { sortedTsutatsu, wareki } from '../data/tsutatsu';
 
 // Markdown の本文から、記号やHTMLを取りのぞいて文字だけにする
 function plainText(md: string | undefined) {
@@ -43,9 +46,25 @@ export async function GET() {
     date: formatDate(a.data.pubDate),
     dateISO: isoDate(a.data.pubDate),
   }));
+  // 法令ナビの条文
+  const laws = HOUREI.map((h) => ({
+    url: `/hourei/#${h.id}`,
+    title: houreiTitle(h),
+    summary: h.summary,
+    text: [LAWS[h.law].name, h.article, h.heading, h.summary, ...h.fields, ...h.keywords].join(' '),
+    category: '法令',
+  }));
+  // 通達ナビの通達
+  const circulars = sortedTsutatsu().map((t) => ({
+    url: `/tsutatsu/${t.id}/`,
+    title: t.title,
+    summary: `${wareki(t.date)}付け ${t.number}。${t.summary}`,
+    text: [t.title, t.number, wareki(t.date), t.summary, ...t.laws, ...t.fields, ...t.keywords].join(' '),
+    category: '通達',
+  }));
   // 関連ワード：用語とそのよみ（「ぶんぴつ」で「分筆」を含む記事も見つかるようにする）
   const synonyms = GLOSSARY.map((t) => ({ words: [t.term.replace(/（.*?）/g, ''), t.yomi] }));
-  return new Response(JSON.stringify({ terms, articles, synonyms }), {
+  return new Response(JSON.stringify({ terms, laws, circulars, articles, synonyms }), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 }

@@ -50,6 +50,13 @@ const RAW: Term[] = [
   { id: 'chousashi', term: '土地家屋調査士', yomi: 'とちかおくちょうさし', desc: '土地や建物の調査・測量をして、表示に関する登記の手続きを行う国家資格者です。境目の調査や分筆の相談先になります。',
     related: [{ label: '土地家屋調査士試験のしくみ', href: '/articles/shiken-shikumi/' }] },
   { id: 'shihoushoshi', term: '司法書士', yomi: 'しほうしょし', desc: '相続登記など、権利に関する登記の手続きを行う国家資格者です。' },
+  // 建物の認定（不動産登記規則111条）の3つの要件
+  { id: 'gaiki', term: '外気分断性', yomi: 'がいきぶんだんせい', desc: '屋根と周りの壁（またはこれに似たもの）で、外の空気からさえぎられていることです。登記できる「建物」と認められるための要件の1つです（不動産登記規則111条）。',
+    related: [{ label: '法令ナビ：不動産登記規則111条（建物）', href: '/hourei/#kisoku-111' }] },
+  { id: 'teichaku', term: '定着性', yomi: 'ていちゃくせい', desc: '土地にしっかり固定されていて、簡単に動かせないことです。登記できる「建物」と認められるための要件の1つです（不動産登記規則111条）。',
+    related: [{ label: '法令ナビ：不動産登記規則111条（建物）', href: '/hourei/#kisoku-111' }] },
+  { id: 'youto', term: '用途性', yomi: 'ようとせい', desc: '住まい・倉庫など、目的とする使い方ができる状態にあることです。登記できる「建物」と認められるための要件の1つです（不動産登記規則111条）。',
+    related: [{ label: '法令ナビ：不動産登記規則111条（建物）', href: '/hourei/#kisoku-111' }] },
 ];
 
 export const GLOSSARY = [...RAW].sort((a, b) => a.yomi.localeCompare(b.yomi, 'ja'));

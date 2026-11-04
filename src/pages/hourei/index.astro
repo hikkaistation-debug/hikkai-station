@@ -1,0 +1,54 @@
+---
+// 駅の施設「法令ナビ」：登記・境界に関係する条文を、分野・キーワードで探せる一覧
+// データは src/data/hourei.ts（条文は e-Gov の原文で確かめてから書く）
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import NaviFilter from '../../components/NaviFilter.astro';
+import { TERMINAL } from '../../data/site';
+import { HOUREI, LAWS, lawUrl, type LawKey } from '../../data/hourei';
+
+const used = [...new Set(HOUREI.flatMap((h) => h.fields))];
+const lawKeys = Object.keys(LAWS) as LawKey[];
+---
+<BaseLayout title="法令ナビ" description="不動産登記法・不動産登記規則など、登記や境界に関係する条文を、分野やキーワードで探せるコーナーです。やさしい説明と、e-Gov法令検索の原文へのリンク付き。">
+  <StationSign title="法令ナビ" sub="LAWS" prev={TERMINAL} />
+
+  <p>
+    登記や境界に関係する<strong>条文</strong>を、分野やキーワードで探せるようにまとめています。
+    説明はこのサイトがやさしく言いかえたものです。正確な内容は、リンク先の e-Gov法令検索（政府の法令データベース）の原文で確かめてください。
+  </p>
+
+  <NaviFilter used={used} placeholder="例）外気分断性、地目、過料" />
+
+  {lawKeys.map((k) => {
+    const list = HOUREI.filter((h) => h.law === k);
+    return list.length > 0 && (
+      <section aria-labelledby={`law-${k}`}>
+        <h2 id={`law-${k}`}>{LAWS[k].name}<small class="law-num">（{LAWS[k].num}）</small></h2>
+        <ul class="tsutatsu-list navi-list">
+          {list.map((h) => (
+            <li class="tsutatsu" id={h.id} data-fields={h.fields.join('|')} data-text={[LAWS[h.law].name, h.article, h.heading, h.summary, ...h.fields, ...h.keywords].join(' ')}>
+              <p class="tsutatsu__meta">{LAWS[h.law].name}</p>
+              <h3 class="tsutatsu__title">{h.article}（{h.heading}）</h3>
+              <p class="tsutatsu__summary">{h.summary}</p>
+              <p class="tsutatsu__links">
+                <a href={lawUrl(h)} rel="noopener" target="_blank">原文を読む（e-Gov）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+                {h.links?.map((l) => <a href={l.href}>{l.label}</a>)}
+              </p>
+              <ul class="tsutatsu__fields">{h.fields.map((f) => <li>{f}</li>)}</ul>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+
+  <div class="page-body">
+    <p>
+      通達は <a href="/tsutatsu/">通達ナビ</a> で、条文・通達・記事・用語をまとめて探すときは <a href="/search/">さがす</a> をどうぞ。
+    </p>
+    <p class="tool__note">
+      条文は改正されることがあります。このページの説明は、それぞれ確かめた日の内容です。個別の判断は、法務局や専門家にご相談ください。
+    </p>
+  </div>
+</BaseLayout>

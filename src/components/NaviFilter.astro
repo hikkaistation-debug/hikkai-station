@@ -1,0 +1,106 @@
+---
+// 法令ナビ・通達ナビの「分野」と「キーワード」の絞り込み
+// 使い方：一覧の <li> に data-fields="分野1|分野2" と data-text="検索用の文字" を付け、
+//         一覧の <ul> に class="navi-list" を付けて、このコンポーネントを上に置く。
+// 分野は複数えらべます（えらんだ分野の「どれか」に当てはまるものを表示）。
+// 条件はアドレス（?q=…&field=…）に残るので、そのまま共有できます。
+import { NAVI_FIELD_GROUPS } from '../data/navi';
+import { GLOSSARY } from '../data/glossary';
+// 用語さくいんの言葉とよみを関連ワードにする（「がいきぶんだんせい」→「外気分断性」）
+const synonyms = GLOSSARY.map((t) => [t.term.replace(/（.*?）/g, ''), t.yomi]);
+
+interface Props {
+  used: string[]; // 一覧で実際に使われている分野（使われていない分野のボタンは出さない）
+  placeholder?: string;
+}
+const { used, placeholder = '例）相続人申告、外気分断性' } = Astro.props;
+const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.filter((f) => used.includes(f)) })).filter((g) => g.fields.length);
+---
+<div class="navi-filter" data-synonyms={JSON.stringify(synonyms)}>
+  <div class="navi-filter__q">
+    <label for="navi-q">キーワード</label>
+    <input type="search" id="navi-q" placeholder={placeholder} />
+  </div>
+  <details class="facets" open>
+    <summary>分野でしぼりこむ<span id="navi-sel"></span></summary>
+    {groups.map((g) => (
+      <div class="facets__row">
+        <p class="facets__label">{g.title}</p>
+        <ul class="facet-chips">
+          {g.fields.map((f) => (
+            <li><button type="button" class="facet-chip facet-chip--tag" data-field={f} aria-pressed="false">{f}<span class="facet-chip__count"></span></button></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+    <p class="facets__foot"><button type="button" class="facets__clear" id="navi-clear">しぼりこみを外す</button></p>
+  </details>
+  <p id="navi-count" aria-live="polite"></p>
+</div>
+
+<script>
+  // 全角・半角、大文字・小文字、カタカナ・ひらがなの違いを気にせず探せるようにする
+  const norm = (s: string) => s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  const items = [...document.querySelectorAll<HTMLElement>('.navi-list > li')];
+  const texts = items.map((li) => norm(li.dataset.text ?? ''));
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.navi-filter [data-field]')];
+  const q = document.getElementById('navi-q') as HTMLInputElement;
+  const count = document.getElementById('navi-count')!;
+  const sel = document.getElementById('navi-sel')!;
+  const selected = new Set<string>();
+  const syn: string[][] = JSON.parse(document.querySelector<HTMLElement>('.navi-filter')!.dataset.synonyms ?? '[]').map((w: string[]) => w.map(norm));
+  // 入力した言葉と、その関連ワード（どれかに当たればよい）
+  const expand = (w: string) => [...new Set([w, ...syn.filter((ws) => ws.some((x) => x === w || (w.length >= 2 && x.includes(w)))).flat()])];
+
+  function apply() {
+    const words = norm(q.value).trim().split(/\s+/).filter(Boolean);
+    const groups = words.map(expand);
+    const byWord = items.map((_, i) => groups.every((alts) => alts.some((w) => texts[i].includes(w))));
+    const fieldsOf = (li: HTMLElement) => (li.dataset.fields ?? '').split('|');
+    let n = 0;
+    items.forEach((li, i) => {
+      const okF = selected.size === 0 || fieldsOf(li).some((f) => selected.has(f));
+      li.hidden = !(byWord[i] && okF);
+      if (!li.hidden) n++;
+    });
+    // ボタンごとの件数（キーワードに合うもののうち、その分野の件数）
+    chips.forEach((c) => {
+      const k = items.filter((li, i) => byWord[i] && fieldsOf(li).includes(c.dataset.field!)).length;
+      c.querySelector('.facet-chip__count')!.textContent = String(k);
+      c.disabled = k === 0 && !selected.has(c.dataset.field!);
+    });
+    // 法律ごとの見出しは、中身が0件なら隠す
+    document.querySelectorAll<HTMLElement>('.navi-list').forEach((ul) => {
+      const sec = ul.closest('section');
+      if (sec) sec.hidden = !ul.querySelector(':scope > li:not([hidden])');
+    });
+    count.textContent = `${n}件`;
+    sel.textContent = selected.size ? `：${selected.size}件えらび中` : '';
+    const p = new URLSearchParams();
+    if (q.value.trim()) p.set('q', q.value.trim());
+    selected.forEach((f) => p.append('field', f));
+    const s = p.toString();
+    history.replaceState(null, '', s ? `?${s}` : location.pathname);
+  }
+
+  chips.forEach((c) =>
+    c.addEventListener('click', () => {
+      const f = c.dataset.field!;
+      if (selected.has(f)) selected.delete(f); else selected.add(f);
+      c.setAttribute('aria-pressed', String(selected.has(f)));
+      apply();
+    }),
+  );
+  document.getElementById('navi-clear')!.addEventListener('click', () => {
+    selected.clear();
+    chips.forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    apply();
+  });
+  q.addEventListener('input', apply);
+
+  const params = new URLSearchParams(location.search);
+  q.value = params.get('q') ?? '';
+  params.getAll('field').forEach((f) => selected.add(f));
+  chips.forEach((c) => c.setAttribute('aria-pressed', String(selected.has(c.dataset.field!))));
+  apply();
+</script>
