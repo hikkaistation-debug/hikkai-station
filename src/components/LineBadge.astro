@@ -1,6 +1,7 @@
 ---
 // 路線（カテゴリ）バッジ。色＋アルファベット＋形の記号で、色が分かりにくくても判別できます。
 import { getLine } from '../data/lines';
+import LineMark from './LineMark.astro';
 
 interface Props {
   id: string;
@@ -13,6 +14,6 @@ const Tag = link ? 'a' : 'span';
 ---
 <Tag class="line-badge" style={`--c:${line.color}`} href={link ? `/category/${line.id}/` : undefined}>
   <span class="line-badge__code" aria-hidden="true">{line.code}</span>
-  <span class="line-badge__mark" aria-hidden="true">{line.mark}</span>
+  <span class="line-badge__mark" aria-hidden="true"><LineMark mark={line.mark} /></span>
   <span><span class="visually-hidden">カテゴリ：</span>{short ? line.short : line.name}</span>
 </Tag>

@@ -1,0 +1,28 @@
+---
+// 路線の記号（境界標・測量標がモチーフ）
+// 色が見分けにくい人のために、外の形（四角・丸・三角・枠なし）と中の印（十字・点・矢印）を組み合わせています。
+//   stake   : コンクリート杭の頭（四角＋十字）
+//   plate   : 金属プレート（四角＋矢印）
+//   sankaku : 三角点（三角＋点）
+//   byo     : 金属鋲（丸＋十字）
+//   yajirushi : 矢印杭（枠なしの矢印）
+//   shinchu : 真鍮鋲（二重丸＋点）
+//   kokuin  : 刻印の十字（十字だけ）
+import type { MarkId } from '../data/lines';
+
+interface Props {
+  mark: MarkId;
+  size?: string;
+}
+const { mark, size = '1em' } = Astro.props;
+---
+<svg class="line-mark" viewBox="0 0 20 20" width={size} height={size} aria-hidden="true" focusable="false"
+  fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  {mark === 'stake' && (<><rect x="2.5" y="2.5" width="15" height="15" rx="1.5" /><path d="M10 5.5v9M5.5 10h9" /></>)}
+  {mark === 'plate' && (<><rect x="2.5" y="2.5" width="15" height="15" rx="1.5" /><path d="M6 14l8-8M8.5 6H14v5.5" /></>)}
+  {mark === 'sankaku' && (<><path d="M10 2.5L18 17H2z" /><circle cx="10" cy="12" r="1.8" fill="currentColor" stroke="none" /></>)}
+  {mark === 'byo' && (<><circle cx="10" cy="10" r="7.5" /><path d="M10 5.5v9M5.5 10h9" /></>)}
+  {mark === 'yajirushi' && (<path d="M10 18V3M4 9l6-6 6 6" stroke-width="3" />)}
+  {mark === 'shinchu' && (<><circle cx="10" cy="10" r="7.8" /><circle cx="10" cy="10" r="4.2" stroke-width="1.6" /><circle cx="10" cy="10" r="1.6" fill="currentColor" stroke="none" /></>)}
+  {mark === 'kokuin' && (<path d="M10 2.5v15M2.5 10h15" stroke-width="3.2" />)}
+</svg>

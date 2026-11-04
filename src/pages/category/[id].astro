@@ -21,7 +21,7 @@ const relatedKiki =
   line.id === 'kiki' ? [] : all.filter((a) => a.data.category === 'kiki' && a.data.relatedLines.includes(line.id));
 ---
 <BaseLayout title={line.name} description={`「${line.name}」の記事一覧です。`}>
-  <StationSign kicker={`${line.code}線 ${line.mark}`} title={line.name} color={line.color} />
+  <StationSign kicker={`${line.code}線`} title={line.name} color={line.color} />
 
   <p><LineBadge id={line.id} /> の記事の一覧です。</p>
 

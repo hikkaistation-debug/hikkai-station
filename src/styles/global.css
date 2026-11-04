@@ -332,7 +332,17 @@ main { padding-bottom: 1rem; }
 .product-spec dt { font-weight: 800; color: var(--ink-soft); }
 .product-spec dd { margin: 0; }
 .product-note { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.6rem !important; }
-.line-list a.is-soon { opacity: 0.55; border-left-style: dashed; }
+.line-list a.is-soon { opacity: 0.55; }
 .more-button { display: block; width: 100%; margin: 0.8rem 0 0; font: inherit; font-weight: 800; padding: 0.7rem; border: 2px solid var(--navy); border-radius: var(--radius); background: #fff; color: var(--navy); cursor: pointer; }
 .more-button:hover { background: #eef2f8; }
 .more-button[hidden] { display: none; }
+
+/* ---------- 路線の記号（境界標モチーフ） ---------- */
+.line-badge__mark { display: inline-flex; align-items: center; }
+.line-badge__mark .line-mark { width: 1.05em; height: 1.05em; }
+.mark-legend { margin: 0.5rem 0 1rem; font-size: 0.9rem; }
+.mark-legend summary { cursor: pointer; font-weight: 700; color: var(--ink-soft); }
+.mark-legend ul { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.35rem; }
+@media (min-width: 760px) { .mark-legend ul { grid-template-columns: repeat(2, 1fr); } }
+.mark-legend li { display: flex; align-items: center; gap: 0.5rem; }
+.mark-legend .line-mark { width: 1.4em; height: 1.4em; color: var(--c); flex: none; }

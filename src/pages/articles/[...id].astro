@@ -28,7 +28,7 @@ const isKiki = data.category === 'kiki' && data.product;
 const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 ---
 <BaseLayout title={data.title} description={data.summary} type="article">
-  <StationSign kicker={`${line.code}線 ${line.mark} ${line.short}`} title={data.title} color={line.color} />
+  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} />
 
   {data.sample && (
     <aside class="notice notice--sample">
