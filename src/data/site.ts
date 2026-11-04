@@ -49,6 +49,7 @@ export const MENU: MenuGroup[] = [
       { href: '/tsutatsu/', label: '通達ナビ', ready: true },
       { href: '/tools/', label: '計算ツール', ready: true },
       { href: '/shindan/', label: '境界トラブル診断', ready: true },
+      { href: '/quiz/', label: '駅のクイズ', ready: true },
       { href: '/links/', label: 'リンク集', ready: true },
     ],
   },

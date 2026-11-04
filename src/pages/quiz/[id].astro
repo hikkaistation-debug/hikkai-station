@@ -1,0 +1,38 @@
+---
+// 駅のクイズ：1問ずつのページ（Xの「今日の1問」のリンク先にも使えます）
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import QuizCard from '../../components/QuizCard.astro';
+import { getQuizzes, QUIZ_LEVELS, type Quiz } from '../../data/quiz';
+import '../../styles/quiz.css';
+
+export function getStaticPaths() {
+  const list = getQuizzes();
+  return list.map((quiz, i) => ({ params: { id: quiz.id }, props: { quiz, next: list[i + 1], num: i + 1 } }));
+}
+const { quiz, next, num } = Astro.props as { quiz: Quiz; next?: Quiz; num: number };
+const pageUrl = new URL(`/quiz/${quiz.id}/`, Astro.site).href;
+const shareText = `【駅のクイズ】${quiz.q}\nあなたはわかる？ 答えと根拠の条文はこちら👇\n#筆界ステーション #クイズ`;
+const share = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+---
+<BaseLayout title={`クイズ 第${num}問：${quiz.q}`} description={`筆界・境界・登記の${QUIZ_LEVELS[quiz.level]}クイズ。答えるとすぐに解説と根拠の条文がわかります。`}>
+  <StationSign
+    kicker="駅のクイズ"
+    title={`第${num}問`}
+    prev={{ label: '駅のクイズ', href: '/quiz/' }}
+    next={next ? { label: `第${num + 1}問`, href: `/quiz/${next.id}/` } : undefined}
+  />
+
+  <QuizCard quiz={quiz} />
+
+  <p class="quiz-start__buttons">
+    <a class="tool__btn quiz-share" href={share} rel="noopener" target="_blank">この問題を X でシェア<span class="visually-hidden">（新しいタブで開きます）</span></a>
+    {next && <a class="tool__btn tool__btn--sub" href={`/quiz/${next.id}/`}>次の問題へ →</a>}
+    <a class="tool__btn tool__btn--sub" href="/quiz/">10問チャレンジ</a>
+  </p>
+</BaseLayout>
+
+<script>
+  import { setupQuizCards } from '../../scripts/quiz';
+  setupQuizCards();
+</script>

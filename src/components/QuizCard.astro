@@ -1,0 +1,57 @@
+---
+// クイズ1問分のカード（問題・選択肢・答えたあとの解説と根拠）
+// JavaScript は src/scripts/quiz.ts。答えるまで解説は隠れていて、選んだら正解・不正解と解説が出ます。
+import type { Quiz } from '../data/quiz';
+import { QUIZ_LEVELS } from '../data/quiz';
+import { HOUREI, houreiTitle, lawUrl } from '../data/hourei';
+
+interface Props {
+  quiz: Quiz;
+  num?: number; // 何問目か（10問チャレンジのとき）
+  total?: number;
+  hidden?: boolean;
+}
+const { quiz, num, total, hidden } = Astro.props;
+const basis = quiz.basis
+  .map((id) => HOUREI.find((h) => h.id === id))
+  .filter((h) => h !== undefined)
+  .map((h) => ({ title: houreiTitle(h), navi: `/hourei/#${h.id}`, egov: lawUrl(h) }));
+const isOX = quiz.choices.length === 2 && quiz.choices[0] === '○';
+---
+<article class="quiz-card" data-quiz={quiz.id} data-answer={quiz.answer} hidden={hidden}>
+  <p class="quiz-card__meta">
+    {num && total && <span class="quiz-card__num">第{num}問／{total}</span>}
+    <span class={`quiz-level quiz-level--${quiz.level}`}>{QUIZ_LEVELS[quiz.level]}</span>
+    <span class="quiz-card__kind">{isOX ? '○×' : '3択'}</span>
+    {quiz.draft && <span class="draft-badge">未チェック</span>}
+  </p>
+  <p class="quiz-card__q">{quiz.q}</p>
+  <ul class={`quiz-choices${isOX ? ' quiz-choices--ox' : ''}`}>
+    {quiz.choices.map((c, i) => (
+      <li><button type="button" class="quiz-choice" data-choice={i}>{c}</button></li>
+    ))}
+  </ul>
+  <div class="quiz-answer" hidden>
+    <p class="quiz-answer__result"></p>
+    <p class="quiz-answer__correct">正解：<strong>{quiz.choices[quiz.answer]}</strong></p>
+    <p class="quiz-answer__explain">{quiz.explain}</p>
+    <div class="quiz-answer__basis">
+      <p class="quiz-answer__label">根拠</p>
+      {quiz.basisNote && <p>{quiz.basisNote}</p>}
+      <ul>
+        {basis.map((b) => (
+          <li>
+            <a href={b.navi}>{b.title}（法令ナビ）</a>
+            ／<a href={b.egov} rel="noopener" target="_blank">原文（e-Gov）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    {quiz.links && quiz.links.length > 0 && (
+      <div class="quiz-answer__links">
+        <p class="quiz-answer__label">もっと知る</p>
+        <ul>{quiz.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+      </div>
+    )}
+  </div>
+</article>

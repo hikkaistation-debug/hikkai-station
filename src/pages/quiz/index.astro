@@ -1,0 +1,172 @@
+---
+// 駅の施設「駅のクイズ」：10問チャレンジと、全問題の一覧
+// 問題は src/data/quiz.ts。答えの根拠は法令ナビの条文（e-Gov で確認済み）。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import QuizCard from '../../components/QuizCard.astro';
+import { TERMINAL, SITE } from '../../data/site';
+import { getQuizzes, QUIZ_LEVELS } from '../../data/quiz';
+import '../../styles/quiz.css';
+
+const quizzes = getQuizzes();
+const counts = { all: quizzes.length, general: quizzes.filter((q) => q.level === 'general').length, exam: quizzes.filter((q) => q.level === 'exam').length };
+const pageUrl = new URL('/quiz/', Astro.site).href;
+---
+<BaseLayout title="駅のクイズ" description="筆界・境界・登記の○×クイズと3択クイズ。答えるとすぐに解説と根拠の条文がわかります。一般の方も、土地家屋調査士試験の受験生も、気軽にチャレンジしてください。">
+  <StationSign kicker="駅の施設" title="駅のクイズ" sub="QUIZ" prev={TERMINAL} />
+
+  <p>
+    筆界・境界・登記にまつわる「なるほど」なクイズです。答えるとすぐに解説が出て、<strong>根拠の条文</strong>も確かめられます。
+  </p>
+
+  {quizzes.length === 0 ? (
+    <p class="notice notice--soon">クイズは準備中です。もうしばらくお待ちください。</p>
+  ) : (
+    <>
+      <section class="quiz-start" id="quiz-start" aria-labelledby="start-h">
+        <h2 id="start-h">10問チャレンジ</h2>
+        <p>問題はランダムに出ます。何問正解できるかな？</p>
+        <div class="quiz-start__buttons">
+          <button type="button" class="tool__btn" data-start="all">すべての問題から（{counts.all}問）</button>
+          {counts.general > 0 && <button type="button" class="tool__btn tool__btn--sub" data-start="general">{QUIZ_LEVELS.general}だけ（{counts.general}問）</button>}
+          {counts.exam > 0 && <button type="button" class="tool__btn tool__btn--sub" data-start="exam">{QUIZ_LEVELS.exam}だけ（{counts.exam}問）</button>}
+        </div>
+      </section>
+
+      <section class="quiz-play" id="quiz-play" hidden aria-label="クイズ">
+        <div class="quiz-progress" aria-hidden="true"><span id="quiz-bar"></span></div>
+        <div id="quiz-cards">
+          {quizzes.map((q) => (
+            <div class="quiz-slot" data-level={q.level} data-id={q.id} hidden>
+              <QuizCard quiz={q} />
+            </div>
+          ))}
+        </div>
+        <div class="quiz-nav">
+          <button type="button" class="tool__btn" id="quiz-next" hidden>次の問題へ →</button>
+        </div>
+      </section>
+
+      <section class="quiz-result" id="quiz-result" hidden aria-labelledby="result-h">
+        <h2 id="result-h">結果</h2>
+        <p class="quiz-result__score"><span id="quiz-score"></span></p>
+        <p id="quiz-comment"></p>
+        <div class="quiz-start__buttons">
+          <a class="tool__btn quiz-share" id="quiz-share" href="#" rel="noopener" target="_blank">結果を X でシェア<span class="visually-hidden">（新しいタブで開きます）</span></a>
+          <button type="button" class="tool__btn tool__btn--sub" id="quiz-retry">もう一度チャレンジ</button>
+        </div>
+        <h3>答えた問題</h3>
+        <ol class="quiz-review" id="quiz-review"></ol>
+      </section>
+
+      <section aria-labelledby="list-h">
+        <h2 id="list-h">問題の一覧</h2>
+        <p>1問ずつのページもあります。気になる問題からどうぞ。</p>
+        <ol class="quiz-list">
+          {quizzes.map((q) => (
+            <li>
+              <a href={`/quiz/${q.id}/`}>{q.q}</a>
+              <span class={`quiz-level quiz-level--${q.level}`}>{QUIZ_LEVELS[q.level]}</span>
+              {q.draft && <span class="draft-badge">未チェック</span>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    </>
+  )}
+
+  <aside class="notice">
+    <p class="notice__title">クイズについて</p>
+    <p>解説は、法令の内容をやさしく言いかえたものです。正確な内容は根拠の条文でご確認ください。個別の案件の判断は、法務局や専門家にご相談ください。</p>
+  </aside>
+
+  <div id="quiz-data" data-url={pageUrl} data-site={SITE.name} hidden></div>
+</BaseLayout>
+
+<script>
+  import { setupQuizCards } from '../../scripts/quiz';
+  setupQuizCards();
+
+  const N = 10;
+  const start = document.getElementById('quiz-start');
+  if (start) {
+    const play = document.getElementById('quiz-play')!;
+    const result = document.getElementById('quiz-result')!;
+    const next = document.getElementById('quiz-next')!;
+    const bar = document.getElementById('quiz-bar')!;
+    const slots = [...document.querySelectorAll<HTMLElement>('.quiz-slot')];
+    const data = document.getElementById('quiz-data')!.dataset;
+    let order: HTMLElement[] = [];
+    let pos = 0;
+    let score = 0;
+    const log: { q: string; id: string; ok: boolean }[] = [];
+
+    const shuffle = <T,>(a: T[]) => {
+      const b = [...a];
+      for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; }
+      return b;
+    };
+    // カードを答える前の状態にもどす（もう一度チャレンジのとき）
+    function reset(slot: HTMLElement) {
+      const card = slot.querySelector<HTMLElement>('.quiz-card')!;
+      delete card.dataset.done;
+      card.querySelectorAll<HTMLButtonElement>('.quiz-choice').forEach((b) => { b.disabled = false; b.classList.remove('is-correct', 'is-wrong'); });
+      card.querySelector<HTMLElement>('.quiz-answer')!.hidden = true;
+    }
+    function show() {
+      slots.forEach((s) => (s.hidden = true));
+      const slot = order[pos];
+      slot.hidden = false;
+      const meta = slot.querySelector('.quiz-card__meta')!;
+      meta.querySelector('.quiz-card__num')?.remove();
+      const num = document.createElement('span');
+      num.className = 'quiz-card__num';
+      num.textContent = `第${pos + 1}問／${order.length}`;
+      meta.prepend(num);
+      bar.style.width = `${(pos / order.length) * 100}%`;
+      next.hidden = true;
+      slot.scrollIntoView({ block: 'nearest' });
+    }
+    function begin(level: string) {
+      const pool = slots.filter((s) => level === 'all' || s.dataset.level === level);
+      order = shuffle(pool).slice(0, N);
+      order.forEach(reset);
+      pos = 0; score = 0; log.length = 0;
+      start!.hidden = true; result.hidden = true; play.hidden = false;
+      show();
+    }
+    function finish() {
+      play.hidden = true; result.hidden = false;
+      bar.style.width = '100%';
+      const total = order.length;
+      document.getElementById('quiz-score')!.textContent = `${total}問中 ${score}問 正解！`;
+      const rate = score / total;
+      document.getElementById('quiz-comment')!.textContent =
+        rate === 1 ? '全問正解！ すばらしいです。' : rate >= 0.7 ? 'よくできました！ まちがえた問題の解説も読んでみてください。' : rate >= 0.4 ? 'まずまずです。解説と根拠の条文で、なるほどを増やしましょう。' : 'これから伸びしろたっぷりです。解説を読んで、もう一度挑戦してみてください。';
+      const text = `${data.site}の「駅のクイズ」で、${total}問中${score}問正解しました！ 筆界・境界・登記の○×＆3択クイズ\n#筆界ステーション #クイズ`;
+      (document.getElementById('quiz-share') as HTMLAnchorElement).href = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(data.url!)}`;
+      const review = document.getElementById('quiz-review')!;
+      review.replaceChildren(...log.map((l) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `/quiz/${l.id}/`;
+        a.textContent = l.q;
+        li.append(l.ok ? '⭕ ' : '❌ ', a);
+        return li;
+      }));
+      result.scrollIntoView({ block: 'start' });
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-start]').forEach((b) => b.addEventListener('click', () => begin(b.dataset.start!)));
+    play.addEventListener('quiz-answered', (e) => {
+      const { id, ok } = (e as CustomEvent).detail;
+      if (ok) score++;
+      log.push({ id, ok, q: order[pos].querySelector('.quiz-card__q')!.textContent ?? '' });
+      next.textContent = pos === order.length - 1 ? '結果を見る →' : '次の問題へ →';
+      next.hidden = false;
+      next.focus({ preventScroll: true });
+    });
+    next.addEventListener('click', () => { pos++; if (pos >= order.length) finish(); else show(); });
+    document.getElementById('quiz-retry')!.addEventListener('click', () => { result.hidden = true; start!.hidden = false; start!.scrollIntoView({ block: 'start' }); });
+  }
+</script>
