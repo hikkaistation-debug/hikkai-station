@@ -1,0 +1,255 @@
+/* 筆界ステーション 全体のデザイン
+   コンセプト：駅・路線図。見やすさ最優先、スマホファースト。 */
+
+:root {
+  --ink: #1a1d24;          /* 文字の色 */
+  --ink-soft: #464c58;     /* 補足の文字 */
+  --paper: #f7f6f2;        /* 背景 */
+  --card: #ffffff;         /* カード */
+  --line: #d5d3cc;         /* 区切り線 */
+  --navy: #1f2a44;         /* 駅の案内サインの紺 */
+  --sign-yellow: #ffd23f;  /* 案内サインの黄色（紺の上で使う） */
+  --focus: #0b62b4;
+  --radius: 10px;
+  --max: 960px;
+  font-size: 106.25%; /* 17px：大きめの文字 */
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+    'BIZ UDPGothic', 'Yu Gothic UI', 'Yu Gothic', Meiryo, 'Noto Sans JP', sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+a { color: #0a55a0; text-underline-offset: 0.2em; }
+a:hover { color: #073c72; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+img, svg { max-width: 100%; }
+
+h1, h2, h3 { line-height: 1.4; }
+h2 { font-size: 1.35rem; margin: 2rem 0 0.75rem; }
+h3 { font-size: 1.12rem; }
+
+.container { width: min(100% - 2rem, var(--max)); margin-inline: auto; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0;
+  background: var(--sign-yellow); color: var(--ink); padding: 0.5rem 1rem; z-index: 100;
+}
+.skip-link:focus { left: 0.5rem; top: 0.5rem; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ---------- ヘッダー（駅の案内サイン風） ---------- */
+.site-header { background: var(--navy); color: #fff; }
+.site-header__inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding-block: 0.75rem;
+}
+.brand { display: flex; align-items: center; gap: 0.6rem; color: #fff; text-decoration: none; }
+.brand:hover { color: #fff; }
+.brand__mark {
+  display: grid; place-items: center; width: 2.4rem; height: 2.4rem;
+  background: #fff; color: var(--navy); border-radius: 50%;
+  font-weight: 800; font-size: 1.2rem;
+}
+.brand__name { font-weight: 800; font-size: 1.15rem; letter-spacing: 0.08em; }
+.brand__sub { display: block; font-size: 0.7rem; letter-spacing: 0.2em; opacity: 0.85; font-weight: 600; }
+
+.menu-toggle {
+  background: transparent; color: #fff; border: 2px solid #fff; border-radius: 8px;
+  font: inherit; font-weight: 700; padding: 0.3rem 0.8rem; cursor: pointer;
+}
+.site-nav { background: var(--navy); border-top: 1px solid rgba(255, 255, 255, 0.2); }
+.site-nav ul { list-style: none; margin: 0 auto; padding: 0.5rem 0 1rem; }
+.site-nav a {
+  display: flex; align-items: center; gap: 0.6rem; color: #fff; text-decoration: none;
+  padding: 0.55rem 0.25rem; font-weight: 600;
+}
+.site-nav a[aria-current='page'] { color: var(--sign-yellow); }
+.site-nav .num {
+  font-size: 0.75rem; font-weight: 800; border: 2px solid currentColor; border-radius: 6px;
+  padding: 0 0.3rem; min-width: 2.2rem; text-align: center;
+}
+.site-nav .soon { font-size: 0.75rem; opacity: 0.8; }
+.site-nav[hidden] { display: none; }
+
+@media (min-width: 860px) {
+  .menu-toggle { display: none; }
+  .site-nav[hidden] { display: block; }
+  .site-nav ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; padding: 0.4rem 0; }
+  .site-nav a { padding: 0.3rem 0; font-size: 0.92rem; }
+  .site-nav .num { display: none; }
+}
+
+/* ---------- 駅名標（ページ見出し） ---------- */
+.station-sign {
+  background: var(--card); border: 2px solid var(--navy); border-radius: var(--radius);
+  margin: 1.5rem 0; overflow: hidden; text-align: center;
+}
+.station-sign__body { padding: 1.1rem 1rem 0.8rem; }
+.station-sign__kicker { font-size: 0.85rem; color: var(--ink-soft); font-weight: 700; letter-spacing: 0.15em; margin: 0; }
+.station-sign__title { margin: 0.2rem 0 0; font-size: clamp(1.45rem, 5vw, 2.1rem); letter-spacing: 0.06em; }
+.station-sign__sub { margin: 0.3rem 0 0; color: var(--ink-soft); font-size: 0.9rem; letter-spacing: 0.1em; }
+.station-sign__bar { height: 12px; background: var(--bar, var(--navy)); position: relative; }
+.station-sign__bar::after {
+  /* 駅名標の下の帯に、白い区切りの点を置く */
+  content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px;
+  background: #fff; border-radius: 50%; transform: translate(-50%, -50%);
+}
+.station-sign__neighbors {
+  display: flex; justify-content: space-between; gap: 1rem;
+  padding: 0.45rem 0.9rem; font-size: 0.85rem; color: var(--ink-soft); font-weight: 600;
+}
+
+/* ---------- 路線バッジ（駅ナンバリング風） ---------- */
+.line-badge {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  background: #fff; color: var(--ink); text-decoration: none;
+  border: 3px solid var(--c); border-radius: 8px;
+  padding: 0.05rem 0.5rem 0.05rem 0.15rem; font-size: 0.85rem; font-weight: 700; line-height: 1.6;
+}
+.line-badge__code {
+  display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.6rem;
+  background: var(--c); color: #fff; border-radius: 5px; font-weight: 800; font-size: 0.85rem;
+}
+.line-badge__mark { color: var(--c); }
+a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
+
+/* 対象バッジ */
+.level-badge {
+  display: inline-block; border-radius: 999px; padding: 0.05rem 0.7rem;
+  font-size: 0.82rem; font-weight: 700; border: 2px solid; line-height: 1.6;
+}
+.level-badge--easy { background: #e8f6ee; border-color: #0a7d3e; color: #075a2c; }
+.level-badge--normal { background: #eef2f8; border-color: #3d5a80; color: #26405f; }
+.level-badge--expert { background: #fdf0e6; border-color: #9a3d00; color: #7a3000; }
+
+.badges { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+
+/* ---------- 記事カード ---------- */
+.card-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.article-card {
+  background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--c);
+  border-radius: var(--radius); padding: 0.9rem 1rem;
+}
+.article-card__title { margin: 0.45rem 0 0.25rem; font-size: 1.1rem; }
+.article-card__title a { color: var(--ink); text-decoration: none; }
+.article-card__title a:hover { text-decoration: underline; }
+.article-card__summary { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+.article-card__meta { margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--ink-soft); }
+
+/* ---------- のりば（トップの入口） ---------- */
+.platforms { display: grid; gap: 1rem; margin: 1.5rem 0; }
+@media (min-width: 760px) { .platforms { grid-template-columns: repeat(3, 1fr); } }
+.platform {
+  display: flex; flex-direction: column; background: var(--navy); color: #fff;
+  border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; text-decoration: none;
+  border: 3px solid var(--navy); transition: transform 0.1s;
+}
+.platform:hover { color: #fff; transform: translateY(-2px); border-color: var(--sign-yellow); }
+.platform__head { display: flex; align-items: center; gap: 0.6rem; }
+.platform__num {
+  display: grid; place-items: center; width: 2.6rem; height: 2.6rem; flex: none;
+  background: var(--sign-yellow); color: var(--navy); border-radius: 50%;
+  font-weight: 900; font-size: 1.35rem;
+}
+.platform__label { display: block; font-size: 0.8rem; letter-spacing: 0.2em; opacity: 0.9; font-weight: 700; }
+.platform__title { display: block; font-size: 1.25rem; font-weight: 800; margin: 0; }
+.platform__desc { display: block; margin: 0.6rem 0 0; font-size: 0.95rem; line-height: 1.7; }
+.platform__go { margin-top: auto; padding-top: 0.6rem; font-weight: 700; color: var(--sign-yellow); }
+
+/* ---------- 路線図ナビ ---------- */
+.route-map { list-style: none; margin: 1rem 0; padding: 0; position: relative; }
+.route-map::before {
+  content: ''; position: absolute; left: 0.95rem; top: 0.8rem; bottom: 0.8rem;
+  width: 8px; background: var(--navy); border-radius: 4px;
+}
+.route-map li { position: relative; padding-left: 2.9rem; margin: 0.25rem 0; }
+.route-map li::before {
+  content: ''; position: absolute; left: 0.45rem; top: 50%; width: 1.1rem; height: 1.1rem;
+  background: #fff; border: 4px solid var(--navy); border-radius: 50%; transform: translateY(-50%);
+}
+.route-map a, .route-map span.stop {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.6rem;
+  padding: 0.55rem 0.8rem; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); text-decoration: none; color: var(--ink); font-weight: 700;
+}
+.route-map a:hover { border-color: var(--navy); }
+.route-map small { font-weight: 500; color: var(--ink-soft); }
+.route-map .is-soon span.stop { color: var(--ink-soft); background: #efeee9; }
+.route-map .is-soon::before { border-style: dashed; }
+
+/* 路線（カテゴリ）一覧 */
+.line-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.6rem; }
+@media (min-width: 760px) { .line-list { grid-template-columns: repeat(2, 1fr); } }
+.line-list a {
+  display: flex; align-items: center; gap: 0.6rem; background: var(--card);
+  border: 1px solid var(--line); border-left: 10px solid var(--c);
+  border-radius: var(--radius); padding: 0.6rem 0.8rem; color: var(--ink); text-decoration: none; font-weight: 700;
+}
+.line-list a:hover { border-color: var(--c); }
+.line-list .count { margin-left: auto; color: var(--ink-soft); font-size: 0.85rem; font-weight: 500; }
+
+/* ---------- 検索ボックス ---------- */
+.search-box { display: flex; gap: 0.5rem; margin: 1rem 0; }
+.search-box input {
+  flex: 1; min-width: 0; font: inherit; padding: 0.65rem 0.8rem;
+  border: 2px solid var(--navy); border-radius: var(--radius); background: #fff;
+}
+.search-box button {
+  font: inherit; font-weight: 700; padding: 0.65rem 1.1rem; border: 0; border-radius: var(--radius);
+  background: var(--navy); color: #fff; cursor: pointer;
+}
+.search-box button:hover { background: #2d3d61; }
+
+/* ---------- 注意書き・お知らせ ---------- */
+.notice {
+  background: #fff8db; border: 2px solid #c99a00; border-radius: var(--radius);
+  padding: 0.9rem 1rem; margin: 1.5rem 0; font-size: 0.95rem;
+}
+.notice__title { margin: 0 0 0.3rem; font-weight: 800; font-size: 1rem; }
+.notice ul { margin: 0; padding-left: 1.2rem; }
+.notice--sample { background: #ffeef0; border-color: #c4122f; }
+.notice--soon { background: #eef2f8; border-color: #3d5a80; }
+
+/* ---------- 記事本文 ---------- */
+.article-meta { color: var(--ink-soft); font-size: 0.9rem; margin: 0.5rem 0; }
+.article-box {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.1rem; margin: 1rem 0;
+}
+.article-box h2 { margin: 0 0 0.4rem; font-size: 1.05rem; display: flex; align-items: center; gap: 0.4rem; }
+.article-box p { margin: 0; }
+.article-box--comment { border-left: 8px solid var(--sign-yellow); }
+.source-link { word-break: break-all; }
+.prose { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.4rem 1.1rem 1rem; }
+.prose h2 { font-size: 1.15rem; border-bottom: 2px solid var(--line); padding-bottom: 0.25rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; margin: 1rem 0; }
+.tags li { background: #ebeae4; border-radius: 6px; padding: 0 0.55rem; font-size: 0.85rem; }
+
+.page-body { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.4rem 1.1rem 1.2rem; }
+
+/* ---------- フッター ---------- */
+.site-footer { background: var(--navy); color: #fff; margin-top: 3rem; padding: 1.5rem 0 2rem; font-size: 0.9rem; }
+.site-footer a { color: #fff; }
+.site-footer ul { list-style: none; padding: 0; margin: 0.75rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
+.site-footer__disclaimer { border: 1px solid rgba(255, 255, 255, 0.4); border-radius: var(--radius); padding: 0.75rem 0.9rem; margin: 0 0 1rem; }
+.site-footer__disclaimer p { margin: 0; }
+
+main { padding-bottom: 1rem; }
+.empty { color: var(--ink-soft); background: var(--card); border: 1px dashed var(--line); border-radius: var(--radius); padding: 1rem; }

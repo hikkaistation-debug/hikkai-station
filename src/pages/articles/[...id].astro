@@ -1,0 +1,81 @@
+---
+// 記事ページ
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import LineBadge from '../../components/LineBadge.astro';
+import LevelBadge from '../../components/LevelBadge.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { getLine } from '../../data/lines';
+import { getPublishedArticles, formatDate, isoDate, isKiso, type Article } from '../../data/articles';
+
+export async function getStaticPaths() {
+  const articles = await getPublishedArticles();
+  return articles.map((article) => ({ params: { id: article.id }, props: { article } }));
+}
+
+interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+const { data } = article;
+const line = getLine(data.category);
+const { Content } = await render(article);
+const hasBody = Boolean(article.body?.trim());
+const back = isKiso(article) ? { href: '/kiso/', label: '基礎解説' } : { href: '/news/', label: 'ニュース' };
+---
+<BaseLayout title={data.title} description={data.summary} type="article">
+  <StationSign kicker={`${line.code}線 ${line.mark} ${line.short}`} title={data.title} color={line.color} />
+
+  {data.sample && (
+    <aside class="notice notice--sample">
+      <p class="notice__title">これはサンプル記事です</p>
+      <p>表示の確認用に作った記事です。公開する前に、運営者が出典の原文と照らして内容を確認してください。</p>
+    </aside>
+  )}
+
+  <div class="badges">
+    <LineBadge id={data.category} link />
+    <LevelBadge level={data.level} />
+  </div>
+  <p class="article-meta">
+    公開日：<time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
+    {data.updatedDate && (
+      <>／更新日：<time datetime={isoDate(data.updatedDate)}>{formatDate(data.updatedDate)}</time></>
+    )}
+  </p>
+
+  <section class="article-box" aria-labelledby="summary-h">
+    <h2 id="summary-h">要約</h2>
+    <p>{data.summary}</p>
+  </section>
+
+  {hasBody && (
+    <div class="prose">
+      <Content />
+    </div>
+  )}
+
+  <section class="article-box article-box--comment" aria-labelledby="comment-h">
+    <h2 id="comment-h">ひとこと</h2>
+    <p>{data.comment}</p>
+  </section>
+
+  <section class="article-box" aria-labelledby="source-h">
+    <h2 id="source-h">出典（原文）</h2>
+    <p>
+      {data.sourceName}<br />
+      <a class="source-link" href={data.sourceUrl} rel="noopener" target="_blank">{data.sourceUrl}<span class="visually-hidden">（新しいタブで開きます）</span></a>
+    </p>
+  </section>
+
+  {data.tags.length > 0 && (
+    <ul class="tags" aria-label="タグ">
+      {data.tags.map((t) => <li>#{t}</li>)}
+    </ul>
+  )}
+
+  <Disclaimer />
+
+  <p><a href={back.href}>← {back.label}の一覧へ</a></p>
+</BaseLayout>

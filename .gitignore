@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+.DS_Store
+
+# Claude Code の作業用設定（公開しない）
+.claude/
+# 要件書は手元だけに置く（公開しない）
+筆界ステーション サイト要件書.md

@@ -1,0 +1,26 @@
+---
+import LineBadge from './LineBadge.astro';
+import LevelBadge from './LevelBadge.astro';
+import { getLine } from '../data/lines';
+import { formatDate, isoDate, type Article } from '../data/articles';
+
+interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+const { data } = article;
+const line = getLine(data.category);
+---
+<li class="article-card" style={`--c:${line.color}`}>
+  <div class="badges">
+    <LineBadge id={data.category} short />
+    <LevelBadge level={data.level} />
+  </div>
+  <h3 class="article-card__title"><a href={`/articles/${article.id}/`}>{data.title}</a></h3>
+  <p class="article-card__summary">{data.summary}</p>
+  <p class="article-card__meta">
+    <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
+    ｜出典：{data.sourceName}
+    {data.sample && <span>｜サンプル</span>}
+  </p>
+</li>

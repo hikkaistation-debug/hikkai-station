@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getPublishedArticles, isKiso } from '../data/articles';
+
+const kiso = (await getPublishedArticles()).filter(isKiso);
+---
+<BaseLayout title="基礎解説" description="境界や登記の基本を、はじめての方向けにやさしく解説します。">
+  <StationSign kicker="02" title="基礎解説" sub="BASICS" color="#6d28a8" prev="ニュース" next="通達ナビ" />
+
+  <p>「筆界ってなに？」「境界とどう違うの？」など、基本の言葉や考え方を、はじめての方向けにやさしく解説します。</p>
+
+  {kiso.length > 0 ? (
+    <ul class="card-list">
+      {kiso.map((a) => <ArticleCard article={a} />)}
+    </ul>
+  ) : (
+    <p class="empty">まだ記事はありません。</p>
+  )}
+</BaseLayout>

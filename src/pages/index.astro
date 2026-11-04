@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { SITE, STATIONS } from '../data/site';
+import { getPublishedArticles } from '../data/articles';
+
+const articles = await getPublishedArticles();
+const latest = articles.slice(0, 6);
+
+// 読者別の入口「のりば」
+const platforms = [
+  {
+    num: '1',
+    who: 'はじめての方',
+    title: '境界ってそもそも何？',
+    desc: '「筆界」「境界」「登記」など、まずは基本の言葉をやさしく解説します。',
+    href: '/kiso/',
+  },
+  {
+    num: '2',
+    who: 'お困りの方',
+    title: '隣地との境界・相続した土地・登記のこと',
+    desc: '相続登記の義務化や、境界の問題を解決するしくみなど、身近な制度を紹介します。',
+    href: '/category/souzoku/',
+  },
+  {
+    num: '3',
+    who: '実務者の方',
+    title: '法改正・通達・裁決・技術の情報',
+    desc: '制度の動きや実務・技術のニュースを、出典リンク付きでまとめます。',
+    href: '/news/',
+  },
+];
+---
+<BaseLayout>
+  <StationSign kicker="ようこそ" title={SITE.name} sub="HIKKAI STATION" prev="境界" next="登記" />
+
+  <p>{SITE.description}</p>
+
+  <section aria-labelledby="platforms-heading">
+    <h2 id="platforms-heading">のりば ― あなたに合う入口から</h2>
+    <div class="platforms">
+      {platforms.map((p) => (
+        <a class="platform" href={p.href}>
+          <span class="platform__head">
+            <span class="platform__num" aria-hidden="true">{p.num}</span>
+            <span>
+              <span class="platform__label">{p.num}番のりば｜{p.who}</span>
+              <span class="platform__title">{p.title}</span>
+            </span>
+          </span>
+          <span class="platform__desc">{p.desc}</span>
+          <span class="platform__go" aria-hidden="true">このホームへ →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section aria-labelledby="search-heading">
+    <h2 id="search-heading">サイト内をさがす</h2>
+    <form class="search-box" action="/search/" method="get" role="search">
+      <label for="top-q" class="visually-hidden">キーワード</label>
+      <input id="top-q" name="q" type="search" placeholder="例：相続登記、筆界特定" />
+      <button type="submit">さがす</button>
+    </form>
+  </section>
+
+  <section aria-labelledby="latest-heading">
+    <h2 id="latest-heading">新着記事</h2>
+    {latest.length > 0 ? (
+      <ul class="card-list">
+        {latest.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    ) : (
+      <p class="empty">まだ記事はありません。</p>
+    )}
+  </section>
+
+  <section aria-labelledby="map-heading">
+    <h2 id="map-heading">路線図（サイトのご案内）</h2>
+    <ol class="route-map">
+      {STATIONS.filter((s) => s.href !== '/').map((s) => (
+        <li class={s.ready ? '' : 'is-soon'}>
+          {s.ready ? (
+            <a href={s.href}>{s.label}</a>
+          ) : (
+            <span class="stop">{s.label}<small>準備中です。もうしばらくお待ちください。</small></span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </section>
+</BaseLayout>

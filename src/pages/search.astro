@@ -1,0 +1,83 @@
+---
+// サイト内検索（ブラウザの中だけで動く、かんたんな検索）
+// 記事が増えたら、Pagefind などの本格的な検索に切り替えを検討します。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+---
+<BaseLayout title="サイト内検索" description="サイト内の記事をキーワードでさがせます。">
+  <StationSign kicker="SEARCH" title="サイト内検索" />
+
+  <form class="search-box" action="/search/" method="get" role="search" id="search-form">
+    <label for="q" class="visually-hidden">キーワード</label>
+    <input id="q" name="q" type="search" placeholder="例：相続登記、筆界特定" />
+    <button type="submit">さがす</button>
+  </form>
+
+  <p id="search-status" aria-live="polite"></p>
+  <ul class="card-list" id="search-results"></ul>
+</BaseLayout>
+
+<script>
+  type Item = { url: string; title: string; summary: string; comment: string; tags: string[]; category: string; date: string };
+
+  const input = document.getElementById('q') as HTMLInputElement;
+  const form = document.getElementById('search-form') as HTMLFormElement;
+  const status = document.getElementById('search-status')!;
+  const results = document.getElementById('search-results')!;
+
+  // 全角・半角や大文字・小文字の違いを気にせず探せるようにする
+  const normalize = (s: string) => s.normalize('NFKC').toLowerCase();
+
+  let items: Item[] = [];
+
+  function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  function run(q: string) {
+    results.replaceChildren();
+    const words = normalize(q).split(/\s+/).filter(Boolean);
+    if (words.length === 0) {
+      status.textContent = 'キーワードを入れて「さがす」を押してください。';
+      return;
+    }
+    const hits = items.filter((it) => {
+      const text = normalize([it.title, it.summary, it.comment, it.category, ...it.tags].join(' '));
+      return words.every((w) => text.includes(w));
+    });
+    status.textContent = `「${q}」の検索結果：${hits.length}件`;
+    for (const it of hits) {
+      const li = el('li', 'article-card');
+      li.style.setProperty('--c', '#1f2a44');
+      const h = el('h3', 'article-card__title');
+      const a = el('a', undefined, it.title);
+      a.href = it.url;
+      h.append(a);
+      li.append(el('p', 'article-card__meta', it.category), h, el('p', 'article-card__summary', it.summary), el('p', 'article-card__meta', it.date));
+      results.append(li);
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    history.replaceState(null, '', q ? `?q=${encodeURIComponent(q)}` : location.pathname);
+    run(q);
+  });
+
+  const initial = new URLSearchParams(location.search).get('q') ?? '';
+  input.value = initial;
+  status.textContent = '読み込み中…';
+  fetch('/search-index.json')
+    .then((r) => r.json())
+    .then((data: Item[]) => {
+      items = data;
+      run(initial);
+    })
+    .catch(() => {
+      status.textContent = '検索データを読み込めませんでした。時間をおいてお試しください。';
+    });
+</script>

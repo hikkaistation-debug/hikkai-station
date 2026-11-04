@@ -1,0 +1,12 @@
+---
+// 準備中のページ用の案内
+interface Props {
+  what: string;
+}
+const { what } = Astro.props;
+---
+<aside class="notice notice--soon">
+  <p class="notice__title">この駅は準備中です</p>
+  <p>{what}は現在準備しています。完成まで、もうしばらくお待ちください。</p>
+  <p><a href="/">トップへもどる</a></p>
+</aside>

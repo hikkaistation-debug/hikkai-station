@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import LineBadge from '../components/LineBadge.astro';
+import { LINES } from '../data/lines';
+import { getPublishedArticles, isKiso } from '../data/articles';
+
+const all = await getPublishedArticles();
+const news = all.filter((a) => !isKiso(a));
+const newsLines = LINES.filter((l) => !l.isKiso);
+---
+<BaseLayout title="ニュース" description="筆界・境界・登記まわりのニュースを、カテゴリ別にまとめています。">
+  <StationSign kicker="01" title="ニュース" sub="NEWS" prev="トップ" next="基礎解説" />
+
+  <h2>路線（カテゴリ）からさがす</h2>
+  <ul class="line-list">
+    {newsLines.map((l) => (
+      <li>
+        <a href={`/category/${l.id}/`} style={`--c:${l.color}`}>
+          <LineBadge id={l.id} />
+          <span class="count">{all.filter((a) => a.data.category === l.id).length}件</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <h2>新しい順</h2>
+  {news.length > 0 ? (
+    <ul class="card-list">
+      {news.map((a) => <ArticleCard article={a} />)}
+    </ul>
+  ) : (
+    <p class="empty">まだ記事はありません。</p>
+  )}
+</BaseLayout>

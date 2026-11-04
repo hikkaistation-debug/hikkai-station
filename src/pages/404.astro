@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+---
+<BaseLayout title="ページが見つかりません">
+  <StationSign kicker="404" title="この駅はありません" sub="NOT FOUND" />
+  <p>お探しのページは見つかりませんでした。移動したか、削除された可能性があります。</p>
+  <p><a href="/">トップへもどる</a></p>
+</BaseLayout>

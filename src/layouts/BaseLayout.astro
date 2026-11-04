@@ -1,0 +1,98 @@
+---
+// すべてのページの共通の枠（ヘッダー・メニュー・フッター・SNS共有用の情報）
+import '../styles/global.css';
+import { SITE, STATIONS } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  type?: 'website' | 'article';
+}
+const { title, description = SITE.description, type = 'website' } = Astro.props;
+const fullTitle = title ? `${title}｜${SITE.name}` : `${SITE.name}｜${SITE.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#1f2a44" />
+    <!-- OGP：SNSでシェアされたときの表示 -->
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a class="brand" href="/">
+          <span class="brand__mark" aria-hidden="true">筆</span>
+          <span>
+            <span class="brand__name">{SITE.name}</span>
+            <span class="brand__sub">HIKKAI STATION</span>
+          </span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">メニュー</button>
+      </div>
+      <nav class="site-nav" id="site-nav" aria-label="サイト内メニュー" hidden>
+        <ul class="container">
+          {STATIONS.map((s) => (
+            <li>
+              <a href={s.href} aria-current={isCurrent(s.href) ? 'page' : undefined}>
+                <span class="num" aria-hidden="true">{s.code}</span>
+                {s.label}
+                {!s.ready && <span class="soon">（準備中）</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="site-footer__disclaimer">
+          <p>
+            {SITE.name}は<strong>非公式・個人運営</strong>の情報まとめサイトです。内容は必ず一次資料でご確認ください。個別の案件の判断や法律相談は行っていません。
+          </p>
+        </div>
+        <ul>
+          <li><a href="/about/">このサイトについて</a></li>
+          <li><a href="/contact/">お問い合わせ</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <p>&copy; {SITE.name}</p>
+      </div>
+    </footer>
+
+    <script>
+      // スマホでメニューを開け閉めする
+      const btn = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const nav = document.getElementById('site-nav');
+      btn?.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        btn.textContent = open ? 'メニュー' : 'とじる';
+        if (nav) nav.hidden = open;
+      });
+    </script>
+  </body>
+</html>

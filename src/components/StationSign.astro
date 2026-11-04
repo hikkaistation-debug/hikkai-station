@@ -1,0 +1,26 @@
+---
+// 駅名標（駅の看板）風の見出し
+interface Props {
+  title: string;
+  kicker?: string; // 上の小さい文字
+  sub?: string; // 下の小さい文字（ローマ字など）
+  color?: string; // 下の帯の色
+  prev?: string; // 左の「となりの駅」
+  next?: string; // 右の「となりの駅」
+}
+const { title, kicker, sub, color, prev, next } = Astro.props;
+---
+<header class="station-sign">
+  <div class="station-sign__body">
+    {kicker && <p class="station-sign__kicker">{kicker}</p>}
+    <h1 class="station-sign__title">{title}</h1>
+    {sub && <p class="station-sign__sub">{sub}</p>}
+  </div>
+  <div class="station-sign__bar" style={color ? `--bar:${color}` : undefined} aria-hidden="true"></div>
+  {(prev || next) && (
+    <div class="station-sign__neighbors" aria-hidden="true">
+      <span>{prev ? `← ${prev}` : ''}</span>
+      <span>{next ? `${next} →` : ''}</span>
+    </div>
+  )}
+</header>

@@ -1,0 +1,13 @@
+---
+// 対象バッジ（やさしい／ふつう／専門）
+import { LEVELS, type LevelId } from '../data/lines';
+
+interface Props {
+  level: LevelId;
+}
+const { level } = Astro.props;
+const info = LEVELS[level];
+---
+<span class={`level-badge level-badge--${level}`}>
+  <span class="visually-hidden">対象：</span>{info.label}{info.note && <span>（{info.note}）</span>}
+</span>

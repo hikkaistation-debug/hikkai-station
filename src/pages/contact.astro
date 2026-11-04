@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+---
+<BaseLayout title="お問い合わせ" description="掲載・削除のご依頼、内容の誤りのご指摘などの窓口です。">
+  <StationSign kicker="06" title="お問い合わせ" sub="CONTACT" prev="このサイトについて" />
+
+  <aside class="notice notice--soon">
+    <p class="notice__title">お問い合わせフォームは準備中です</p>
+    <p>専用の受付フォームを用意しています。公開まで、もうしばらくお待ちください。</p>
+  </aside>
+
+  <div class="page-body">
+    <h2>受け付けている内容</h2>
+    <ul>
+      <li>掲載しているリンク・記事の<strong>削除や修正のご依頼</strong>（リンク先サイトの運営者の方など）</li>
+      <li>内容の誤りや、古くなった情報のご指摘</li>
+      <li>掲載してほしい資料・ツールのご紹介</li>
+    </ul>
+
+    <h2>受け付けていない内容</h2>
+    <ul>
+      <li>個別の案件についてのご相談・法律相談（法務局、土地家屋調査士会、専門家へご相談ください）</li>
+    </ul>
+
+    <h2>お送りいただくときのお願い</h2>
+    <ul>
+      <li>ご自身や他の方の住所、地番、氏名など、個人や土地が特定できる情報は書かないでください。</li>
+    </ul>
+  </div>
+</BaseLayout>

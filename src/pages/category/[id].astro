@@ -1,0 +1,32 @@
+---
+// 路線（カテゴリ）ごとの記事一覧。lines.ts に足したカテゴリは自動でページができます。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import LineBadge from '../../components/LineBadge.astro';
+import { LINES, getLine } from '../../data/lines';
+import { getPublishedArticles } from '../../data/articles';
+
+export function getStaticPaths() {
+  return LINES.map((l) => ({ params: { id: l.id } }));
+}
+
+const { id } = Astro.params;
+const line = getLine(id!);
+const articles = (await getPublishedArticles()).filter((a) => a.data.category === line.id);
+---
+<BaseLayout title={line.name} description={`「${line.name}」の記事一覧です。`}>
+  <StationSign kicker={`${line.code}線 ${line.mark}`} title={line.name} color={line.color} />
+
+  <p><LineBadge id={line.id} /> の記事を新しい順に並べています。</p>
+
+  {articles.length > 0 ? (
+    <ul class="card-list">
+      {articles.map((a) => <ArticleCard article={a} />)}
+    </ul>
+  ) : (
+    <p class="empty">この路線には、まだ記事がありません。</p>
+  )}
+
+  <p><a href="/news/">← ニュース一覧へ</a></p>
+</BaseLayout>
