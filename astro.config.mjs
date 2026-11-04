@@ -42,10 +42,26 @@ function shitagakiReview() {
 }
 
 // X 投稿チェック（/x-check/）のしくみ。確認用画面（npm run dev）のときだけ動きます。
-//   /__xcheck … 投稿済み・チェック結果を review/x-check.json に保存／読み出し
+//   /__xcheck … 投稿済み・チェック結果を review/x-check.json に保存／読み出し（送られてきた話の分だけ書きかえる）
+//   /__xcheck/handoff … 「保存して Claude に渡す」で review/x-handoff.json に書く（待機中の Claude が読みに来る）
+//   /__xcheck/status … Claude が待機中か（scripts/check-watch.sh x が review/.claude-watching-x を更新している）
 //   /__xstories/<日付>/<画像> … brand/x/stories/ の画像を見せる（GitHub には送らない画像）
-const xCheckFile = fileURLToPath(new URL('./review/x-check.json', import.meta.url));
+const xReviewDir = fileURLToPath(new URL('./review/', import.meta.url));
+const xCheckFile = `${xReviewDir}x-check.json`;
+const xHandoffFile = `${xReviewDir}x-handoff.json`;
+const xWatchingFile = `${xReviewDir}.claude-watching-x`;
 const xStoriesDir = fileURLToPath(new URL('./brand/x/stories/', import.meta.url));
+const xRead = (f) => {
+  try {
+    return JSON.parse(fs.readFileSync(f, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+const xWrite = (f, data) => {
+  fs.mkdirSync(xReviewDir, { recursive: true });
+  fs.writeFileSync(f, JSON.stringify(data, null, 2) + '\n');
+};
 function xCheck() {
   return {
     name: 'x-check',
@@ -53,8 +69,17 @@ function xCheck() {
     configureServer(server) {
       server.middlewares.use('/__xcheck', (req, res) => {
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        const path = (req.url ?? '/').split('?')[0];
+        if (req.method === 'GET' && path === '/status') {
+          let watching = false;
+          try {
+            watching = Date.now() - fs.statSync(xWatchingFile).mtimeMs < 15000;
+          } catch {}
+          res.end(JSON.stringify({ watching }));
+          return;
+        }
         if (req.method === 'GET') {
-          res.end(fs.existsSync(xCheckFile) ? fs.readFileSync(xCheckFile, 'utf8') : '{}');
+          res.end(JSON.stringify(xRead(xCheckFile)));
           return;
         }
         if (req.method === 'POST') {
@@ -63,9 +88,18 @@ function xCheck() {
           req.on('end', () => {
             try {
               const data = JSON.parse(body);
-              fs.mkdirSync(fileURLToPath(new URL('./review/', import.meta.url)), { recursive: true });
-              fs.writeFileSync(xCheckFile, JSON.stringify(data, null, 2) + '\n');
-              res.end('{"ok":true}');
+              if (path === '/handoff') {
+                xWrite(xHandoffFile, { at: new Date().toISOString(), text: String(data.text ?? '') });
+                res.end('{"ok":true}');
+                return;
+              }
+              const current = xRead(xCheckFile);
+              for (const [id, entry] of Object.entries(data)) {
+                if (entry === null) delete current[id];
+                else current[id] = entry;
+              }
+              xWrite(xCheckFile, current);
+              res.end(JSON.stringify(current));
             } catch {
               res.statusCode = 400;
               res.end('{"ok":false}');
