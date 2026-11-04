@@ -1,5 +1,7 @@
 // 車内の読み物の1話を、X に載せる画像（1080×1350、最大4枚）にします。
 // 使い方：node scripts/story-images.mjs kakueki 01
+//         node scripts/story-images.mjs kakueki 01 --text-only（投稿文だけ作り直す）
+// 投稿文の1行目は scripts/x-hooks.json（新しい話を書いたら、そこにも1行足す）
 // できる場所：brand/x/stories/<投稿する日>/（GitHub には送りません）
 //   投稿する日＝その話の公開日（pubDate）。例：brand/x/stories/2026-11-05/
 //   その中に kakueki-03-1.png, kakueki-03-2.png … と、投稿文（kakueki-03.txt）
@@ -76,8 +78,12 @@ body{background:#f7f6f2;color:#1a1d24;font-family:'Yu Mincho','YuMincho','Hiragi
 const outDir = path.join(root, 'brand/x/stories', pub);
 fs.mkdirSync(outDir, { recursive: true });
 const edge = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => fs.existsSync(p));
-const files = [];
-pages.forEach((ps, i) => {
+// --text-only を付けると、画像は作り直さず、投稿文（txt）だけ作り直す
+const textOnly = process.argv.includes('--text-only');
+const files = textOnly
+  ? fs.readdirSync(outDir).filter((f) => f.startsWith(`${train}-${no}-`) && f.endsWith('.png')).sort().map((f) => path.join(outDir, f))
+  : [];
+if (!textOnly) pages.forEach((ps, i) => {
   const isLast = i === pages.length - 1;
   const html = `<!doctype html><meta charset="utf-8"><style>${css}</style>
 ${i === 0 ? `<div class="head"><span class="kind">${t.kind}</span><span class="series">${t.title}</span><div class="title">第${data.no}話　${esc(data.title)}</div></div>` : ''}
@@ -93,13 +99,30 @@ ${isLast ? `<div class="point"><b>📍 今日のひとこと</b>${esc(data.point
 });
 
 // 投稿文（本文は画像なので、文は短く。サイトのリンクも本文に入れて、1つの投稿で予約投稿できるようにする）
+// 形：1行目＝暮らしの中の疑問（scripts/x-hooks.json）→ 🚃毎朝6時の1分小説 → 話数・題名 → リンク → 次の駅 → タグ
 const url = `https://hikkai-station.com/yomimono/${train}/${no}/`;
-const tags = '#筆界ステーション #車内の読み物 #土地家屋調査士';
-const head = `【${t.kind}】${t.title} 第${data.no}話「${data.title}」`;
 // X の文字数（日本語は1字＝2、URLは23）
 const weight = (s) => [...s.replace(/https?:\/\/\S+/g, 'x'.repeat(23))].reduce((n, ch) => n + (ch.codePointAt(0) < 0x1100 ? 1 : 2), 0);
-let post = `${head}\n${data.summary}\n▼解説記事はサイトで\n${url}\n${tags}`;
-if (weight(post) > 280) post = `${head}\n▼解説記事はサイトで\n${url}\n${tags}`; // 長すぎたら要約を省く
+const hooks = JSON.parse(fs.readFileSync(path.join(root, 'scripts/x-hooks.json'), 'utf8'));
+const hook = hooks[train]?.[Number(data.no)];
+if (!hook) console.warn(`⚠ scripts/x-hooks.json に ${train} の第${data.no}話の1行目がありません。題名だけの投稿文にします`);
+// 次の話（あれば）
+const nextNo = String(Number(no) + 1).padStart(2, '0');
+const nextSrc = path.join(root, 'src/content/stories', train, `${nextNo}.md`);
+const nextTitle = fs.existsSync(nextSrc) ? (fs.readFileSync(nextSrc, 'utf8').match(/^title:\s*(.+)$/m) || [])[1]?.trim() : null;
+const lead = train === 'kakueki' ? '🚃毎朝6時の1分小説' : `🚄${t.kind}`;
+const build = (withNote, withNext) => [
+  ...(hook ? [hook.hook, ''] : []),
+  lead,
+  `${t.title} 第${data.no}話「${data.title}」`, '',
+  ...(withNote ? ['▼解説つきで、サイトでも読めます'] : []),
+  url,
+  ...(withNext ? [nextTitle ? `次の駅▶第${Number(nextNo)}話「${nextTitle}」` : '次の駅は、ただいま準備中です'] : []),
+  `#連載小説${hook ? ` #${hook.tag}` : ' #土地家屋調査士'} #筆界ステーション`,
+].join('\n');
+let post = build(true, true);
+if (weight(post) > 280) post = build(false, true); // 長すぎたら短くする
+if (weight(post) > 280) post = build(false, false);
 const intent = `https://x.com/intent/post?text=${encodeURIComponent(post)}`;
 const txt = `■ 投稿する日時：${pub} 6:00（予約投稿）\n\n■ 本文（画像${files.length}枚をつけて、この1つだけを予約投稿）※${weight(post)}/280\n${post}\n\n■ 投稿画面を開くリンク（画像は自分でつけてください）\n${intent}\n`;
 fs.writeFileSync(path.join(outDir, `${train}-${no}.txt`), txt);
