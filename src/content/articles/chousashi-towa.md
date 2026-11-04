@@ -52,6 +52,11 @@ tags:
 
 たとえば家を建てて住宅ローンを組むときは、まず土地家屋調査士が「建物表題登記」で建物を登記し、そのあと司法書士が持ち主やローンの登記をする、という順番になります。
 
+<figure class="figure">
+  <a href="/images/kiso/chousashi-loan-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/chousashi-loan-nagare.svg" alt="家が完成したら、土地家屋調査士が建物表題登記で登記簿の表題部を作り、そのあと司法書士が所有権保存登記と抵当権設定登記で権利部に書く、という順番を示した図" width="640" height="380" loading="lazy" /></a>
+  <figcaption>表題部（建物の姿）は土地家屋調査士、権利部（持ち主・ローンの担保）は司法書士が担当します。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## こんなときに頼みます
 
 | こんなとき | おもな手続き |

@@ -283,6 +283,13 @@ main { padding-bottom: 1rem; }
 .figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
 .figure figcaption { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.35rem; }
 
+/* ---------- 記事の中の表（横にはみ出すときは横スクロール） ---------- */
+.prose table { display: block; overflow-x: auto; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+.prose th, .prose td { border: 1px solid var(--line); padding: 0.45rem 0.7rem; text-align: left; vertical-align: top; min-width: 6.5em; }
+.prose thead th { background: var(--navy); color: #fff; font-weight: 700; }
+.prose tbody tr:nth-child(even) td { background: #f4f3ee; }
+.prose tbody td:first-child { font-weight: 700; }
+
 /* ---------- ヘッダーの「さがす」 ---------- */
 .header-actions { display: flex; align-items: center; gap: 0.5rem; }
 .header-search {
