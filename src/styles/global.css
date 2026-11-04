@@ -155,7 +155,7 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 
 /* ---------- のりば（トップの入口） ---------- */
 .platforms { display: grid; gap: 1rem; margin: 1.5rem 0; }
-@media (min-width: 760px) { .platforms { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 760px) { .platforms { grid-template-columns: repeat(2, 1fr); } }
 .platform {
   display: flex; flex-direction: column; background: var(--navy); color: #fff;
   border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; text-decoration: none;

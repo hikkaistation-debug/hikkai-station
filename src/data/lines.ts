@@ -12,6 +12,7 @@ export const LINES = [
   { id: 'kyokai', name: '境界トラブル・筆界特定・裁判', short: '境界', code: 'K', mark: '▲', color: '#c4122f', isKiso: false },
   { id: 'gijutsu', name: '測量・登記の実務と技術', short: '技術', code: 'G', mark: '■', color: '#b45309', isKiso: false },
   { id: 'kiso', name: '基礎解説', short: '基礎', code: 'B', mark: '★', color: '#6d28a8', isKiso: true },
+  { id: 'shiken', name: '土地家屋調査士試験', short: '試験', code: 'T', mark: '◎', color: '#0f766e', isKiso: false },
 ] as const;
 
 export type LineId = (typeof LINES)[number]['id'];

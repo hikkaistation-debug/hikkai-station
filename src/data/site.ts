@@ -19,8 +19,9 @@ export const STATIONS = [
   { href: '/', label: 'トップ', code: '00', ready: true },
   { href: '/news/', label: 'ニュース', code: '01', ready: true },
   { href: '/kiso/', label: '基礎解説', code: '02', ready: true },
-  { href: '/tsutatsu/', label: '通達ナビ', code: '03', ready: false },
-  { href: '/links/', label: 'リンク集', code: '04', ready: false },
-  { href: '/about/', label: 'このサイトについて', code: '05', ready: true },
-  { href: '/contact/', label: 'お問い合わせ', code: '06', ready: true },
+  { href: '/shiken/', label: '試験', code: '03', ready: true },
+  { href: '/tsutatsu/', label: '通達ナビ', code: '04', ready: false },
+  { href: '/links/', label: 'リンク集', code: '05', ready: false },
+  { href: '/about/', label: 'このサイトについて', code: '06', ready: true },
+  { href: '/contact/', label: 'お問い合わせ', code: '07', ready: true },
 ] as const;

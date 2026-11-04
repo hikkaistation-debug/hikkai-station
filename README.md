@@ -22,7 +22,7 @@
    ---
    title: 記事のタイトル
    pubDate: 2026-11-04
-   category: souzoku        # seido / souzoku / kyokai / gijutsu / kiso のどれか
+   category: souzoku        # seido / souzoku / kyokai / gijutsu / kiso / shiken のどれか
    level: easy              # easy（やさしい）/ normal（ふつう）/ expert（専門）
    sourceName: 出典の名前
    sourceUrl: https://...

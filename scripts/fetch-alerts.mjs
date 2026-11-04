@@ -76,7 +76,7 @@ function draftMarkdown(item) {
 # 使わないときは、このファイルを削除してください。
 title: ${yamlStr(item.title || '（タイトルを書く）')}
 pubDate: ${date}
-category: seido   # seido / souzoku / kyokai / gijutsu / kiso
+category: seido   # seido / souzoku / kyokai / gijutsu / kiso / shiken
 level: normal     # easy / normal / expert
 sourceName: ${yamlStr(hostOf(item.url))}
 sourceUrl: ${yamlStr(item.url)}

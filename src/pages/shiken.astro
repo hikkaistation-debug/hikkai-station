@@ -1,0 +1,86 @@
+---
+// 土地家屋調査士試験の「のりば」ページ
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getLine } from '../data/lines';
+import { getPublishedArticles } from '../data/articles';
+
+const line = getLine('shiken');
+const articles = (await getPublishedArticles()).filter((a) => a.data.category === 'shiken');
+
+// 公式の情報へのリンク（法務省）
+const officialLinks = [
+  {
+    name: '法務省「土地家屋調査士試験」',
+    url: 'https://www.moj.go.jp/shikaku_saiyo_index5.html',
+    note: '各年度の試験のお知らせが、新しい順にまとまっています。',
+  },
+  {
+    name: '法務省「令和8年度土地家屋調査士試験」',
+    url: 'https://www.moj.go.jp/MINJI/minji05_00770.html',
+    note: '今年度の出願状況や、電卓の使用などのお知らせがあります。',
+  },
+  {
+    name: '法務省「令和8年度土地家屋調査士試験受験案内書」',
+    url: 'https://www.moj.go.jp/MINJI/minji05_00768.html',
+    note: '試験日・試験地・科目・申請方法などは、必ずこの受験案内書で確認してください。',
+  },
+];
+---
+<BaseLayout title="土地家屋調査士試験" description="土地家屋調査士試験のしくみや、公式の情報へのリンク、試験に関するニュースをまとめています。">
+  <StationSign kicker={`03 ｜ ${line.code}線 ${line.mark}`} title="土地家屋調査士試験" sub="EXAM" color={line.color} prev="基礎解説" next="通達ナビ" />
+
+  <p>
+    土地家屋調査士は、土地や建物の調査・測量をして、表示に関する登記の申請手続きを行う国家資格です。
+    このページでは、土地家屋調査士試験を目指す方向けに、試験のしくみや公式の情報への入口をまとめています。
+  </p>
+
+  <aside class="notice notice--soon">
+    <p class="notice__title">試験の日程・科目は、必ず公式の情報で確認してください</p>
+    <p>このページの説明は、例年の流れをもとにした概要です。年度によって変わることがあります。試験日・試験地・申請方法などは、必ず法務省の受験案内書で確認してください。</p>
+  </aside>
+
+  <div class="page-body">
+    <h2>試験のしくみ（例年の流れ）</h2>
+    <ol>
+      <li><strong>受験の申請</strong>：夏ごろ（申請書を管轄の法務局に提出します）</li>
+      <li><strong>筆記試験</strong>：秋（例年10月ごろ）</li>
+      <li><strong>口述試験</strong>：冬（例年1月ごろ。筆記試験の合格者が受けます）</li>
+      <li><strong>最終合格の発表</strong>：口述試験のあと</li>
+    </ol>
+    <p>受験資格はなく、年齢や学歴にかかわらず、だれでも受験できます。</p>
+
+    <h2>筆記試験の中身</h2>
+    <h3>午前の部</h3>
+    <ul>
+      <li>平面測量に関する多肢択一式の問題と、作図の問題が出題されます。</li>
+      <li><strong>測量士・測量士補・一級建築士・二級建築士</strong>などの資格がある人は、申請すると午前の部が免除されます。多くの受験生が、この免除を使っています。</li>
+    </ul>
+    <h3>午後の部</h3>
+    <ul>
+      <li><strong>多肢択一式</strong>：民法、不動産登記法、土地家屋調査士法などから出題されます。</li>
+      <li><strong>記述式</strong>：土地と建物について、それぞれ登記の申請に必要な書面や図面を作る問題が出題されます。</li>
+    </ul>
+
+    <h2>公式の情報</h2>
+    <ul>
+      {officialLinks.map((l) => (
+        <li>
+          <a href={l.url} target="_blank" rel="noopener">{l.name}<span class="visually-hidden">（新しいタブで開きます）</span></a><br />
+          <small>{l.note}</small>
+        </li>
+      ))}
+    </ul>
+    <p><small>※このサイトでは、過去の試験問題は掲載していません。</small></p>
+  </div>
+
+  <h2>試験に関する記事</h2>
+  {articles.length > 0 ? (
+    <ul class="card-list">
+      {articles.map((a) => <ArticleCard article={a} />)}
+    </ul>
+  ) : (
+    <p class="empty">まだ記事はありません。</p>
+  )}
+</BaseLayout>
