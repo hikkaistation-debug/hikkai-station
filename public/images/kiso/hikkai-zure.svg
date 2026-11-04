@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">1番の土地の一部をBさんに売ったが分筆していないため、筆界と所有権の境がずれている図</title>
+  <defs>
+    <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="10" height="10" fill="#f3efe6"/>
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#c4122f" stroke-width="2" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <rect width="640" height="320" fill="#ffffff"/>
+  <text x="320" y="34" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">ずれている例：土地の一部を売ったのに、分筆していない</text>
+  <rect x="40" y="60" width="280" height="170" fill="#eef2f8" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="320" y="60" width="280" height="170" fill="#f3efe6" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="230" y="60" width="90" height="170" fill="url(#hatch)"/>
+  <text x="135" y="132" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">1番の土地</text>
+  <text x="135" y="160" font-size="16" text-anchor="middle" fill="#464c58">Aさんのもの</text>
+  <text x="460" y="132" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">2番の土地</text>
+  <text x="460" y="160" font-size="16" text-anchor="middle" fill="#464c58">Bさんのもの</text>
+  <text x="275" y="140" font-size="14" font-weight="700" text-anchor="middle" fill="#7a0b1d">Bさんが</text>
+  <text x="275" y="160" font-size="14" font-weight="700" text-anchor="middle" fill="#7a0b1d">買った部分</text>
+  <line x1="230" y1="52" x2="230" y2="238" stroke="#c4122f" stroke-width="3" stroke-dasharray="10 7"/>
+  <line x1="320" y1="52" x2="320" y2="238" stroke="#1f2a44" stroke-width="7"/>
+  <text x="230" y="258" font-size="14" font-weight="700" text-anchor="end" fill="#c4122f">所有権の境 →</text>
+  <text x="326" y="258" font-size="14" font-weight="700" fill="#1f2a44">← 筆界（動かない）</text>
+  <text x="320" y="284" font-size="14" text-anchor="middle" fill="#464c58">しま模様の部分は、持ち主はBさんでも、登記の上では「1番の土地」のまま</text>
+  <g font-size="14" fill="#1a1d24">
+    <line x1="60" y1="306" x2="100" y2="306" stroke="#1f2a44" stroke-width="7"/>
+    <text x="108" y="311">筆界（太い実線）</text>
+    <line x1="330" y1="306" x2="370" y2="306" stroke="#c4122f" stroke-width="3" stroke-dasharray="10 7"/>
+    <text x="378" y="311">所有権の境（赤い点線）</text>
+  </g>
+</svg>

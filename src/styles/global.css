@@ -263,3 +263,8 @@ main { padding-bottom: 1rem; }
 }
 .cta__button:hover { color: #fff; border-color: var(--sign-yellow); }
 .cta small { color: var(--ink-soft); }
+
+/* ---------- 記事の中の図 ---------- */
+.figure { margin: 1.2rem 0; }
+.figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+.figure figcaption { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.35rem; }
