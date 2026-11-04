@@ -38,6 +38,7 @@ const articles = defineCollection({
         .optional(),
       sample: z.boolean().default(false), // サンプル記事なら true
       draft: z.boolean().default(false), // true の間はサイトに出ません
+      draftNo: z.number().optional(), // 下書き番号（確認のときに「下書き3」のように呼ぶため。公開するときは消してよい）
     })
     .superRefine((d, ctx) => {
       if (d.category === 'kiki' && !d.product) {

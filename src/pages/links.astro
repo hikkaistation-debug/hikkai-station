@@ -2,9 +2,137 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import { TERMINAL } from '../data/site';
-import ComingSoon from '../components/ComingSoon.astro';
+import { LINKS, LINK_CATEGORIES, LINK_KINDS, LINK_AUDIENCES, LINK_PRICES } from '../data/links';
+import { formatDate, getPublishedArticles } from '../data/articles';
+
+// 関連する記事は、公開されている記事のときだけ表示する（下書きへのリンクを出さないため）
+const publishedHrefs = new Set((await getPublishedArticles()).map((a) => `/articles/${a.id}/`));
+const showRelated = (r?: { href: string }) => !!r && (!r.href.startsWith('/articles/') || publishedHrefs.has(r.href));
+
+const byCat = LINK_CATEGORIES.map((c) => ({ cat: c, items: LINKS.filter((l) => l.category === c) })).filter((g) => g.items.length);
+const opt = (label: string, values: readonly string[]) => ({ label, values });
+const filters = [
+  { key: 'cat', ...opt('カテゴリ', LINK_CATEGORIES) },
+  { key: 'aud', ...opt('対象', LINK_AUDIENCES) },
+  { key: 'kind', ...opt('種類', LINK_KINDS) },
+  { key: 'price', ...opt('料金', LINK_PRICES) },
+];
 ---
-<BaseLayout title="リンク集（準備中）" description="官公庁の資料や便利なツールへのリンク集です（準備中）。">
+<BaseLayout title="リンク集" description="地図・登記・法令・測量について、官公庁のサイトや便利なツールを、案内文つきでまとめたリンク集です。">
   <StationSign title="リンク集" sub="LINKS" prev={TERMINAL} />
-  <ComingSoon what="官公庁の資料や、個人制作の便利ツールを絞り込んで探せるリンク集" />
+
+  <p>地図・登記・法令・測量について、役に立つサイトを案内文つきでまとめました。官公庁の公式サイトのほか、個人や事務所が作っている便利なツールやブログも載せています。</p>
+
+  <form class="link-filter" id="link-filter" role="search" onsubmit="return false">
+    <label class="link-filter__q">
+      キーワード
+      <input type="search" name="q" placeholder="例：公図、GIS、登記事項証明書" />
+    </label>
+    <div class="link-filter__selects">
+      {filters.map((f) => (
+        <label>
+          {f.label}
+          <select name={f.key}>
+            <option value="">すべて</option>
+            {f.values.map((v) => <option value={v}>{v}</option>)}
+          </select>
+        </label>
+      ))}
+    </div>
+    <p class="link-filter__count" id="link-count" aria-live="polite">{LINKS.length}件</p>
+  </form>
+
+  {byCat.map((g) => (
+    <section class="link-group" data-group={g.cat}>
+      <h2>{g.cat}</h2>
+      <ul class="link-list">
+        {g.items.map((l) => (
+          <li
+            class="link-item"
+            data-cat={l.category}
+            data-aud={l.audience.join(' ')}
+            data-kind={l.kind}
+            data-price={l.price}
+            data-text={`${l.name} ${l.desc} ${l.note ?? ''}`.toLowerCase()}
+          >
+            <h3 class="link-item__name">
+              <a href={l.url} target="_blank" rel="noopener">{l.name}<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+            </h3>
+            <p class="link-item__tags">
+              <span class="link-tag">{l.kind}</span>
+              <span class="link-tag">{l.price}</span>
+              {l.audience.map((a) => <span class="link-tag link-tag--aud">{a}向け</span>)}
+            </p>
+            <p class="link-item__desc">{l.desc}</p>
+            {l.note && <p class="link-item__note">ひとこと：{l.note}</p>}
+            {showRelated(l.related) && l.related && <p class="link-item__related">関連する記事：<a href={l.related.href}>{l.related.label}</a></p>}
+            <p class="link-item__checked">最終確認日：{formatDate(new Date(l.checked))}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <p class="empty" id="link-empty" hidden>条件に合うリンクはありません。</p>
+
+  <aside class="notice">
+    <p class="notice__title">リンクについてのお約束</p>
+    <ul>
+      <li>このサイトは、リンク先の運営者とは関係がありません（公式・提携ではありません）。</li>
+      <li>リンク先の内容の正しさは保証できません。最終確認日のあとに内容が変わっていることもあります。</li>
+      <li>特定の会社や事務所をおすすめするものではありません。</li>
+      <li>掲載や削除のご希望は、<a href="/contact/">お問い合わせ</a>からお知らせください。</li>
+    </ul>
+  </aside>
 </BaseLayout>
+
+<style>
+  .link-filter { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; margin: 1rem 0; }
+  .link-filter label { display: flex; flex-direction: column; font-size: 0.85rem; font-weight: 700; gap: 0.2rem; }
+  .link-filter input, .link-filter select { font: inherit; font-size: 1rem; padding: 0.4rem 0.5rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; }
+  .link-filter__selects { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; margin-top: 0.6rem; }
+  .link-filter__count { margin: 0.6rem 0 0; font-weight: 700; }
+  .link-group h2 { font-size: 1.15rem; border-bottom: 2px solid var(--line); padding-bottom: 0.25rem; }
+  .link-list { list-style: none; padding: 0; display: grid; gap: 0.8rem; }
+  .link-item { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--navy); border-radius: var(--radius); padding: 0.7rem 1rem; }
+  .link-item__name { font-size: 1.05rem; margin: 0 0 0.3rem; word-break: break-all; }
+  .link-item__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0 0 0.4rem; }
+  .link-tag { font-size: 0.78rem; font-weight: 700; border: 1px solid var(--navy); color: var(--navy); border-radius: 999px; padding: 0 0.55rem; }
+  .link-tag--aud { border-color: var(--ink-soft); color: var(--ink-soft); }
+  .link-item p { margin: 0.25rem 0; }
+  .link-item__note, .link-item__related, .link-item__checked { font-size: 0.88rem; color: var(--ink-soft); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+
+<script>
+  const form = document.getElementById('link-filter') as HTMLFormElement;
+  const items = [...document.querySelectorAll<HTMLLIElement>('.link-item')];
+  const groups = [...document.querySelectorAll<HTMLElement>('.link-group')];
+  const count = document.getElementById('link-count')!;
+  const empty = document.getElementById('link-empty')!;
+
+  const apply = () => {
+    const f = new FormData(form);
+    const q = String(f.get('q') ?? '').trim().toLowerCase();
+    const cat = String(f.get('cat') ?? '');
+    const aud = String(f.get('aud') ?? '');
+    const kind = String(f.get('kind') ?? '');
+    const price = String(f.get('price') ?? '');
+    let n = 0;
+    for (const li of items) {
+      const d = li.dataset;
+      const show =
+        (!q || q.split(/\s+/).every((w) => d.text!.includes(w))) &&
+        (!cat || d.cat === cat) &&
+        (!aud || d.aud!.split(' ').includes(aud)) &&
+        (!kind || d.kind === kind) &&
+        (!price || d.price === price);
+      li.hidden = !show;
+      if (show) n++;
+    }
+    for (const g of groups) g.hidden = !g.querySelector('.link-item:not([hidden])');
+    count.textContent = `${n}件`;
+    empty.hidden = n > 0;
+  };
+  form.addEventListener('input', apply);
+  form.addEventListener('change', apply);
+</script>

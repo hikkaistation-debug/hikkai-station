@@ -1,4 +1,5 @@
 ---
+import { splitTitle } from '../data/title';
 import LineBadge from './LineBadge.astro';
 import LevelBadge from './LevelBadge.astro';
 import { getLine } from '../data/lines';
@@ -10,13 +11,15 @@ interface Props {
 const { article } = Astro.props;
 const { data } = article;
 const line = getLine(data.category);
+const [titleMain, titleSub] = splitTitle(data.title);
 ---
 <li class="article-card" style={`--c:${line.color}`} data-level={data.level} data-date={isoDate(data.pubDate)}>
   <div class="badges">
     <LineBadge id={data.category} short />
     <LevelBadge level={data.level} compact />
+    {data.draft && <span class="draft-badge">下書き{data.draftNo ? ` No.${data.draftNo}` : ''}</span>}
   </div>
-  <h3 class="article-card__title"><a href={`/articles/${article.id}/`}>{data.title}</a></h3>
+  <h3 class="article-card__title"><a href={`/articles/${article.id}/`}>{titleMain}{titleSub && <span class="title-sub">{titleSub}</span>}</a></h3>
   <p class="article-card__summary">{data.summary}</p>
   <p class="article-card__meta">
     <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>

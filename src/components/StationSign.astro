@@ -14,7 +14,9 @@ interface Props {
   bars?: string[]; // 帯を複数の色に分けるとき（ターミナル駅のトップで使う）
   branch?: { label: string; href: string }; // この駅から分かれる支線の最初の駅
 }
+import { splitTitle } from '../data/title';
 const { title, kicker, sub, color, prev, next, bars, branch } = Astro.props;
+const [titleMain, titleSub] = splitTitle(title);
 const norm = (n?: Neighbor) => (n === undefined ? undefined : typeof n === 'string' ? { label: n } : n);
 const p = norm(prev);
 const n = norm(next);
@@ -22,7 +24,7 @@ const n = norm(next);
 <header class="station-sign">
   <div class="station-sign__body">
     {kicker && <p class="station-sign__kicker">{kicker}</p>}
-    <h1 class="station-sign__title">{title}</h1>
+    <h1 class="station-sign__title">{titleMain}{titleSub && <span class="title-sub">{titleSub}</span>}</h1>
     {sub && <p class="station-sign__sub">{sub}</p>}
   </div>
   {bars && bars.length > 0 ? (

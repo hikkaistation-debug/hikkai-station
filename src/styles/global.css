@@ -161,6 +161,13 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 .article-card__title { margin: 0.45rem 0 0.25rem; font-size: 1.1rem; }
 .article-card__title a { color: var(--ink); text-decoration: none; }
 .article-card__title a:hover { text-decoration: underline; }
+
+/* 下書きの印（手元の確認用画面だけに出る） */
+.draft-badge { display: inline-block; background: #c4122f; color: #fff; font-weight: 800; font-size: 0.8rem; border-radius: 6px; padding: 0.05rem 0.5rem; }
+
+/* タイトルの2行目（splitTitle で分けたうしろの部分） */
+.title-sub { display: block; font-size: 0.68em; font-weight: 700; letter-spacing: 0.02em; margin-top: 0.25em; }
+.article-card__title .title-sub { font-size: 0.85em; color: var(--ink-soft); margin-top: 0.1em; }
 .article-card__summary { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
 .article-card__meta { margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--ink-soft); }
 

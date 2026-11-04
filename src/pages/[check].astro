@@ -1,0 +1,142 @@
+---
+// 下書きチェックのページ（手元の確認用画面だけ。本物のサイトには作られません）
+// アドレス：http://localhost:4321/shitagaki-check/
+// チェックの結果は review/shitagaki-check.json に自動で保存されます（astro.config.mjs の shitagakiReview）。
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import LineBadge from '../components/LineBadge.astro';
+import LevelBadge from '../components/LevelBadge.astro';
+import { TERMINAL } from '../data/site';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { check: 'shitagaki-check' } }] : [];
+}
+
+const drafts = (await getCollection('articles', ({ id, data }) => data.draft && !id.startsWith('inbox/'))).sort(
+  (a, b) => (a.data.draftNo ?? 9999) - (b.data.draftNo ?? 9999),
+);
+---
+<BaseLayout title="下書きチェック（手元だけ）" description="下書きの確認用ページ">
+  <StationSign kicker="手元だけのページ" title="下書きチェック" sub="DRAFT CHECK" color="#c4122f" prev={TERMINAL} />
+
+  <aside class="notice notice--sample">
+    <p class="notice__title">このページは、手元の確認用画面だけにあります</p>
+    <p>本物のサイトには出ません。選んだ結果とメモは、このパソコンの中に自動で保存されます。チェックが終わったら、Claude に「チェックしたよ」と伝えてください。</p>
+  </aside>
+
+  <p class="check-summary" id="check-summary">全{drafts.length}本</p>
+
+  {drafts.length === 0 ? (
+    <p class="empty">チェック前の下書きはありません。</p>
+  ) : (
+    <ol class="check-list">
+      {drafts.map((a) => (
+        <li class="check-item" data-id={a.id} data-no={a.data.draftNo ?? ''} data-title={a.data.title}>
+          <div class="check-item__head">
+            <span class="draft-badge">下書き{a.data.draftNo ? ` No.${a.data.draftNo}` : ''}</span>
+            <LineBadge id={a.data.category} short />
+            <LevelBadge level={a.data.level} compact />
+          </div>
+          <h2 class="check-item__title">
+            <a href={`/articles/${a.id}/`} target="_blank" rel="noopener">{a.data.title}</a>
+          </h2>
+          <fieldset class="check-item__status">
+            <legend>チェック</legend>
+            <label><input type="radio" name={`s-${a.id}`} value="" checked /> まだ</label>
+            <label><input type="radio" name={`s-${a.id}`} value="ok" /> OK（公開してよい）</label>
+            <label><input type="radio" name={`s-${a.id}`} value="fix" /> 直してほしい</label>
+          </fieldset>
+          <label class="check-item__note">
+            直してほしいところ（任意）
+            <textarea rows="3" placeholder="例：2つ目の表の「期間の目安」を〇〇に"></textarea>
+          </label>
+        </li>
+      ))}
+    </ol>
+  )}
+
+  <p class="check-saved" id="check-saved" aria-live="polite"></p>
+</BaseLayout>
+
+<style>
+  .check-summary { font-weight: 700; }
+  .check-list { list-style: none; padding: 0; display: grid; gap: 0.9rem; }
+  .check-item { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .check-item[data-status='ok'] { border-left-color: #1a7f37; }
+  .check-item[data-status='fix'] { border-left-color: #c4122f; }
+  .check-item__head { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+  .check-item__title { font-size: 1.05rem; margin: 0.5rem 0; }
+  .check-item__status { border: 0; padding: 0; margin: 0.4rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; }
+  .check-item__status legend { font-size: 0.85rem; color: var(--ink-soft); padding: 0; margin-bottom: 0.2rem; }
+  .check-item__status label { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 700; cursor: pointer; }
+  .check-item__note { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+  .check-item__note textarea { display: block; width: 100%; margin-top: 0.25rem; font: inherit; font-size: 0.95rem; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0.45rem 0.6rem; box-sizing: border-box; }
+  .check-saved { position: sticky; bottom: 0.5rem; text-align: right; font-size: 0.85rem; color: var(--ink-soft); }
+</style>
+
+<script>
+  type Entry = { no: string; title: string; status: '' | 'ok' | 'fix'; note: string; updated: string };
+  const items = [...document.querySelectorAll<HTMLLIElement>('.check-item')];
+  const savedEl = document.getElementById('check-saved')!;
+  const summaryEl = document.getElementById('check-summary')!;
+  let state: Record<string, Entry> = {};
+
+  const read = (li: HTMLLIElement): Entry => ({
+    no: li.dataset.no ?? '',
+    title: li.dataset.title ?? '',
+    status: ((li.querySelector<HTMLInputElement>('input[type=radio]:checked')?.value ?? '') as Entry['status']),
+    note: li.querySelector('textarea')!.value.trim(),
+    updated: new Date().toISOString(),
+  });
+
+  const paint = () => {
+    let ok = 0, fix = 0;
+    for (const li of items) {
+      const s = li.querySelector<HTMLInputElement>('input[type=radio]:checked')?.value ?? '';
+      li.dataset.status = s;
+      if (s === 'ok') ok++;
+      if (s === 'fix') fix++;
+    }
+    summaryEl.textContent = `全${items.length}本：OK ${ok}本／直してほしい ${fix}本／まだ ${items.length - ok - fix}本`;
+  };
+
+  let timer: number | undefined;
+  const save = () => {
+    window.clearTimeout(timer);
+    savedEl.textContent = '保存中…';
+    timer = window.setTimeout(async () => {
+      try {
+        const res = await fetch('/__shitagaki', { method: 'POST', body: JSON.stringify(state) });
+        savedEl.textContent = res.ok ? `保存しました（${new Date().toLocaleTimeString('ja-JP')}）` : '保存できませんでした';
+      } catch {
+        savedEl.textContent = '保存できませんでした（確認用画面が止まっているかもしれません）';
+      }
+    }, 600);
+  };
+
+  const onChange = (li: HTMLLIElement) => {
+    state[li.dataset.id!] = read(li);
+    paint();
+    save();
+  };
+
+  (async () => {
+    try {
+      state = await (await fetch('/__shitagaki')).json();
+    } catch {
+      state = {};
+    }
+    for (const li of items) {
+      const e = state[li.dataset.id!];
+      if (e) {
+        const r = li.querySelector<HTMLInputElement>(`input[type=radio][value="${e.status}"]`);
+        if (r) r.checked = true;
+        li.querySelector('textarea')!.value = e.note ?? '';
+      }
+      li.querySelectorAll('input[type=radio]').forEach((r) => r.addEventListener('change', () => onChange(li)));
+      li.querySelector('textarea')!.addEventListener('input', () => onChange(li));
+    }
+    paint();
+  })();
+</script>

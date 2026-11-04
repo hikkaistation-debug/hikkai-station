@@ -78,6 +78,13 @@ const relatedLines = [...new Set([data.category, ...data.relatedLines])];
     branch={toNb(branchStart)}
   />
 
+  {data.draft && (
+    <aside class="notice notice--sample">
+      <p class="notice__title">下書き{data.draftNo ? ` No.${data.draftNo}` : ''}（まだ公開していません）</p>
+      <p>この表示は手元の確認用画面だけに出ます。本物のサイトには出ません。</p>
+    </aside>
+  )}
+
   {data.sample && (
     <aside class="notice notice--sample">
       <p class="notice__title">これはサンプル記事です</p>

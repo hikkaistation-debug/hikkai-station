@@ -4,8 +4,13 @@ import { getLine } from './lines';
 export type Article = CollectionEntry<'articles'>;
 
 // 公開する記事を新しい順に取り出す（draft: true は除く）
+// ただし手元の確認用画面（npm run dev）では、自分で書いた下書きも表示する（Googleアラートの inbox は除く）。
+// 本番のサイト（ビルド）には、下書きは出ない。
 export async function getPublishedArticles(): Promise<Article[]> {
-  const all = await getCollection('articles', ({ data }) => !data.draft);
+  const all = await getCollection(
+    'articles',
+    ({ id, data }) => !data.draft || (import.meta.env.DEV && !id.startsWith('inbox/')),
+  );
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
