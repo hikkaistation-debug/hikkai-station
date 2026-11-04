@@ -147,6 +147,18 @@ export const LINKS: LinkItem[] = [
     related: { label: 'GNSSとは？', href: '/articles/gnss-towa/' },
   },
   {
+    name: 'エーサーベイ（A-Survey）',
+    url: 'https://a-survey.d.dooo.jp/',
+    desc: 'AndroidのスマートフォンやWindowsのパソコンで使える測量計算ソフトです。Bluetoothでトータルステーションとつないだ観測や、GNSS受信機との連携、座標計算・杭打ちなどができます。',
+    category: '測量・技術',
+    audience: ['実務者'],
+    kind: 'ツール',
+    price: '有料',
+    checked: '2026-11-05',
+    note: '個人のプロジェクトとして開発されているソフトです。本体のほかに機能を足すオプションがあり、デモ版の案内もあります。対応する機種や端末は公式サイトで確かめてください。特定のソフトをおすすめするものではありません。',
+    related: { label: 'エーサーベイ（A-Survey）とは？', href: '/articles/a-survey/' },
+  },
+  {
     name: '桜町測量ウェブサイト',
     url: 'https://sakura.3ku.jp/',
     desc: '土地家屋調査士事務所のサイトです。ブログで、GNSS測量・3次元測量・GISの使い方など、測量の技術情報を発信しています。',
