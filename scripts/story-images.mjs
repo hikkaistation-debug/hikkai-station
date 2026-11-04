@@ -83,7 +83,7 @@ pages.forEach((ps, i) => {
 ${i === 0 ? `<div class="head"><span class="kind">${t.kind}</span><span class="series">${t.title}</span><div class="title">第${data.no}話　${esc(data.title)}</div></div>` : ''}
 <div class="body">${ps.map((p) => (p === '◇' ? '<p class="sep">◇◇◇</p>' : `<p>${esc(p)}</p>`)).join('')}
 ${isLast ? `<div class="point"><b>📍 今日のひとこと</b>${esc(data.point)}</div>` : ''}</div>
-<div class="foot"><span class="brand"><span class="mark">筆</span>筆界ステーション｜車内の読み物</span><span>${isLast ? 'おわり　' : 'つづく →　'}${i + 1}/${pages.length}</span></div>`;
+<div class="foot"><span class="brand"><span class="mark">筆</span>筆界ステーション｜車内の読み物｜hikkai-station.com</span><span>${isLast ? 'おわり　' : 'つづく →　'}${i + 1}/${pages.length}</span></div>`;
   const htmlPath = path.join(outDir, `_tmp-${i}.html`);
   fs.writeFileSync(htmlPath, html);
   const png = path.join(outDir, `${train}-${no}-${i + 1}.png`);
@@ -92,13 +92,16 @@ ${isLast ? `<div class="point"><b>📍 今日のひとこと</b>${esc(data.point
   files.push(png);
 });
 
-// 投稿文（本文は画像なので、文は短く。サイトのリンクはリプライに）
+// 投稿文（本文は画像なので、文は短く。サイトのリンクも本文に入れて、1つの投稿で予約投稿できるようにする）
 const url = `https://hikkai-station.com/yomimono/${train}/${no}/`;
-const post = `【${t.kind}】${t.title} 第${data.no}話「${data.title}」\n${data.summary}\n#筆界ステーション #車内の読み物 #土地家屋調査士`;
-const reply = `サイトでは、この話で出てきた言葉をくわしく解説した記事も読めます👇\n${url}`;
+const tags = '#筆界ステーション #車内の読み物 #土地家屋調査士';
+const head = `【${t.kind}】${t.title} 第${data.no}話「${data.title}」`;
+// X の文字数（日本語は1字＝2、URLは23）
+const weight = (s) => [...s.replace(/https?:\/\/\S+/g, 'x'.repeat(23))].reduce((n, ch) => n + (ch.codePointAt(0) < 0x1100 ? 1 : 2), 0);
+let post = `${head}\n${data.summary}\n▼解説記事はサイトで\n${url}\n${tags}`;
+if (weight(post) > 280) post = `${head}\n▼解説記事はサイトで\n${url}\n${tags}`; // 長すぎたら要約を省く
 const intent = `https://x.com/intent/post?text=${encodeURIComponent(post)}`;
-const weight = (s) => [...s].reduce((n, ch) => n + (ch.codePointAt(0) < 0x1100 ? 1 : 2), 0);
-const txt = `■ 投稿する日時：${pub} 6:00（予約投稿）\n\n■ 本文（画像${files.length}枚をつけて投稿）※${weight(post)}/280\n${post}\n\n■ 投稿画面を開くリンク（画像は自分でつけてください）\n${intent}\n\n■ 自分の投稿へのリプライ\n${reply}\n`;
+const txt = `■ 投稿する日時：${pub} 6:00（予約投稿）\n\n■ 本文（画像${files.length}枚をつけて、この1つだけを予約投稿）※${weight(post)}/280\n${post}\n\n■ 投稿画面を開くリンク（画像は自分でつけてください）\n${intent}\n`;
 fs.writeFileSync(path.join(outDir, `${train}-${no}.txt`), txt);
 console.log(files.map((f) => path.relative(root, f)).join('\n'));
 console.log(`投稿文：${path.relative(root, path.join(outDir, `${train}-${no}.txt`))}（${weight(post)}/280）`);
