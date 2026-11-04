@@ -38,5 +38,11 @@ import { SITE } from '../data/site';
 
     <h2>運営者</h2>
     <p>{SITE.operator}（個人で運営しています）</p>
+    {SITE.xUser && (
+      <p>
+        更新情報は X（旧Twitter）でもお知らせしています：
+        <a href={`https://x.com/${SITE.xUser}`} rel="noopener me" target="_blank">@{SITE.xUser}<span class="visually-hidden">（新しいタブで開きます）</span></a>
+      </p>
+    )}
   </div>
 </BaseLayout>

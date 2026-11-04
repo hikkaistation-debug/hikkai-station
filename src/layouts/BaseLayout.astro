@@ -78,6 +78,9 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
           <li><a href="/about/">このサイトについて</a></li>
           <li><a href="/contact/">お問い合わせ</a></li>
           <li><a href="/rss.xml">RSS</a></li>
+          {SITE.xUser && (
+            <li><a href={`https://x.com/${SITE.xUser}`} rel="noopener me" target="_blank">X（@{SITE.xUser}）<span class="visually-hidden">（新しいタブで開きます）</span></a></li>
+          )}
         </ul>
         <p>&copy; {SITE.name}</p>
       </div>
