@@ -25,8 +25,9 @@ import StationSign from '../components/StationSign.astro';
   const status = document.getElementById('search-status')!;
   const results = document.getElementById('search-results')!;
 
-  // 全角・半角や大文字・小文字の違いを気にせず探せるようにする
-  const normalize = (s: string) => s.normalize('NFKC').toLowerCase();
+  // 全角・半角、大文字・小文字、カタカナ・ひらがなの違いを気にせず探せるようにする
+  const normalize = (s: string) =>
+    s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
   let items: Item[] = [];
 

@@ -1,0 +1,139 @@
+---
+// 逆引き案内所：「こんなときは？」と「用語さくいん」
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import { GLOSSARY } from '../data/glossary';
+
+// こんなときは？（困りごと → 読むとよい記事・相談先）
+const cases = [
+  {
+    q: '隣の土地との境目がわからない',
+    links: [
+      { label: '「筆界」と「所有権の境」はちがうもの？', href: '/articles/hikkai-to-shoyukenkai/' },
+      { label: '実家の「境界」と「越境」、年内に確認しておきたいポイント', href: '/articles/kyokai-ekkyo-nennai-check/' },
+    ],
+    who: '土地家屋調査士',
+  },
+  {
+    q: '隣の人と境目のことで話がまとまらない',
+    links: [{ label: '裁判をしなくても使える「筆界特定制度」のしくみ', href: '/articles/hikkai-tokutei-seido/' }],
+    who: '土地家屋調査士・弁護士、法務局（筆界特定）',
+  },
+  {
+    q: '隣の木の枝や塀が、こちらに越えてきている',
+    links: [{ label: '実家の「境界」と「越境」、年内に確認しておきたいポイント', href: '/articles/kyokai-ekkyo-nennai-check/' }],
+    who: 'まずはお隣と話し合い。まとまらないときは弁護士',
+  },
+  {
+    q: '土地を分けたい・一部だけ売りたい',
+    links: [{ label: '「筆界」と「所有権の境」はちがうもの？（分筆の説明）', href: '/articles/hikkai-to-shoyukenkai/' }],
+    who: '土地家屋調査士',
+  },
+  {
+    q: '相続した土地の名義を変えたい',
+    links: [{ label: '相続登記の申請が義務になりました', href: '/articles/souzoku-touki-gimuka/' }],
+    who: '司法書士、法務局（手続きの案内）',
+  },
+  {
+    q: '相続した土地を手放したい',
+    links: [{ label: 'いらない土地を国に引き取ってもらえる「相続土地国庫帰属制度」', href: '/articles/souzoku-tochi-kokko-kizoku/' }],
+    who: '法務局',
+  },
+  {
+    q: '共有になっている土地のことで困っている',
+    links: [{ label: '共有者が59人に──相続登記をしないまま代替わりが続いた森林の例', href: '/articles/kyoyu-shinrin-souzoku/' }],
+    who: '司法書士・弁護士',
+  },
+  {
+    q: '法務局でもらった図面の種類がわからない',
+    links: [{ label: '法務局の「地図」と「地図に準ずる図面」', href: '/articles/14jou-chizu/' }],
+    who: '土地家屋調査士、法務局',
+  },
+  {
+    q: '土地家屋調査士になりたい',
+    links: [
+      { label: '土地家屋調査士試験のしくみ（はじめての方へ）', href: '/articles/shiken-shikumi/' },
+      { label: '試験ののりば', href: '/shiken/' },
+    ],
+    who: '',
+  },
+];
+---
+<BaseLayout title="逆引き案内所" description="困りごとから読むとよい記事や相談先を探したり、筆界・境界・登記の言葉を調べたりできます。">
+  <StationSign kicker="INFORMATION" title="逆引き案内所" sub="GUIDE & GLOSSARY" />
+
+  <p>
+    「こんなときはどうする？」という困りごとから、読むとよい記事と相談先を案内します。
+    わからない言葉は、下の「用語さくいん」で調べられます。
+  </p>
+
+  <nav aria-label="このページの目次">
+    <ol class="route-map">
+      <li><a href="#cases">こんなときは？<small>{cases.length}件</small></a></li>
+      <li><a href="#glossary">用語さくいん<small>{GLOSSARY.length}語</small></a></li>
+    </ol>
+  </nav>
+
+  <section id="cases" aria-labelledby="cases-h">
+    <h2 id="cases-h">こんなときは？</h2>
+    <ul class="case-list">
+      {cases.map((c) => (
+        <li class="case">
+          <p class="case__q">{c.q}</p>
+          <p class="case__label">読むとよい記事</p>
+          <ul>
+            {c.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+          {c.who && <p class="case__who"><span class="case__label">相談先</span>{c.who}</p>}
+        </li>
+      ))}
+    </ul>
+    <p><small>※このサイトでは、個別の案件についてのご相談はお受けしていません。</small></p>
+  </section>
+
+  <section id="glossary" aria-labelledby="glossary-h">
+    <h2 id="glossary-h">用語さくいん</h2>
+    <div class="search-box">
+      <label for="g-filter" class="visually-hidden">言葉をしぼりこむ</label>
+      <input id="g-filter" type="search" placeholder="言葉やよみで、しぼりこみ（例：ぶんぴつ）" autocomplete="off" />
+    </div>
+    <p id="g-status" aria-live="polite" class="visually-hidden"></p>
+    <dl class="glossary">
+      {GLOSSARY.map((t) => (
+        <div class="glossary__item" id={`g-${t.id}`} data-text={`${t.term} ${t.yomi} ${t.desc}`}>
+          <dt>{t.term}<span class="glossary__yomi">（{t.yomi}）</span></dt>
+          <dd>
+            {t.desc}
+            {t.related && (
+              <ul class="glossary__related">
+                {t.related.map((r) => <li><a href={r.href}>{r.label}</a></li>)}
+              </ul>
+            )}
+          </dd>
+        </div>
+      ))}
+    </dl>
+    <p id="g-empty" class="empty" hidden>見つかりませんでした。別の言葉や、ひらがなのよみで試してください。</p>
+  </section>
+</BaseLayout>
+
+<script>
+  // 用語さくいんの絞り込み（全角・半角、カタカナ・ひらがなの違いを気にせず探せる）
+  const input = document.getElementById('g-filter') as HTMLInputElement;
+  const items = Array.from(document.querySelectorAll<HTMLElement>('.glossary__item'));
+  const empty = document.getElementById('g-empty')!;
+  const status = document.getElementById('g-status')!;
+  const norm = (s: string) =>
+    s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+  input.addEventListener('input', () => {
+    const q = norm(input.value.trim());
+    let shown = 0;
+    for (const el of items) {
+      const hit = !q || norm(el.dataset.text ?? '').includes(q);
+      el.hidden = !hit;
+      if (hit) shown++;
+    }
+    empty.hidden = shown > 0;
+    status.textContent = `${shown}語`;
+  });
+</script>

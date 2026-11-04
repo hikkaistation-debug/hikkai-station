@@ -4,41 +4,13 @@ import StationSign from '../components/StationSign.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import { SITE, STATIONS } from '../data/site';
 import { getPublishedArticles } from '../data/articles';
+import { PLATFORMS } from '../data/platforms';
 
 const articles = await getPublishedArticles();
 const latest = articles.slice(0, 6);
 
-// 読者別の入口「のりば」
-const platforms = [
-  {
-    num: '1',
-    who: 'はじめての方',
-    title: '境界ってそもそも何？',
-    desc: '「筆界」「境界」「登記」など、まずは基本の言葉をやさしく解説します。',
-    href: '/kiso/',
-  },
-  {
-    num: '2',
-    who: 'お困りの方',
-    title: '隣地との境界・相続した土地・登記のこと',
-    desc: '隣の土地との境目や、相続した土地のことなど、困りごと別にやさしい記事を集めました。',
-    href: '/komarigoto/',
-  },
-  {
-    num: '3',
-    who: '実務者の方',
-    title: '法改正・通達・裁決・技術の情報',
-    desc: '制度の動きや実務・技術のニュースを、出典リンク付きでまとめます。',
-    href: '/news/',
-  },
-  {
-    num: '4',
-    who: '受験生の方',
-    title: '土地家屋調査士試験',
-    desc: '試験のしくみや公式の情報へのリンク、試験に関するニュースをまとめます。',
-    href: '/shiken/',
-  },
-];
+// 読者別の入口「のりば」（色などは src/data/platforms.ts にまとめています）
+const platforms = PLATFORMS;
 ---
 <BaseLayout>
   <StationSign kicker="ようこそ" title={SITE.name} sub="HIKKAI STATION" prev="境界" next="登記" />
@@ -49,7 +21,7 @@ const platforms = [
     <h2 id="platforms-heading">のりば ― あなたに合う入口から</h2>
     <div class="platforms">
       {platforms.map((p) => (
-        <a class="platform" href={p.href}>
+        <a class="platform" href={p.href} style={`--pc:${p.color}`}>
           <span class="platform__head">
             <span class="platform__num" aria-hidden="true">{p.num}</span>
             <span>
@@ -85,7 +57,7 @@ const platforms = [
   </section>
 
   <section aria-labelledby="map-heading">
-    <h2 id="map-heading">路線図（サイトのご案内）</h2>
+    <h2 id="map-heading">サイトの案内図</h2>
     <ol class="route-map">
       {STATIONS.filter((s) => s.href !== '/').map((s) => (
         <li class={s.ready ? '' : 'is-soon'}>

@@ -56,7 +56,7 @@ h3 { font-size: 1.12rem; }
 
 /* ---------- ヘッダー（駅の案内サイン風） ---------- */
 .site-header { background: var(--navy); color: #fff; }
-.site-header__inner {
+.site-header__inner { min-width: 0;
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   padding-block: 0.75rem;
 }
@@ -156,22 +156,23 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 /* ---------- のりば（トップの入口） ---------- */
 .platforms { display: grid; gap: 1rem; margin: 1.5rem 0; }
 @media (min-width: 760px) { .platforms { grid-template-columns: repeat(2, 1fr); } }
+/* --pc：のりばごとの色（src/data/platforms.ts） */
 .platform {
-  display: flex; flex-direction: column; background: var(--navy); color: #fff;
+  display: flex; flex-direction: column; background: var(--card); color: var(--ink);
   border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; text-decoration: none;
-  border: 3px solid var(--navy); transition: transform 0.1s;
+  border: 3px solid var(--pc, var(--navy)); border-top-width: 12px; transition: transform 0.1s;
 }
-.platform:hover { color: #fff; transform: translateY(-2px); border-color: var(--sign-yellow); }
+.platform:hover { color: var(--ink); transform: translateY(-2px); box-shadow: 0 4px 0 var(--pc, var(--navy)); }
 .platform__head { display: flex; align-items: center; gap: 0.6rem; }
 .platform__num {
   display: grid; place-items: center; width: 2.6rem; height: 2.6rem; flex: none;
-  background: var(--sign-yellow); color: var(--navy); border-radius: 50%;
+  background: var(--pc, var(--navy)); color: #fff; border-radius: 50%;
   font-weight: 900; font-size: 1.35rem;
 }
-.platform__label { display: block; font-size: 0.8rem; letter-spacing: 0.2em; opacity: 0.9; font-weight: 700; }
+.platform__label { display: block; font-size: 0.8rem; letter-spacing: 0.15em; font-weight: 700; color: var(--pc, var(--navy)); }
 .platform__title { display: block; font-size: 1.25rem; font-weight: 800; margin: 0; }
-.platform__desc { display: block; margin: 0.6rem 0 0; font-size: 0.95rem; line-height: 1.7; }
-.platform__go { margin-top: auto; padding-top: 0.6rem; font-weight: 700; color: var(--sign-yellow); }
+.platform__desc { display: block; margin: 0.6rem 0 0; font-size: 0.95rem; line-height: 1.7; color: var(--ink-soft); }
+.platform__go { margin-top: auto; padding-top: 0.6rem; font-weight: 800; color: var(--pc, var(--navy)); }
 
 /* ---------- 路線図ナビ ---------- */
 .route-map { list-style: none; margin: 1rem 0; padding: 0; position: relative; }
@@ -268,3 +269,37 @@ main { padding-bottom: 1rem; }
 .figure { margin: 1.2rem 0; }
 .figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
 .figure figcaption { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.35rem; }
+
+/* ---------- ヘッダーの「さがす」 ---------- */
+.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.header-search {
+  display: inline-flex; align-items: center; gap: 0.3rem; color: var(--navy); background: var(--sign-yellow);
+  border: 2px solid var(--sign-yellow); border-radius: 8px; padding: 0.3rem 0.7rem;
+  font-weight: 800; text-decoration: none; line-height: 1.4;
+}
+.header-search:hover { color: var(--navy); background: #ffe27a; }
+
+/* ---------- 逆引き案内所 ---------- */
+.case-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.8rem; }
+@media (min-width: 760px) { .case-list { grid-template-columns: repeat(2, 1fr); } }
+.case { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--sign-yellow); border-radius: var(--radius); padding: 0.8rem 1rem; }
+.case__q { margin: 0 0 0.4rem; font-weight: 800; font-size: 1.05rem; }
+.case__q::before { content: 'Q. '; color: var(--navy); }
+.case ul { margin: 0.2rem 0 0.4rem; padding-left: 1.2rem; }
+.case__label { display: inline-block; margin: 0 0.5rem 0 0; font-size: 0.78rem; font-weight: 800; color: #fff; background: var(--navy); border-radius: 4px; padding: 0 0.4rem; }
+.case__who { margin: 0.2rem 0 0; font-size: 0.95rem; }
+.glossary { margin: 1rem 0; display: grid; gap: 0.6rem; }
+.glossary__item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.7rem 1rem; scroll-margin-top: 1rem; }
+.glossary__item:target { border-color: var(--navy); box-shadow: 0 0 0 3px var(--sign-yellow); }
+.glossary__item[hidden] { display: none; }
+.glossary dt { font-weight: 800; font-size: 1.05rem; }
+.glossary__yomi { font-weight: 500; font-size: 0.85rem; color: var(--ink-soft); margin-left: 0.3rem; }
+.glossary dd { margin: 0.2rem 0 0; }
+.glossary__related { margin: 0.3rem 0 0; padding-left: 1.2rem; font-size: 0.9rem; }
+@media (max-width: 480px) {
+  .brand__name { font-size: 1rem; letter-spacing: 0.04em; }
+  .brand__sub { display: none; }
+  .brand__mark { width: 2.1rem; height: 2.1rem; font-size: 1.05rem; }
+  .header-actions { gap: 0.35rem; }
+  .header-search, .menu-toggle { padding: 0.3rem 0.5rem; font-size: 0.9rem; }
+}

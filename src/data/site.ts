@@ -16,12 +16,13 @@ export const SITE = {
 // サイト内のおもな行き先（路線図ナビ・メニューで使います）
 // ready: false のページは「準備中」と表示します。
 export const STATIONS = [
-  { href: '/', label: 'トップ', code: '00', ready: true },
-  { href: '/news/', label: 'ニュース', code: '01', ready: true },
-  { href: '/kiso/', label: '基礎解説', code: '02', ready: true },
-  { href: '/shiken/', label: '試験', code: '03', ready: true },
-  { href: '/tsutatsu/', label: '通達ナビ', code: '04', ready: false },
-  { href: '/links/', label: 'リンク集', code: '05', ready: false },
-  { href: '/about/', label: 'このサイトについて', code: '06', ready: true },
-  { href: '/contact/', label: 'お問い合わせ', code: '07', ready: true },
+  { href: '/', label: 'トップ', ready: true },
+  { href: '/news/', label: 'ニュース', ready: true },
+  { href: '/kiso/', label: '基礎解説', ready: true },
+  { href: '/shiken/', label: '試験', ready: true },
+  { href: '/annai/', label: '逆引き案内所', ready: true },
+  { href: '/tsutatsu/', label: '通達ナビ', ready: false },
+  { href: '/links/', label: 'リンク集', ready: false },
+  { href: '/about/', label: 'このサイトについて', ready: true },
+  { href: '/contact/', label: 'お問い合わせ', ready: true },
 ] as const;
