@@ -34,6 +34,18 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary" />
+    {SITE.gaId && import.meta.env.PROD && (
+      <>
+        <!-- アクセス解析（Googleアナリティクス）。説明は /privacy/ に書いています -->
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${SITE.gaId}`}></script>
+        <script is:inline define:vars={{ gaId: SITE.gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
   </head>
   <body>
     <a class="skip-link" href="#main">本文へ移動</a>
@@ -90,6 +102,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
         <ul>
           <li><a href="/about/">このサイトについて</a></li>
           <li><a href="/contact/">お問い合わせ</a></li>
+          <li><a href="/privacy/">プライバシーポリシー</a></li>
           <li><a href="/rss.xml">RSS</a></li>
           {SITE.xUser && (
             <li><a href={`https://x.com/${SITE.xUser}`} rel="noopener me" target="_blank">X（@{SITE.xUser}）<span class="visually-hidden">（新しいタブで開きます）</span></a></li>

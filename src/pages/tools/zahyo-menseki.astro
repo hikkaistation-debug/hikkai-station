@@ -1,0 +1,204 @@
+---
+// 座標から面積を計算（座標法）
+// 倍面積 = Σ Xn × (Yn+1 − Yn−1)。地積の端数の扱いは 不動産登記規則100条。
+// 入力は「点名・X・Y」を1点1行の表で入れる形（Excel からの貼り付けにも対応）。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="座標から面積を計算（座標法）" description="筆界点の座標（X・Y）から、座標法で面積・倍面積・辺長を計算し、求積表の形で表示します。地積の端数処理（不動産登記規則100条）にも対応。">
+  <StationSign kicker="計算ツール" title="座標から面積を計算（座標法）" sub="AREA BY COORDINATES" prev={TOOLS_TOP} />
+
+  <p>
+    筆界点の座標を、土地をひと回りする順番に入れると、座標法で面積を計算します。入れた座標はどこにも送りません。
+  </p>
+
+  <section class="tool" aria-labelledby="z-h">
+    <h2 id="z-h">座標を入れる</h2>
+    <p class="tool__note">1行に1点ずつ、X と Y を入れてください（点名はなくてもかまいません）。3点以上入れると、自動で計算します。</p>
+    <div class="calc-wrap">
+      <table class="coord-table">
+        <thead><tr><th scope="col">No.</th><th scope="col">点名</th><th scope="col">X（m）</th><th scope="col">Y（m）</th><th scope="col"><span class="visually-hidden">削除</span></th></tr></thead>
+        <tbody id="coord-rows"></tbody>
+      </table>
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="add-row">＋ 点を追加</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="sample">例を入れる</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="clear">すべて消す</button>
+    </div>
+    <p class="tool__note">Enter キーで次の欄へ進みます。Excel で「点名・X・Y」の3列（または X・Y の2列）をコピーして、表の欄に貼り付けると、まとめて入ります。</p>
+    <div class="tool__row">
+      <label for="kind">地目</label>
+      <select id="kind">
+        <option value="taku">宅地・鉱泉地</option>
+        <option value="other">それ以外（田・畑・山林など）</option>
+      </select>
+    </div>
+    <p class="tool__note">X は北向き、Y は東向き（平面直角座標系の向き）です。点の順番は右回り・左回りのどちらでもかまいません。</p>
+    <div class="tool__result" id="result" aria-live="polite"></div>
+  </section>
+
+  <div class="page-body">
+    <h2>計算のしかた（座標法）</h2>
+    <p>
+      各点の X に、「次の点の Y − 前の点の Y」をかけて、すべて足したものが<strong>倍面積</strong>です。その半分が面積になります。
+      マイナスになったときは、点の順番が逆回りというだけなので、絶対値をとります。
+    </p>
+    <div class="prose">
+      <table>
+        <thead><tr><th>項目</th><th>式</th></tr></thead>
+        <tbody>
+          <tr><td>倍面積</td><td>Σ Xn ×（Yn+1 − Yn−1）</td></tr>
+          <tr><td>面積</td><td>倍面積 ÷ 2</td></tr>
+          <tr><td>辺長</td><td>√（（Xn+1 − Xn）² ＋（Yn+1 − Yn）²）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>登記の地積にするとき</h2>
+    <p>不動産登記規則100条により、地積は平方メートルで表し、端数は次のように切り捨てます。</p>
+    <ul>
+      <li>宅地・鉱泉地：1㎡の100分の1未満を切り捨て（例：123.456㎡ → 123.45㎡）</li>
+      <li>それ以外の土地で10㎡を超えるもの：1㎡未満を切り捨て（例：123.456㎡ → 123㎡）</li>
+      <li>それ以外の土地で10㎡以下のもの：1㎡の100分の1未満を切り捨て</li>
+    </ul>
+    <p class="tool__note">このツールの結果は計算の目安です。登記に使う求積は、土地家屋調査士などの専門家が確認したものを使ってください。</p>
+  </div>
+
+  <script>
+    type Pt = { name: string; x: string; y: string };
+    const SAMPLE: Pt[] = [
+      { name: 'K1', x: '100.000', y: '100.000' },
+      { name: 'K2', x: '100.000', y: '120.000' },
+      { name: 'K3', x: '85.000', y: '120.000' },
+      { name: 'K4', x: '85.000', y: '100.000' },
+    ];
+    const body = document.getElementById('coord-rows') as HTMLTableSectionElement;
+    const out = document.getElementById('result')!;
+    const kindSel = document.getElementById('kind') as HTMLSelectElement;
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const f3 = (v: number) => v.toFixed(3);
+    const f6 = (v: number) => v.toFixed(6);
+    // 浮動小数の誤差（例：123.4499999）で切り捨てがずれないよう、少し丸めてから切り捨てる
+    const floorTo = (v: number, unit: number) => Math.floor(Math.round((v / unit) * 1e6) / 1e6) * unit;
+    const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v.normalize('NFKC').trim()));
+    const field = (tr: Element, cls: string) => tr.querySelector(cls) as HTMLInputElement;
+
+    function addRow(p: Pt = { name: '', x: '', y: '' }, focus = false) {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="coord-no"></td>' +
+        '<td><input type="text" class="c-name" aria-label="点名" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-x" aria-label="X座標" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-y" aria-label="Y座標" /></td>' +
+        '<td><button type="button" class="coord-del" aria-label="この点を削除">×</button></td>';
+      field(tr, '.c-name').value = p.name;
+      field(tr, '.c-x').value = p.x;
+      field(tr, '.c-y').value = p.y;
+      body.appendChild(tr);
+      renumber();
+      if (focus) field(tr, '.c-x').focus();
+    }
+    function renumber() {
+      [...body.rows].forEach((tr, i) => {
+        tr.querySelector('.coord-no')!.textContent = String(i + 1);
+        field(tr, '.c-name').placeholder = String(i + 1);
+      });
+    }
+    function setRows(list: Pt[]) {
+      body.innerHTML = '';
+      list.forEach((p) => addRow(p));
+      while (body.rows.length < Math.max(4, list.length)) addRow();
+      calc();
+    }
+    function readRows() {
+      return [...body.rows].map((tr, i) => {
+        const xs = field(tr, '.c-x').value;
+        const ys = field(tr, '.c-y').value;
+        return { no: i + 1, name: field(tr, '.c-name').value.trim() || String(i + 1), xs, ys, x: toNum(xs), y: toNum(ys) };
+      });
+    }
+
+    function calc() {
+      const pts = readRows().filter((r) => r.xs.trim() !== '' || r.ys.trim() !== '');
+      const bad = pts.filter((r) => !Number.isFinite(r.x) || !Number.isFinite(r.y));
+      if (bad.length) {
+        out.innerHTML = bad.map((r) => `<p class="tool__error">No.${r.no} の X・Y を数字で入れてください。</p>`).join('');
+        return;
+      }
+      if (pts.length < 3) {
+        out.innerHTML = pts.length ? `<p class="tool__note">あと${3 - pts.length}点入れると計算します。</p>` : '';
+        return;
+      }
+      const n = pts.length;
+      let sum = 0;
+      let perim = 0;
+      const trs = pts.map((p, i) => {
+        const prev = pts[(i - 1 + n) % n];
+        const next = pts[(i + 1) % n];
+        const dy = next.y - prev.y;
+        const prod = p.x * dy;
+        sum += prod;
+        const len = Math.hypot(next.x - p.x, next.y - p.y);
+        perim += len;
+        return `<tr><td>${esc(p.name)}</td><td>${f3(p.x)}</td><td>${f3(p.y)}</td><td>${f3(dy)}</td><td>${f6(prod)}</td><td>${esc(p.name)}→${esc(next.name)}</td><td>${f3(len)}</td></tr>`;
+      });
+      const bai = Math.abs(sum);
+      const area = bai / 2;
+      const toki = kindSel.value === 'other' && area > 10 ? floorTo(area, 1).toFixed(0) : floorTo(area, 0.01).toFixed(2);
+      const tsubo = area / (400 / 121);
+      out.innerHTML = `
+        <p>面積 <span class="tool__big">${f6(area)}</span> ㎡（倍面積 ${f6(bai)}）</p>
+        <p>登記の地積にすると <strong>${toki} ㎡</strong>（不動産登記規則100条の端数処理）／ 約 ${tsubo.toFixed(2)} 坪 ／ 周囲の長さ ${f3(perim)} m</p>
+        ${sum < 0 ? '<p class="tool__note">点の順番の回り方によって、倍面積の合計がマイナスになりました。面積は絶対値で表示しています。</p>' : ''}
+        <div class="calc-wrap"><table class="calc-table">
+          <thead><tr><th>点名</th><th>X</th><th>Y</th><th>Yn+1 − Yn−1</th><th>Xn ×（Yn+1 − Yn−1）</th><th>辺</th><th>辺長</th></tr></thead>
+          <tbody>${trs.join('')}</tbody>
+          <tfoot><tr><td colspan="4">倍面積（合計）</td><td>${f6(sum)}</td><td colspan="2"></td></tr></tfoot>
+        </table></div>`;
+    }
+
+    // 貼り付けた文字（複数行）を点の一覧にする
+    function parseText(text: string): Pt[] {
+      return text
+        .split(/\r?\n/)
+        .map((l) => l.normalize('NFKC').trim())
+        .filter(Boolean)
+        .map((l) => {
+          const p = l.split(/[\s,]+/);
+          return p.length >= 3 ? { name: p[0], x: p[1], y: p[2] } : { name: '', x: p[0] ?? '', y: p[1] ?? '' };
+        });
+    }
+
+    body.addEventListener('input', calc);
+    kindSel.addEventListener('change', calc);
+    body.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.coord-del');
+      if (!btn) return;
+      btn.closest('tr')!.remove();
+      if (body.rows.length < 3) addRow();
+      renumber();
+      calc();
+    });
+    // Enter で次の欄へ（最後の欄なら、点を1つ足して次へ）
+    body.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      const inputs = [...body.querySelectorAll('input')];
+      const i = inputs.indexOf(e.target);
+      if (i === inputs.length - 1) addRow(undefined, true);
+      else inputs[i + 1].focus();
+    });
+    // 表の欄に、Excel などから複数行・複数列をまとめて貼り付けたとき
+    body.addEventListener('paste', (e) => {
+      const text = e.clipboardData?.getData('text') ?? '';
+      if (!/[\n\t]/.test(text.trim())) return;
+      e.preventDefault();
+      setRows(parseText(text));
+    });
+    document.getElementById('add-row')!.addEventListener('click', () => addRow(undefined, true));
+    document.getElementById('sample')!.addEventListener('click', () => setRows(SAMPLE));
+    document.getElementById('clear')!.addEventListener('click', () => setRows([]));
+    setRows([]);
+  </script>
+</BaseLayout>

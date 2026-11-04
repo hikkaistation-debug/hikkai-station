@@ -11,6 +11,8 @@ export const SITE = {
   contactFormUrl: 'https://forms.gle/5qNVMSbHERXpndb66',
   // サイト専用の Xアカウントのユーザー名（@は付けない。空のままなら表示しない）
   xUser: 'hikkai_station',
+  // Googleアナリティクスの測定ID（G-で始まる記号）。空のままなら解析は動きません。本番のサイトだけで動きます。
+  gaId: 'G-S9499G6TRD',
 };
 
 // ─────────────────────────────────────────────
@@ -43,7 +45,9 @@ export const MENU: MenuGroup[] = [
       { href: '/annai/', label: '逆引き案内所', ready: true },
       { href: '/search/', label: 'さがす', ready: true },
       { href: '/yomimono/', label: '車内の読み物', ready: true },
-      { href: '/tsutatsu/', label: '通達ナビ', ready: false },
+      { href: '/tsutatsu/', label: '通達ナビ', ready: true },
+      { href: '/tools/', label: '計算ツール', ready: true },
+      { href: '/shindan/', label: '境界トラブル診断', ready: true },
       { href: '/links/', label: 'リンク集', ready: true },
     ],
   },
@@ -53,6 +57,7 @@ export const MENU: MenuGroup[] = [
     items: [
       { href: '/about/', label: 'このサイトについて', ready: true },
       { href: '/contact/', label: 'お問い合わせ', ready: true },
+      { href: '/privacy/', label: 'プライバシーポリシー', ready: true },
     ],
   },
 ];

@@ -1,0 +1,245 @@
+---
+// 境界トラブル診断：質問に答えていくと、相談先と次にやることがわかる
+// 質問と答えは下の STEPS に書きます。next に次の質問の id、または結果の id を書きます。
+// JavaScript が動かない環境では、すべての質問と結果が一覧で表示されます。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import { TERMINAL } from '../data/site';
+
+type Choice = { label: string; next: string };
+type Step = { id: string; q: string; choices: Choice[] };
+type Result = { id: string; title: string; who: string[]; todo: string[]; links?: { label: string; href: string }[] };
+
+const STEPS: Step[] = [
+  {
+    id: 'start',
+    q: 'どんなことで困っていますか？',
+    choices: [
+      { label: '隣の土地との境目がどこかわからない', next: 'where' },
+      { label: '隣の人と、境目について意見が合わない', next: 'dispute' },
+      { label: '塀・建物・木の枝などが境目を越えている（越境）', next: 'r-ekkyo' },
+      { label: '道路や水路など、公共の土地との境目を知りたい', next: 'r-kanmin' },
+      { label: '土地を分けたい・売りたい・面積を正確に知りたい', next: 'r-bunpitsu' },
+      { label: '相続した土地のこと', next: 'souzoku' },
+    ],
+  },
+  {
+    id: 'where',
+    q: '土地の角などに、境界標（コンクリートの杭・金属のプレートや鋲など）は見つかりますか？',
+    choices: [
+      { label: '見つかる', next: 'r-hyo-ari' },
+      { label: '見つからない・動いていそう・壊れている', next: 'r-hyo-nashi' },
+      { label: 'わからない', next: 'r-hyo-nashi' },
+    ],
+  },
+  {
+    id: 'dispute',
+    q: '相手の方と、話し合いはできそうですか？',
+    choices: [
+      { label: 'できそう', next: 'r-hanashiai' },
+      { label: 'むずかしい・こじれている', next: 'r-funsou' },
+    ],
+  },
+  {
+    id: 'souzoku',
+    q: '相続した土地について、いちばん気になることは？',
+    choices: [
+      { label: '名義の変更（相続登記）がまだ', next: 'r-souzokutouki' },
+      { label: '境目や面積がはっきりしない', next: 'where' },
+      { label: '使う予定がなく、手放したい', next: 'r-kokko' },
+    ],
+  },
+];
+
+const RESULTS: Result[] = [
+  {
+    id: 'r-hyo-ari',
+    title: 'まず、資料と境界標を照らし合わせましょう',
+    who: ['法務局', '土地家屋調査士'],
+    todo: [
+      '法務局で、地積測量図や地図（公図）を取って、境界標の位置や辺の長さと見比べます。',
+      '資料と合っていれば、その境界標が目安になります。',
+      '資料がない・合わない・境界標が本当に境目かわからないときは、土地家屋調査士に相談してください。',
+    ],
+    links: [
+      { label: '法務局で取れる資料（逆引き案内所）', href: '/annai/' },
+      { label: '用語：境界標', href: '/annai/#g-kyokaihyo' },
+    ],
+  },
+  {
+    id: 'r-hyo-nashi',
+    title: '土地家屋調査士に、境目の調査を相談しましょう',
+    who: ['土地家屋調査士'],
+    todo: [
+      '土地家屋調査士が、法務局の資料や現地を調べ、測量して境目の位置を確かめます。',
+      'そのうえで、隣の土地の方と現地で立ち会って確認し、境界標を入れることが一般的です。',
+      '確認した内容は、書面（境界確認書など）に残しておくと安心です。',
+    ],
+    links: [
+      { label: '用語：境界の立ち会い', href: '/annai/#g-tachiai' },
+      { label: '用語：土地家屋調査士', href: '/annai/#g-chousashi' },
+    ],
+  },
+  {
+    id: 'r-hanashiai',
+    title: '資料と測量をもとに、話し合いで確認しましょう',
+    who: ['土地家屋調査士'],
+    todo: [
+      'まず土地家屋調査士に、資料調査と測量を頼み、境目の位置の根拠を整理してもらいます。',
+      'その結果をもとに、隣の方と現地で立ち会い、境目を確認します。',
+      '合意できたら、境界標を入れ、書面に残しておきます。',
+    ],
+  },
+  {
+    id: 'r-funsou',
+    title: '第三者の手を借りる方法があります',
+    who: ['法務局（筆界特定）', '土地家屋調査士会のADR', '弁護士'],
+    todo: [
+      '筆界特定制度：法務局の筆界特定登記官が、専門家の意見をふまえて筆界の位置を調べて示す制度です。ただし、位置をはっきり示せず、範囲で示されることもあります。',
+      'ADR（裁判外の話し合いの手続き）：各地の土地家屋調査士会などが、境界の問題の相談・話し合いの場を設けています。',
+      '「どこまでがだれの持ち物か（所有権）」の争いや裁判は、弁護士に相談してください。',
+    ],
+    links: [
+      { label: '用語：筆界特定制度', href: '/annai/#g-tokutei' },
+      { label: '用語：筆界確定訴訟', href: '/annai/#g-kakutei' },
+    ],
+  },
+  {
+    id: 'r-ekkyo',
+    title: 'まず、境目の位置をはっきりさせましょう',
+    who: ['土地家屋調査士', '弁護士'],
+    todo: [
+      '本当に越えているかは、境目の位置がわからないと判断できません。境界標や資料で確かめ、わからなければ土地家屋調査士に相談します。',
+      '越えていることがはっきりしたら、まずは相手の方と話し合います。',
+      '話し合いでの解決がむずかしいときや、木の枝の切り取りなど法律の判断が必要なときは、弁護士に相談してください。',
+    ],
+    links: [{ label: '用語：越境', href: '/annai/#g-ekkyo' }],
+  },
+  {
+    id: 'r-kanmin',
+    title: '道路や水路の管理者に、境界の確認を申し出ます',
+    who: ['道路・水路の管理者（市区町村など）', '土地家屋調査士'],
+    todo: [
+      '公共の土地との境目（官民境界）は、その道路や水路を管理する役所（市区町村など）と確認します。',
+      '申請の書類や図面の準備、立ち会いは、土地家屋調査士に頼むのが一般的です。',
+    ],
+    links: [{ label: '用語：官民境界', href: '/annai/#g-kanmin' }],
+  },
+  {
+    id: 'r-bunpitsu',
+    title: '土地家屋調査士に、測量と登記を相談しましょう',
+    who: ['土地家屋調査士'],
+    todo: [
+      '土地を分ける（分筆）・正確な面積を出すには、まず境目をすべて確かめる測量が必要です。',
+      '隣の土地の方や、道路などの管理者との立ち会いが必要になることが多いです。',
+      '分筆などの登記の申請も、土地家屋調査士が行います。',
+    ],
+    links: [
+      { label: '用語：分筆', href: '/annai/#g-bunpitsu' },
+      { label: '坪・平方メートル換算ツール', href: '/tools/tsubo/' },
+    ],
+  },
+  {
+    id: 'r-souzokutouki',
+    title: '相続登記は、期限があります',
+    who: ['司法書士', '法務局（手続案内）'],
+    todo: [
+      '2024年4月から、相続登記の申請は義務になりました。相続で取得したことを知った日から3年以内が期限です。',
+      '司法書士か、法務局の手続案内に相談しましょう。',
+      '遺産分割の話し合いがまとまらないときは、「相続人申告登記」という方法もあります。',
+    ],
+    links: [
+      { label: '用語：相続登記', href: '/annai/#g-souzokutouki' },
+    ],
+  },
+  {
+    id: 'r-kokko',
+    title: '国に引き取ってもらう制度があります',
+    who: ['法務局'],
+    todo: [
+      '相続土地国庫帰属制度：一定の条件を満たせば、相続した土地を国に引き取ってもらえます（審査や負担金があります）。',
+      '条件に合うかは、法務局に相談できます。',
+      '境目がはっきりしない土地は対象にならないことがあるので、その場合は土地家屋調査士にも相談してください。',
+    ],
+    links: [{ label: '用語：相続土地国庫帰属制度', href: '/annai/#g-kokko' }],
+  },
+];
+---
+<BaseLayout title="境界トラブル診断" description="質問に答えていくと、境目・越境・相続した土地などの困りごとについて、相談先と次にやることがわかります。">
+  <StationSign kicker="駅の施設" title="境界トラブル診断" sub="TROUBLE GUIDE" color="#c4122f" prev={TERMINAL} />
+
+  <p>
+    いくつかの質問に答えると、相談先と、次にやることの目安がわかります。
+    ここでの答えは記録されず、どこにも送られません。
+  </p>
+
+  <div class="shindan" id="shindan">
+    <p class="shindan__trail" id="trail" hidden></p>
+    {STEPS.map((s) => (
+      <section class="shindan__step" data-step={s.id} aria-labelledby={`q-${s.id}`}>
+        <p class="shindan__q" id={`q-${s.id}`}>{s.q}</p>
+        <ul class="shindan__choices">
+          {s.choices.map((c) => (
+            <li><a href={`#${c.next}`} data-next={c.next}>{c.label}</a></li>
+          ))}
+        </ul>
+      </section>
+    ))}
+    {RESULTS.map((r) => (
+      <section class="shindan__step shindan__result" data-step={r.id} id={r.id} aria-labelledby={`h-${r.id}`}>
+        <h3 id={`h-${r.id}`}>{r.title}</h3>
+        <p>相談先：{r.who.map((w) => <span class="shindan__who">{w}</span>)}</p>
+        <ol>{r.todo.map((t) => <li>{t}</li>)}</ol>
+        {r.links && (
+          <ul>{r.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
+        )}
+      </section>
+    ))}
+    <div class="shindan__nav" id="shindan-nav" hidden>
+      <button type="button" class="tool__btn tool__btn--sub" id="back">← 1つ前へ</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="restart">最初から</button>
+    </div>
+  </div>
+
+  <aside class="notice">
+    <p class="notice__title">ご注意</p>
+    <p>
+      この診断は、一般的な流れを案内するものです。個別の事情によって、適切な相談先や手続きは変わります。
+      具体的な判断は、土地家屋調査士・司法書士・弁護士などの専門家や、法務局にご相談ください。
+    </p>
+  </aside>
+
+  <p><a href="/komarigoto/">← お困りの方へ（記事の一覧）</a></p>
+
+  <script>
+    // 1問ずつ表示する（JavaScript が動かないときは、すべて表示されたまま）
+    const steps = [...document.querySelectorAll<HTMLElement>('.shindan__step')];
+    const nav = document.getElementById('shindan-nav')!;
+    const trail = document.getElementById('trail')!;
+    const history: { id: string; label: string }[] = [];
+    function show(id: string) {
+      steps.forEach((s) => (s.hidden = s.dataset.step !== id));
+      nav.hidden = history.length <= 1;
+      trail.hidden = history.length <= 1;
+      trail.textContent = "ここまでの答え：" +
+        history.slice(1).map((h) => h.label).join(' → ');
+    }
+    function go(id: string, label = '') { history.push({ id, label }); show(id); }
+    document.querySelectorAll<HTMLAnchorElement>('[data-next]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        go(a.dataset.next!, a.textContent?.trim() ?? '');
+        document.getElementById('shindan')!.scrollIntoView({ block: 'nearest' });
+      }),
+    );
+    document.getElementById('back')!.addEventListener('click', () => {
+      if (history.length > 1) history.pop();
+      show(history[history.length - 1].id);
+    });
+    document.getElementById('restart')!.addEventListener('click', () => {
+      history.length = 0;
+      go('start');
+    });
+    go('start');
+  </script>
+</BaseLayout>

@@ -1,0 +1,79 @@
+---
+// 駅の施設「通達ナビ」：登記に関する通達を、分野・キーワードで探せる一覧
+// データは src/data/tsutatsu.ts
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import { sortedTsutatsu, TSUTATSU_FIELDS, wareki } from '../../data/tsutatsu';
+
+const list = sortedTsutatsu();
+const fields = TSUTATSU_FIELDS.filter((f) => list.some((t) => t.fields.includes(f)));
+---
+<BaseLayout title="通達ナビ" description="登記に関する法務省の通達を、分野やキーワードで探せるコーナーです。名称・日付・番号と公式の本文へのリンクをまとめています。">
+  <StationSign title="通達ナビ" sub="CIRCULARS" prev={TERMINAL} />
+
+  <p>
+    登記に関する<strong>通達</strong>を、分野やキーワードで探せるようにまとめています。
+    本文は転載せず、公式の資料（法務省など）へのリンクで紹介します。少しずつ増やしていきます。
+  </p>
+
+  <div class="list-controls" id="tsutatsu-controls">
+    <div class="list-controls__group" role="group" aria-label="分野でしぼりこむ">
+      <span class="list-controls__label">分野</span>
+      <button type="button" data-field="" aria-pressed="true">すべて</button>
+      {fields.map((f) => <button type="button" data-field={f} aria-pressed="false">{f}</button>)}
+    </div>
+    <div class="list-controls__group">
+      <label class="list-controls__label" for="tsutatsu-q">キーワード</label>
+      <input type="search" id="tsutatsu-q" placeholder="例）相続人申告、住所" />
+    </div>
+  </div>
+  <p id="tsutatsu-count" aria-live="polite">{list.length}件</p>
+
+  <ul class="tsutatsu-list">
+    {list.map((t) => (
+      <li class="tsutatsu" data-fields={t.fields.join('|')} data-text={`${t.title} ${t.number} ${t.summary} ${t.laws.join(' ')} ${t.fields.join(' ')}`.normalize('NFKC')}>
+        <p class="tsutatsu__meta">{wareki(t.date)}付け　{t.number}</p>
+        <h2 class="tsutatsu__title"><a href={`/tsutatsu/${t.id}/`}>{t.title}</a></h2>
+        <p class="tsutatsu__summary">{t.summary}</p>
+        <ul class="tsutatsu__fields">{t.fields.map((f) => <li>{f}</li>)}</ul>
+      </li>
+    ))}
+  </ul>
+
+  <div class="page-body">
+    <h2>「通達」とは？</h2>
+    <p>
+      通達は、国の役所（たとえば法務省）が、法務局などの下の機関に向けて出す<strong>行政内部の指示</strong>です。
+      法律そのものではなく、一般の方を直接しばるものではありませんが、登記の実務がどのように行われるかを知る手がかりになります。
+    </p>
+    <p class="tool__note">
+      掲載している説明は、このサイトがまとめたものです。正確な内容は、必ずリンク先の本文でご確認ください。改正されていることもあります。
+    </p>
+  </div>
+
+  <script>
+    const items = [...document.querySelectorAll<HTMLElement>('.tsutatsu-list > li')];
+    const btns = [...document.querySelectorAll<HTMLButtonElement>('#tsutatsu-controls [data-field]')];
+    const q = document.getElementById('tsutatsu-q') as HTMLInputElement;
+    const count = document.getElementById('tsutatsu-count')!;
+    let field = '';
+    function apply() {
+      const words = q.value.normalize('NFKC').trim().split(/\s+/).filter(Boolean);
+      let n = 0;
+      items.forEach((li) => {
+        const okF = !field || li.dataset.fields!.split('|').includes(field);
+        const okQ = words.every((w) => li.dataset.text!.includes(w));
+        li.hidden = !(okF && okQ);
+        if (!li.hidden) n++;
+      });
+      count.textContent = `${n}件`;
+    }
+    btns.forEach((b) => b.addEventListener('click', () => {
+      field = b.dataset.field!;
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      apply();
+    }));
+    q.addEventListener('input', apply);
+  </script>
+</BaseLayout>

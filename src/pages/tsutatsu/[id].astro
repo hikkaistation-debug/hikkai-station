@@ -1,0 +1,39 @@
+---
+// 通達ナビ：1件ずつの詳しいページ
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { TSUTATSU, wareki, seireki, type Tsutatsu } from '../../data/tsutatsu';
+
+export function getStaticPaths() {
+  return TSUTATSU.map((t) => ({ params: { id: t.id }, props: { t } }));
+}
+const { t } = Astro.props as { t: Tsutatsu };
+---
+<BaseLayout title={`${t.title}（${t.number}）`} description={t.summary}>
+  <StationSign kicker="通達ナビ" title={t.title} prev={{ label: '通達ナビ', href: '/tsutatsu/' }} />
+
+  <dl class="spec">
+    <div><dt>日付</dt><dd>{wareki(t.date)}（{seireki(t.date)}）</dd></div>
+    <div><dt>番号</dt><dd>{t.number}</dd></div>
+    <div><dt>出した人</dt><dd>{t.issuer}</dd></div>
+    <div><dt>分野</dt><dd>{t.fields.join('、')}</dd></div>
+    <div><dt>関係する法令</dt><dd>{t.laws.join('、')}</dd></div>
+  </dl>
+
+  <section class="article-box" aria-labelledby="s-h">
+    <h2 id="s-h">どんな通達？</h2>
+    <p>{t.summary}</p>
+  </section>
+
+  <p class="read-original">
+    <a class="cta__button" href={t.url} rel="noopener" target="_blank">本文を読む（公式）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+  </p>
+  {t.sourcePage && (
+    <p>掲載ページ：<a href={t.sourcePage.href} rel="noopener" target="_blank">{t.sourcePage.label}<span class="visually-hidden">（新しいタブで開きます）</span></a></p>
+  )}
+  <p class="article-meta">このサイトで確かめた日：{seireki(t.checkedDate)}</p>
+
+  <Disclaimer />
+  <p><a href="/tsutatsu/">← 通達ナビの一覧へ</a></p>
+</BaseLayout>

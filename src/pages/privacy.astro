@@ -1,0 +1,76 @@
+---
+// プライバシーポリシー（アクセス解析・お問い合わせ・外部送信についての説明）
+// ※解析や広告のしくみを増やしたときは、このページも必ず書き足してください。
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import { SITE, TERMINAL } from '../data/site';
+---
+<BaseLayout title="プライバシーポリシー" description={`${SITE.name}での、アクセス解析・お問い合わせなどの情報の取り扱いについての説明です。`}>
+  <StationSign title="プライバシーポリシー" sub="PRIVACY POLICY" prev={TERMINAL} />
+
+  <div class="page-body">
+    <p>
+      {SITE.name}（以下「このサイト」）では、利用される方の情報を、次のとおり取り扱います。
+    </p>
+
+    <h2>1. アクセス解析について</h2>
+    <p>
+      このサイトでは、どのページがよく読まれているかを知り、内容を良くするために、Google LLC が提供するアクセス解析サービス「Googleアナリティクス」を使っています。
+      Googleアナリティクスは、Cookie（クッキー：ブラウザに保存される小さな記録）を使って、利用状況の情報を集めます。
+      この情報には、名前やメールアドレスなど、個人を直接特定するものは含まれません。
+    </p>
+    <p>
+      Cookie はブラウザの設定で無効にできます。また、Google が提供する
+      <a href="https://tools.google.com/dlpage/gaoptout?hl=ja" rel="noopener" target="_blank">Googleアナリティクス オプトアウト アドオン<span class="visually-hidden">（新しいタブで開きます）</span></a>
+      を使うと、情報の収集を止められます。
+      Google での情報の扱いは、<a href="https://policies.google.com/technologies/partner-sites?hl=ja" rel="noopener" target="_blank">Google のサービスを使用するサイトやアプリから収集した情報の Google による使用<span class="visually-hidden">（新しいタブで開きます）</span></a>
+      をご覧ください。
+    </p>
+
+    <h2>2. 外部に送られる情報（利用者情報の外部送信）</h2>
+    <p>このサイトを見ると、次の情報がブラウザから外部の事業者へ送られます。</p>
+    <div class="prose">
+      <table>
+        <thead>
+          <tr><th scope="col">送り先</th><th scope="col">サービス</th><th scope="col">送られる情報</th><th scope="col">目的</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google LLC</td>
+            <td>Googleアナリティクス</td>
+            <td>見たページのアドレス、どこから来たか（参照元）、閲覧した日時、ブラウザ・端末の種類、IPアドレス、Cookie の識別子 など</td>
+            <td>アクセス数や読まれ方の分析（サイトの改善のため）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>3. お問い合わせについて</h2>
+    <p>
+      お問い合わせは Googleフォーム（Google LLC のサービス）で受け付けています。
+      入力された内容（お名前・連絡先・お問い合わせ内容など）は、<strong>お返事と、掲載内容の修正のためだけ</strong>に使い、ほかの目的には使いません。
+      法令にもとづく場合をのぞき、本人の同意なく第三者に渡すことはありません。
+    </p>
+
+    <h2>4. 広告・紹介リンクについて</h2>
+    <p>
+      現在、このサイトには広告や、商品を紹介して報酬を受け取るリンク（アフィリエイト）は載せていません。
+      今後載せる場合は、記事の中に「PR」などとはっきり表示し、このページにも使うサービスを書き足します。
+    </p>
+
+    <h2>5. 免責事項・著作権</h2>
+    <p>
+      掲載内容の正確さや、リンク先についての考え方は、<a href="/about/">このサイトについて</a>をご覧ください。
+    </p>
+
+    <h2>6. このページの変更</h2>
+    <p>
+      このページの内容は、必要に応じて変更することがあります。変更した場合は、このページでお知らせします。
+    </p>
+
+    <h2>7. お問い合わせ先</h2>
+    <p>このページについてのご質問は、<a href="/contact/">お問い合わせ</a>からご連絡ください。</p>
+
+    <p class="article-meta">制定日：2026年11月4日</p>
+  </div>
+</BaseLayout>

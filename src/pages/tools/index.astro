@@ -1,0 +1,34 @@
+---
+// 駅の施設「計算ツール」の入口
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import { TOOLS, toolHref } from '../../data/tools';
+---
+<BaseLayout title="計算ツール" description="坪⇔㎡の換算、座標からの面積計算、公差の計算など、土地や境界の計算ツールです。">
+  <StationSign title="計算ツール" sub="CALCULATORS" prev={TERMINAL} />
+
+  <p>
+    土地や境界にかかわる計算を、その場でできるツールです。入力した数字はこのページの中だけで計算し、どこにも送りません。
+  </p>
+
+  <ul class="tool-list">
+    {TOOLS.map((t) => (
+      <li>
+        <a class="tool-card" href={toolHref(t.id)}>
+          <span class="tool-card__name">{t.name}</span>
+          <span class="tool-card__who">{t.who}</span>
+          <span class="tool-card__desc">{t.desc}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <aside class="notice">
+    <p class="notice__title">ご利用にあたって</p>
+    <ul>
+      <li>計算結果は目安です。登記の申請や測量の成果として使う場合は、必ず専門家や一次資料で確認してください。</li>
+      <li>計算のまちがいに気づいたときは、<a href="/contact/">お問い合わせ</a>から教えていただけると助かります。</li>
+    </ul>
+  </aside>
+</BaseLayout>

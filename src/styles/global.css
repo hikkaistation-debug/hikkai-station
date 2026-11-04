@@ -542,3 +542,78 @@ main { padding-bottom: 1rem; }
 .story-latest .train__kind { flex: none; font-size: 0.85rem; }
 .story-latest__train { display: block; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); }
 .story-latest__title { display: block; font-weight: 800; }
+
+/* ---------- 計算ツール ---------- */
+.tool-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.8rem; }
+@media (min-width: 760px) { .tool-list { grid-template-columns: repeat(2, 1fr); } }
+.tool-card { display: flex; flex-direction: column; height: 100%; background: var(--card); color: var(--ink); text-decoration: none; border: 2px solid var(--navy); border-left-width: 10px; border-radius: var(--radius); padding: 0.8rem 1rem; }
+.tool-card:hover { color: var(--ink); box-shadow: 0 3px 0 var(--navy); }
+.tool-card__name { font-weight: 800; font-size: 1.1rem; }
+.tool-card__who { display: inline-block; margin-top: 0.2rem; font-size: 0.78rem; font-weight: 800; color: #fff; background: var(--navy); border-radius: 4px; padding: 0 0.45rem; align-self: flex-start; }
+.tool-card__desc { margin: 0.4rem 0 0; font-size: 0.93rem; color: var(--ink-soft); line-height: 1.7; }
+.tool { background: var(--card); border: 2px solid var(--navy); border-radius: var(--radius); padding: 1rem 1.1rem; margin: 1.2rem 0; }
+.tool h2 { margin-top: 0; font-size: 1.15rem; }
+.tool__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; margin: 0.6rem 0; }
+.tool label { font-weight: 700; }
+.tool input[type='number'], .tool input[type='date'], .tool input[type='text'], .tool select, .tool textarea {
+  font: inherit; font-size: 1.05rem; padding: 0.35rem 0.55rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; color: var(--ink);
+}
+.tool input[type='number'] { width: 11em; }
+.tool textarea { width: 100%; min-height: 10em; font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; }
+.tool__btn { font: inherit; font-weight: 800; cursor: pointer; padding: 0.4rem 1rem; border-radius: 8px; border: 2px solid var(--navy); background: var(--navy); color: #fff; }
+.tool__btn--sub { background: #fff; color: var(--navy); }
+.tool__result { margin: 0.8rem 0 0; padding: 0.8rem 1rem; background: #eef2f8; border-radius: 8px; border-left: 6px solid var(--navy); }
+.tool__result:empty { display: none; }
+.tool__big { font-size: 1.5rem; font-weight: 900; color: var(--navy); }
+.tool__ok { color: #0f766e; font-weight: 800; }
+.tool__ng { color: #c4122f; font-weight: 800; }
+.tool__error { color: #c4122f; font-weight: 700; }
+.tool__note { font-size: 0.88rem; color: var(--ink-soft); }
+.calc-table { border-collapse: collapse; margin: 0.6rem 0; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.calc-wrap { overflow-x: auto; }
+.calc-table th, .calc-table td { border: 1px solid var(--line); padding: 0.3rem 0.6rem; text-align: right; white-space: nowrap; }
+.calc-table th { background: var(--navy); color: #fff; text-align: center; }
+.calc-table td:first-child { text-align: center; font-weight: 700; }
+.calc-table tfoot td { font-weight: 800; background: #f4f3ee; }
+
+/* ---------- 境界トラブル診断 ---------- */
+.shindan { background: var(--card); border: 2px solid #c4122f; border-radius: var(--radius); padding: 1rem 1.1rem; margin: 1.2rem 0; }
+.shindan__step[hidden] { display: none; }
+.shindan__q { font-weight: 800; font-size: 1.15rem; margin: 0 0 0.7rem; }
+.shindan__q::before { content: 'Q. '; color: #c4122f; }
+.shindan__choices { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.shindan__choices button, .shindan__choices a { display: block; width: 100%; text-align: left; font: inherit; font-weight: 700; cursor: pointer; padding: 0.6rem 0.9rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; color: var(--navy); text-decoration: none; }
+.shindan__choices button:hover, .shindan__choices a:hover { background: #eef2f8; }
+.shindan__result h3 { margin: 0 0 0.4rem; color: #c4122f; }
+.shindan__who { display: inline-block; margin: 0.2rem 0.3rem 0.2rem 0; padding: 0.1rem 0.6rem; border-radius: 999px; background: var(--navy); color: #fff; font-weight: 800; font-size: 0.9rem; }
+.shindan__nav[hidden], .shindan__trail[hidden] { display: none; }
+.shindan__nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
+.shindan__trail { font-size: 0.85rem; color: var(--ink-soft); margin: 0 0 0.6rem; }
+
+/* ---------- 通達ナビ ---------- */
+.tsutatsu-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.8rem; }
+.tsutatsu-list > li[hidden] { display: none; }
+.tsutatsu { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--navy); border-radius: var(--radius); padding: 0.8rem 1rem; }
+.tsutatsu__meta { margin: 0; font-size: 0.85rem; color: var(--ink-soft); font-weight: 700; }
+.tsutatsu__title { margin: 0.2rem 0 0.3rem; font-size: 1.05rem; }
+.tsutatsu__summary { margin: 0; font-size: 0.93rem; }
+.tsutatsu__fields { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.4rem 0 0; padding: 0; list-style: none; }
+.tsutatsu__fields li { font-size: 0.78rem; font-weight: 800; color: var(--navy); border: 2px solid var(--navy); border-radius: 999px; padding: 0 0.5rem; }
+.spec { display: grid; gap: 0.3rem; margin: 0.8rem 0; }
+.spec > div { display: grid; grid-template-columns: 7.5em 1fr; gap: 0.6rem; border-bottom: 1px dashed var(--line); padding: 0.25rem 0; }
+.spec dt { font-weight: 800; }
+.spec dd { margin: 0; }
+.list-controls input[type='search'] { font: inherit; font-size: 0.95rem; padding: 0.25rem 0.6rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; min-width: 14em; }
+/* 座標の入力表（点名・X・Y を1点1行） */
+.coord-table { border-collapse: collapse; margin: 0.4rem 0; }
+.coord-table th { background: var(--navy); color: #fff; font-size: 0.85rem; padding: 0.3rem 0.5rem; }
+.coord-table td { padding: 0.25rem; border-bottom: 1px solid var(--line); }
+.coord-table .coord-no { text-align: center; font-weight: 800; color: var(--ink-soft); width: 2.5em; }
+.coord-table input { font: inherit; font-size: 1rem; padding: 0.3rem 0.45rem; border: 2px solid var(--navy); border-radius: 6px; background: #fff; min-width: 0; font-variant-numeric: tabular-nums; }
+.coord-table .c-name { width: 6em; }
+.coord-table .c-x, .coord-table .c-y { width: 9.5em; text-align: right; }
+.coord-del { font: inherit; font-weight: 800; cursor: pointer; width: 2.2em; height: 2.2em; border: 2px solid #c4122f; color: #c4122f; background: #fff; border-radius: 6px; }
+@media (max-width: 560px) {
+  .coord-table .c-name { width: 4em; }
+  .coord-table .c-x, .coord-table .c-y { width: 6.5em; }
+}

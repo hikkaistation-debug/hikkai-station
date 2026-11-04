@@ -1,0 +1,64 @@
+---
+// 坪・平方メートル換算
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="坪・平方メートル換算" description="坪と平方メートル（㎡）を相互に換算します。畝・反・町、アール・ヘクタールにも対応。1坪＝400/121㎡（約3.3058㎡）で計算します。">
+  <StationSign kicker="計算ツール" title="坪・平方メートル換算" sub="TSUBO / m²" prev={TOOLS_TOP} />
+
+  <section class="tool" aria-labelledby="t-h">
+    <h2 id="t-h">換算する</h2>
+    <p class="tool__note">どれか1つの欄に数字を入れると、ほかの欄が自動で変わります。</p>
+    <div class="calc-wrap">
+      <table class="calc-table" id="tsubo-table">
+        <tbody>
+          <tr><td>平方メートル（㎡）</td><td><input type="number" step="any" min="0" data-unit="m2" aria-label="平方メートル" /></td></tr>
+          <tr><td>坪（つぼ）</td><td><input type="number" step="any" min="0" data-unit="tsubo" aria-label="坪" /></td></tr>
+          <tr><td>畝（せ）＝30坪</td><td><input type="number" step="any" min="0" data-unit="se" aria-label="畝" /></td></tr>
+          <tr><td>反（たん）＝300坪</td><td><input type="number" step="any" min="0" data-unit="tan" aria-label="反" /></td></tr>
+          <tr><td>町（ちょう）＝3,000坪</td><td><input type="number" step="any" min="0" data-unit="cho" aria-label="町" /></td></tr>
+          <tr><td>アール（a）＝100㎡</td><td><input type="number" step="any" min="0" data-unit="a" aria-label="アール" /></td></tr>
+          <tr><td>ヘクタール（ha）＝10,000㎡</td><td><input type="number" step="any" min="0" data-unit="ha" aria-label="ヘクタール" /></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="page-body">
+    <h2>計算のしかた</h2>
+    <div class="prose">
+      <table>
+        <thead><tr><th>単位</th><th>平方メートルにすると</th></tr></thead>
+        <tbody>
+          <tr><td>1坪</td><td>400/121㎡（約3.30579㎡）。1坪は「6尺×6尺」、1尺は10/33メートルです。</td></tr>
+          <tr><td>1畝</td><td>30坪（約99.17㎡）</td></tr>
+          <tr><td>1反</td><td>300坪（約991.7㎡）</td></tr>
+          <tr><td>1町</td><td>3,000坪（約9,917㎡）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>登記に記録される面積（地積）は、平方メートルで表します。坪などは、広さのイメージをつかむための目安として使ってください。</li>
+      <li>よく使われる「1坪＝3.3㎡」は、おおよその値です。このツールは 400/121 で計算しています。</li>
+    </ul>
+  </div>
+
+  <script>
+    // 1単位あたりの平方メートル
+    const TSUBO = 400 / 121;
+    const PER: Record<string, number> = { m2: 1, tsubo: TSUBO, se: TSUBO * 30, tan: TSUBO * 300, cho: TSUBO * 3000, a: 100, ha: 10000 };
+    const inputs = [...document.querySelectorAll<HTMLInputElement>('#tsubo-table input')];
+    const fmt = (v: number) => String(Number(v.toPrecision(10)));
+    inputs.forEach((inp) => {
+      inp.addEventListener('input', () => {
+        const v = Number(inp.value);
+        const m2 = inp.value === '' || !Number.isFinite(v) ? NaN : v * PER[inp.dataset.unit!];
+        inputs.forEach((o) => {
+          if (o === inp) return;
+          o.value = Number.isNaN(m2) ? '' : fmt(m2 / PER[o.dataset.unit!]);
+        });
+      });
+    });
+  </script>
+</BaseLayout>

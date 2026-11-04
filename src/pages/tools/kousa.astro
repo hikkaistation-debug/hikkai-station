@@ -1,0 +1,184 @@
+---
+// 公差の計算（地積・距離）
+// 根拠：国土調査法施行令 別表第四（一筆地測量及び地積測定の誤差の限度）
+//       不動産登記規則10条4項（地図の精度区分）・77条5項（地積測量図に準用）
+// 式の「⁴√F」は F の4乗根（4分の1乗）です。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+
+// 別表第四の値（そのまま転記）
+const GRADES = [
+  { id: 'k1', name: '甲一', rms: 2, tol: 6, d: [0.02, 0.003], a: [0.025, 0.003] },
+  { id: 'k2', name: '甲二', rms: 7, tol: 20, d: [0.04, 0.01], a: [0.05, 0.01] },
+  { id: 'k3', name: '甲三', rms: 15, tol: 45, d: [0.08, 0.02], a: [0.1, 0.02] },
+  { id: 'o1', name: '乙一', rms: 25, tol: 75, d: [0.13, 0.04], a: [0.1, 0.04] },
+  { id: 'o2', name: '乙二', rms: 50, tol: 150, d: [0.25, 0.07], a: [0.25, 0.07] },
+  { id: 'o3', name: '乙三', rms: 100, tol: 300, d: [0.5, 0.14], a: [0.5, 0.14] },
+];
+---
+<BaseLayout title="公差の計算（地積・距離）" description="国土調査法施行令 別表第四の精度区分（甲一〜乙三）にもとづき、地積測定の公差と筆界点間の距離の公差を計算します。登記簿の地積と実測の差が公差内かも確かめられます。">
+  <StationSign kicker="計算ツール" title="公差の計算（地積・距離）" sub="TOLERANCE" prev={TOOLS_TOP} />
+
+  <p>
+    <strong>公差</strong>は、測量や面積の計算で「ここまでの差なら許される」という誤差の限度です。
+    国土調査法施行令の別表第四に、精度区分（甲一〜乙三）ごとの値が決められています。
+  </p>
+  <p class="tool__note">
+    精度区分に迷ったら、土地のある地域で選んでください：市街地（宅地など）＝<strong>甲二</strong>、田・畑などの農地＝<strong>乙一</strong>、山林・原野＝<strong>乙三</strong>（法務局の地図・地積測量図の基準）。
+  </p>
+
+  <section class="tool" aria-labelledby="a-h">
+    <h2 id="a-h">地積測定の公差</h2>
+    <div class="tool__row">
+      <label for="a-grade">精度区分</label>
+      <select id="a-grade">
+        {GRADES.map((g) => <option value={g.id} selected={g.id === 'k2'}>{g.name}</option>)}
+      </select>
+      <label for="a-f">地積 F</label>
+      <input type="number" id="a-f" step="any" min="0" placeholder="例）200" /> ㎡
+    </div>
+    <details>
+      <summary>（任意）2つの面積の差が公差内か確かめる</summary>
+      <div class="tool__row">
+        <label for="a-x">比べる面積</label>
+        <input type="number" id="a-x" step="any" min="0" placeholder="例）登記簿の地積" /> ㎡
+      </div>
+      <p class="tool__note">上の「地積 F」に実測の面積、ここに登記簿などの面積を入れると、差が公差の範囲内かを表示します。</p>
+    </details>
+    <div class="tool__row"><button type="button" class="tool__btn" id="a-calc">計算する</button></div>
+    <div class="tool__result" id="a-result" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" aria-labelledby="d-h">
+    <h2 id="d-h">筆界点間の距離の公差</h2>
+    <p class="tool__note">図面上の距離（または座標から計算した距離）と、現地で直接測った距離との差の限度です。</p>
+    <div class="tool__row">
+      <label for="d-grade">精度区分</label>
+      <select id="d-grade">
+        {GRADES.map((g) => <option value={g.id} selected={g.id === 'k2'}>{g.name}</option>)}
+      </select>
+      <label for="d-s">距離 S</label>
+      <input type="number" id="d-s" step="any" min="0" placeholder="例）20" /> m
+    </div>
+    <details>
+      <summary>（ふつうは不要）古い図面（図解法）と比べるとき</summary>
+      <p class="tool__note">
+        座標で測る今のふつうの測量（数値法）なら、ここは変えずにそのまま計算してください。
+        図に定規などで描いて作った地図（図解法）と比べるときだけ、描いたときの誤差の分（α）を足します。
+      </p>
+      <div class="tool__row">
+        <label for="d-method">作り方</label>
+        <select id="d-method">
+          <option value="num">数値法（座標で計算）…ふつうはこちら</option>
+          <option value="zuA">図解法・A級</option>
+          <option value="zu">図解法・A級以外</option>
+        </select>
+        <label for="d-scale">図面の縮尺 1/</label>
+        <input type="number" id="d-scale" step="1" min="1" placeholder="例）500" />
+      </div>
+    </details>
+    <div class="tool__row">
+      <label for="d-m">（任意）実際に測った距離</label>
+      <input type="number" id="d-m" step="any" min="0" /> m
+    </div>
+    <div class="tool__row"><button type="button" class="tool__btn" id="d-calc">計算する</button></div>
+    <div class="tool__result" id="d-result" aria-live="polite"></div>
+  </section>
+
+  <div class="page-body">
+    <h2>別表第四の値</h2>
+    <div class="prose">
+      <table>
+        <thead>
+          <tr><th>精度区分</th><th>筆界点の位置誤差<br />（平均二乗誤差）</th><th>筆界点の位置誤差<br />（公差）</th><th>距離の差異の公差</th><th>地積測定の公差</th></tr>
+        </thead>
+        <tbody>
+          {GRADES.map((g) => (
+            <tr>
+              <td>{g.name}</td>
+              <td>{g.rms}cm</td>
+              <td>{g.tol}cm</td>
+              <td>{g.d[0]}m＋{g.d[1]}√S m＋α mm</td>
+              <td>（{g.a[0]}＋{g.a[1]}⁴√F）√F ㎡</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>S は筆界点間の距離（メートル）、F は一筆地の地積（平方メートル）です。⁴√F は F の4乗根です。</li>
+      <li>α は図解法を使う場合の値で、図解作業がA級なら 0.2、それ以外なら 0.3 に地籍図の縮尺の分母をかけた数（単位はミリメートル）です。数値法では 0 として計算しています。</li>
+      <li>筆界点の位置誤差は、その筆界点を決めたもとの点（与点）に対する位置の誤差です。</li>
+    </ul>
+
+    <h2>どの精度区分を使う？</h2>
+    <p>法務局の地図（不動産登記規則10条4項）と地積測量図（同規則77条5項で準用）では、地域ごとに次の精度区分までとされています。</p>
+    <div class="prose">
+      <table>
+        <thead><tr><th>地域</th><th>精度区分</th></tr></thead>
+        <tbody>
+          <tr><td>市街地地域（主に宅地が占める地域とその周辺）</td><td>甲二まで</td></tr>
+          <tr><td>村落・農耕地域（主に田・畑・塩田が占める地域とその周辺）</td><td>乙一まで</td></tr>
+          <tr><td>山林・原野地域（主に山林・牧場・原野が占める地域とその周辺）</td><td>乙三まで</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      出典：e-Gov法令検索
+      <a href="https://laws.e-gov.go.jp/law/327CO0000000059" rel="noopener" target="_blank">国土調査法施行令<span class="visually-hidden">（新しいタブで開きます）</span></a>（別表第四）、
+      <a href="https://laws.e-gov.go.jp/law/417M60000010018" rel="noopener" target="_blank">不動産登記規則<span class="visually-hidden">（新しいタブで開きます）</span></a>（10条4項・77条5項）
+    </p>
+    <p class="tool__note">計算結果は目安です。実際の測量や登記では、法務局や土地家屋調査士の判断・運用を確認してください。</p>
+  </div>
+
+  <script define:vars={{ GRADES }}>
+    const byId = (id) => document.getElementById(id);
+    const grade = (id) => GRADES.find((g) => g.id === id);
+    const num = (id) => { const v = byId(id).value; return v === '' ? NaN : Number(v); };
+    const err = (el, msg) => { el.innerHTML = `<p class="tool__error">${msg}</p>`; };
+
+    byId('a-calc').addEventListener('click', () => {
+      const out = byId('a-result');
+      const g = grade(byId('a-grade').value);
+      const F = num('a-f');
+      if (!(F > 0)) return err(out, '地積 F を入れてください。');
+      const tol = (g.a[0] + g.a[1] * Math.pow(F, 0.25)) * Math.sqrt(F);
+      let html = `<p>${g.name}・地積 ${F} ㎡ の公差は <span class="tool__big">±${tol.toFixed(2)}</span> ㎡</p>`;
+      html += `<p class="tool__note">計算式：（${g.a[0]}＋${g.a[1]}×${Math.pow(F, 0.25).toFixed(4)}）×${Math.sqrt(F).toFixed(4)} ＝ ${tol.toFixed(4)}</p>`;
+      const X = num('a-x');
+      if (X > 0) {
+        const diff = Math.abs(F - X);
+        html += diff <= tol
+          ? `<p>差は ${diff.toFixed(2)} ㎡ → <span class="tool__ok">公差の範囲内です</span></p>`
+          : `<p>差は ${diff.toFixed(2)} ㎡ → <span class="tool__ng">公差を超えています</span></p>`;
+      }
+      byId('a-result').innerHTML = html;
+    });
+
+    byId('d-calc').addEventListener('click', () => {
+      const out = byId('d-result');
+      const g = grade(byId('d-grade').value);
+      const S = num('d-s');
+      if (!(S > 0)) return err(out, '距離 S を入れてください。');
+      const method = byId('d-method').value;
+      let alphaMm = 0;
+      if (method !== 'num') {
+        const scale = num('d-scale');
+        if (!(scale > 0)) return err(out, '図解法では、縮尺の分母を入れてください（例：500）。');
+        alphaMm = (method === 'zuA' ? 0.2 : 0.3) * scale;
+      }
+      const tol = g.d[0] + g.d[1] * Math.sqrt(S) + alphaMm / 1000;
+      let html = `<p>${g.name}・距離 ${S} m の公差は <span class="tool__big">±${(tol * 100).toFixed(1)}</span> cm（${tol.toFixed(3)} m）</p>`;
+      html += `<p class="tool__note">計算式：${g.d[0]}＋${g.d[1]}×√${S}${alphaMm ? `＋${alphaMm}mm` : ''} ＝ ${tol.toFixed(4)} m</p>`;
+      const M = num('d-m');
+      if (M > 0) {
+        const diff = Math.abs(S - M);
+        html += diff <= tol
+          ? `<p>差は ${(diff * 100).toFixed(1)} cm → <span class="tool__ok">公差の範囲内です</span></p>`
+          : `<p>差は ${(diff * 100).toFixed(1)} cm → <span class="tool__ng">公差を超えています</span></p>`;
+      }
+      out.innerHTML = html;
+    });
+  </script>
+</BaseLayout>
