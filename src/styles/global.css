@@ -321,3 +321,18 @@ main { padding-bottom: 1rem; }
 .search-related { font-size: 0.9rem; color: var(--ink-soft); background: #fff8db; border-radius: 8px; padding: 0.3rem 0.7rem; display: inline-block; }
 .search-related[hidden] { display: none; }
 .search-cat { font-size: 0.82rem; font-weight: 700; border: 2px solid var(--c); border-radius: 8px; padding: 0 0.5rem; line-height: 1.6; }
+
+/* ---------- 記事ページ：元の記事を読む・機器の情報 ---------- */
+.read-original { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.9rem; margin: 1rem 0; }
+.read-original small { color: var(--ink-soft); }
+.source-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.product-box { border-left: 8px solid #be185d; }
+.product-spec { margin: 0; display: grid; gap: 0.3rem; }
+.product-spec > div { display: grid; grid-template-columns: 7em 1fr; gap: 0.5rem; }
+.product-spec dt { font-weight: 800; color: var(--ink-soft); }
+.product-spec dd { margin: 0; }
+.product-note { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.6rem !important; }
+.line-list a.is-soon { opacity: 0.55; border-left-style: dashed; }
+.more-button { display: block; width: 100%; margin: 0.8rem 0 0; font: inherit; font-weight: 800; padding: 0.7rem; border: 2px solid var(--navy); border-radius: var(--radius); background: #fff; color: var(--navy); cursor: pointer; }
+.more-button:hover { background: #eef2f8; }
+.more-button[hidden] { display: none; }

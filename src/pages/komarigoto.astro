@@ -1,6 +1,6 @@
 ---
 // 2番のりば「お困りの方」向けのまとめページ
-// 境界・相続した土地・基礎解説の路線から、一般の方向けの記事を困りごと別に集めます。
+// 境界・基礎解説の路線と、「相続」のタグが付いた記事から、一般の方向けの記事を困りごと別に集めます。
 // （「専門」の記事は出しません。やさしい記事を先に並べます）
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
@@ -23,7 +23,8 @@ const sections = [
     id: 'souzoku',
     title: '相続した土地のこと',
     desc: '相続した土地の登記、使わない土地、共有になっている土地、など。',
-    articles: easyFirst(all.filter((a) => a.data.category === 'souzoku')),
+    // 「相続」のタグが付いた記事（境界の記事は上の段に出るので除く）
+    articles: easyFirst(all.filter((a) => a.data.tags.includes('相続') && a.data.category !== 'kyokai')),
   },
   {
     id: 'kiso',

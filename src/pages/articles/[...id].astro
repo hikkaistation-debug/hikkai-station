@@ -23,6 +23,9 @@ const line = getLine(data.category);
 const { Content } = await render(article);
 const hasBody = Boolean(article.body?.trim());
 const back = isKiso(article) ? { href: '/kiso/', label: '基礎解説' } : { href: '/news/', label: 'ニュース' };
+const isKiki = data.category === 'kiki' && data.product;
+// 関連する駅：この記事の路線＋relatedLines（重複なし）
+const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 ---
 <BaseLayout title={data.title} description={data.summary} type="article">
   <StationSign kicker={`${line.code}線 ${line.mark} ${line.short}`} title={data.title} color={line.color} />
@@ -45,10 +48,30 @@ const back = isKiso(article) ? { href: '/kiso/', label: '基礎解説' } : { hre
     )}
   </p>
 
+  {isKiki && data.product && (
+    <section class="article-box product-box" aria-labelledby="product-h">
+      <h2 id="product-h">測量ツールの情報</h2>
+      <dl class="product-spec">
+        <div><dt>名前</dt><dd>{data.product.name}</dd></div>
+        <div><dt>種類</dt><dd>{data.product.kind}</dd></div>
+        <div><dt>用途</dt><dd>{data.product.use}</dd></div>
+        <div><dt>最終確認日</dt><dd><time datetime={isoDate(data.product.checkedDate)}>{formatDate(data.product.checkedDate)}</time></dd></div>
+      </dl>
+      <p class="product-note">価格・仕様・対応機種などは変わることがあります。必ず公式の情報で確認してください。このサイトは、特定の製品をおすすめするものではありません。</p>
+    </section>
+  )}
+
   <section class="article-box" aria-labelledby="summary-h">
     <h2 id="summary-h">要約</h2>
     <p>{data.summary}</p>
   </section>
+
+  <p class="read-original">
+    <a class="cta__button" href={data.sourceUrl} rel="noopener" target="_blank">
+      元の記事を読む<span class="visually-hidden">（{data.sourceName}・新しいタブで開きます）</span> ↗
+    </a>
+    <small>出典：{data.sourceName}</small>
+  </p>
 
   {hasBody && (
     <div class="prose">
@@ -62,11 +85,25 @@ const back = isKiso(article) ? { href: '/kiso/', label: '基礎解説' } : { hre
   </section>
 
   <section class="article-box" aria-labelledby="source-h">
-    <h2 id="source-h">出典（原文）</h2>
-    <p>
-      {data.sourceName}<br />
-      <a class="source-link" href={data.sourceUrl} rel="noopener" target="_blank">{data.sourceUrl}<span class="visually-hidden">（新しいタブで開きます）</span></a>
-    </p>
+    <h2 id="source-h">{isKiki ? '公式資料へのリンク' : '出典（原文）'}</h2>
+    <ul class="source-list">
+      <li>
+        {data.sourceName}<br />
+        <a class="source-link" href={data.sourceUrl} rel="noopener" target="_blank">{data.sourceUrl}<span class="visually-hidden">（新しいタブで開きます）</span></a>
+      </li>
+      {isKiki && data.product && data.product.officialUrl !== data.sourceUrl && (
+        <li>
+          公式サイト<br />
+          <a class="source-link" href={data.product.officialUrl} rel="noopener" target="_blank">{data.product.officialUrl}<span class="visually-hidden">（新しいタブで開きます）</span></a>
+        </li>
+      )}
+      {isKiki && data.product?.makerDocUrl && (
+        <li>
+          メーカー資料<br />
+          <a class="source-link" href={data.product.makerDocUrl} rel="noopener" target="_blank">{data.product.makerDocUrl}<span class="visually-hidden">（新しいタブで開きます）</span></a>
+        </li>
+      )}
+    </ul>
   </section>
 
   {data.tags.length > 0 && (
@@ -74,6 +111,13 @@ const back = isKiso(article) ? { href: '/kiso/', label: '基礎解説' } : { hre
       {data.tags.map((t) => <li>#{t}</li>)}
     </ul>
   )}
+
+  <section class="article-box" aria-labelledby="stations-h">
+    <h2 id="stations-h">関連する駅</h2>
+    <div class="badges">
+      {relatedLines.map((id) => <LineBadge id={id} link />)}
+    </div>
+  </section>
 
   <Disclaimer />
 

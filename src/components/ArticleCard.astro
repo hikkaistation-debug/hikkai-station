@@ -14,13 +14,11 @@ const line = getLine(data.category);
 <li class="article-card" style={`--c:${line.color}`} data-level={data.level} data-date={isoDate(data.pubDate)}>
   <div class="badges">
     <LineBadge id={data.category} short />
-    <LevelBadge level={data.level} />
+    <LevelBadge level={data.level} compact />
   </div>
   <h3 class="article-card__title"><a href={`/articles/${article.id}/`}>{data.title}</a></h3>
   <p class="article-card__summary">{data.summary}</p>
   <p class="article-card__meta">
     <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
-    ｜出典：{data.sourceName}
-    {data.sample && <span>｜サンプル</span>}
   </p>
 </li>

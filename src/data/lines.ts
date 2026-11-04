@@ -7,12 +7,13 @@
 //   color  : 路線カラー（色だけに頼らず、code と mark も必ず一緒に表示します）
 //   isKiso : true なら「基礎解説」コーナーに並びます
 export const LINES = [
-  { id: 'seido', name: '制度・法改正・官公庁のお知らせ', short: '制度', code: 'H', mark: '◆', color: '#0b62b4', isKiso: false },
-  { id: 'souzoku', name: '相続した土地・所有者不明土地', short: '相続', code: 'S', mark: '●', color: '#0a7d3e', isKiso: false },
-  { id: 'kyokai', name: '境界トラブル・筆界特定・裁判', short: '境界', code: 'K', mark: '▲', color: '#c4122f', isKiso: false },
-  { id: 'gijutsu', name: '測量・登記の実務と技術', short: '技術', code: 'G', mark: '■', color: '#b45309', isKiso: false },
+  { id: 'kyokai', name: '境界について', short: '境界', code: 'K', mark: '▲', color: '#c4122f', isKiso: false },
+  { id: 'toki', name: '登記について', short: '登記', code: 'R', mark: '▼', color: '#0a7d3e', isKiso: false },
+  { id: 'sokuryo', name: '測量実務について', short: '測量', code: 'G', mark: '■', color: '#b45309', isKiso: false },
+  { id: 'kiki', name: '測量ツールについて', short: 'ツール', code: 'E', mark: '●', color: '#be185d', isKiso: false },
+  { id: 'seido', name: '制度・法改正について', short: '制度', code: 'H', mark: '◆', color: '#0b62b4', isKiso: false },
+  { id: 'shiken', name: '試験について', short: '試験', code: 'T', mark: '◎', color: '#0f766e', isKiso: false },
   { id: 'kiso', name: '基礎解説', short: '基礎', code: 'B', mark: '★', color: '#6d28a8', isKiso: true },
-  { id: 'shiken', name: '土地家屋調査士試験', short: '試験', code: 'T', mark: '◎', color: '#0f766e', isKiso: false },
 ] as const;
 
 export type LineId = (typeof LINES)[number]['id'];

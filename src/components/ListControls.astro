@@ -24,8 +24,9 @@
 
 <script>
   const RANK: Record<string, number> = { easy: 0, normal: 1, expert: 2 };
+  const PAGE = 20; // 1回に表示する件数（これを超えたら「もっと見る」）
 
-  function apply(box: HTMLElement) {
+  function apply(box: HTMLElement, resetPage = true) {
     const scope = box.closest('main') ?? document;
     const level = box.querySelector<HTMLButtonElement>('button[aria-pressed="true"]')?.dataset.level ?? 'all';
     const sort = box.querySelector<HTMLSelectElement>('[data-sort]')!.value;
@@ -33,20 +34,22 @@
     scope.querySelectorAll<HTMLElement>('.card-list').forEach((list) => {
       const items = Array.from(list.querySelectorAll<HTMLElement>(':scope > li[data-level]'));
       if (items.length === 0) return;
+      if (resetPage || !list.dataset.limit) list.dataset.limit = String(PAGE);
+      const limit = Number(list.dataset.limit);
       items.sort((a, b) => {
         const byDate = (b.dataset.date ?? '').localeCompare(a.dataset.date ?? '');
         if (sort === 'new') return byDate;
         const diff = (RANK[a.dataset.level!] ?? 1) - (RANK[b.dataset.level!] ?? 1);
         return (sort === 'easy' ? diff : -diff) || byDate;
       });
-      let shown = 0;
+      let matched = 0;
       for (const li of items) {
         const hit = level === 'all' || li.dataset.level === level;
-        li.hidden = !hit;
-        if (hit) shown++;
+        if (hit) matched++;
+        li.hidden = !hit || matched > limit;
         list.append(li); // 並べ替え
       }
-      total += shown;
+      total += matched;
       let empty = list.querySelector<HTMLElement>(':scope > .filter-empty');
       if (!empty) {
         empty = document.createElement('li');
@@ -54,9 +57,26 @@
         empty.textContent = 'この対象の記事はありません。';
         list.append(empty);
       }
-      empty.hidden = shown > 0;
+      empty.hidden = matched > 0;
+      list.append(empty);
+
+      // もっと見る
+      let more = list.nextElementSibling as HTMLButtonElement | null;
+      if (!more || !more.classList.contains('more-button')) {
+        more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'more-button';
+        list.after(more);
+        more.addEventListener('click', () => {
+          list.dataset.limit = String(Number(list.dataset.limit) + PAGE);
+          apply(box, false);
+        });
+      }
+      const rest = matched - limit;
+      more.hidden = rest <= 0;
+      more.textContent = `もっと見る（残り${rest}件）`;
     });
-    box.querySelector('[data-status]')!.textContent = `${total}件を表示`;
+    box.querySelector('[data-status]')!.textContent = `${total}件`;
   }
 
   document.querySelectorAll<HTMLElement>('[data-list-controls]').forEach((box) => {
@@ -69,5 +89,6 @@
     box.querySelector('[data-sort]')!.addEventListener('change', () => apply(box));
     // 検索結果など、あとから一覧が書きかわったときにも効かせる
     document.addEventListener('cards-updated', () => apply(box));
+    apply(box); // 最初に20件までにする
   });
 </script>

@@ -2,13 +2,14 @@
 title: 相続登記の申請が義務になりました（2024年4月から）
 pubDate: 2026-11-04
 updatedDate: 2026-11-04
-category: souzoku
+category: seido
 level: easy
 sourceName: 法務省「相続登記の義務化」特設ページ
 sourceUrl: https://www.moj.go.jp/MINJI/souzokutouki-gimuka/index.html
-summary: 2024年4月1日から、土地や建物を相続したら、相続を知った日から3年以内に登記の申請をすることが義務になりました。正当な理由なく申請しないと、10万円以下の過料の対象になることがあります。
+summary: 2024年4月から、相続で土地や建物を取得したら、知った日から3年以内に相続登記を申請することが義務になりました。
 comment: 2024年4月より前に相続した不動産も対象です。その場合の期限は2027年3月31日までなので、「昔のことだから」と思わず早めに確認しておきましょう。
 tags:
+  - 相続
   - 相続登記
   - 義務化
 ---

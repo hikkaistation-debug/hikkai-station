@@ -7,20 +7,38 @@ import { LINE_IDS } from './data/lines';
 
 const articles = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
-  schema: z.object({
-    title: z.string(), // タイトル
-    pubDate: z.coerce.date(), // 公開日
-    updatedDate: z.coerce.date().optional(), // 更新日（任意）
-    category: z.enum(LINE_IDS), // カテゴリ（1つ）
-    level: z.enum(['easy', 'normal', 'expert']), // 対象バッジ
-    sourceName: z.string(), // 出典名
-    sourceUrl: z.string().url(), // 出典URL
-    summary: z.string(), // 要約（自分の言葉で）
-    comment: z.string(), // 一言コメント
-    tags: z.array(z.string()).default([]), // タグ（任意）
-    sample: z.boolean().default(false), // サンプル記事なら true
-    draft: z.boolean().default(false), // true の間はサイトに出ません
-  }),
+  schema: z
+    .object({
+      title: z.string(), // タイトル
+      pubDate: z.coerce.date(), // 公開日
+      updatedDate: z.coerce.date().optional(), // 更新日（任意）
+      category: z.enum(LINE_IDS), // カテゴリ（1つ）
+      level: z.enum(['easy', 'normal', 'expert']), // 対象バッジ
+      sourceName: z.string(), // 出典名
+      sourceUrl: z.string().url(), // 出典URL
+      summary: z.string(), // 要約（自分の言葉で。1〜2文・100字くらい）
+      comment: z.string(), // 一言コメント
+      tags: z.array(z.string()).default([]), // タグ（任意）
+      relatedLines: z.array(z.enum(LINE_IDS)).default([]), // 関連する駅（路線）（任意）
+      // ▼ 測量ツール（category: kiki）の記事だけ書く項目
+      product: z
+        .object({
+          name: z.string(), // 機器・ソフトの名前
+          kind: z.enum(['機器', 'ソフト', 'アプリ']), // 種類
+          use: z.string(), // 用途
+          officialUrl: z.string().url(), // 公式サイトのURL
+          makerDocUrl: z.string().url().optional(), // メーカー資料のURL（任意）
+          checkedDate: z.coerce.date(), // 最終確認日
+        })
+        .optional(),
+      sample: z.boolean().default(false), // サンプル記事なら true
+      draft: z.boolean().default(false), // true の間はサイトに出ません
+    })
+    .superRefine((d, ctx) => {
+      if (d.category === 'kiki' && !d.product) {
+        ctx.addIssue({ code: 'custom', path: ['product'], message: '測量ツールの記事には product（名前・種類・用途・公式サイト・最終確認日）が必要です' });
+      }
+    }),
 });
 
 export const collections = { articles };

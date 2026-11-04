@@ -22,11 +22,11 @@
    ---
    title: 記事のタイトル
    pubDate: 2026-11-04
-   category: souzoku        # seido / souzoku / kyokai / gijutsu / kiso / shiken のどれか
+   category: souzoku        # seido / kyokai / sokuryo / kiki / toki / shiken / kiso のどれか
    level: easy              # easy（やさしい）/ normal（ふつう）/ expert（専門）
    sourceName: 出典の名前
    sourceUrl: https://...
-   summary: 要約（自分の言葉で）
+   summary: 要約（自分の言葉で。1〜2文・100字くらい。民間の記事は細かい数字や要点まで書かない）
    comment: ひとことコメント
    tags:
      - タグ1

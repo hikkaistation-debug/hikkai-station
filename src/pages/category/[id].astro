@@ -1,5 +1,6 @@
 ---
 // 路線（カテゴリ）ごとの記事一覧。lines.ts に足したカテゴリは自動でページができます。
+// 機器・ソフトガイドの記事のうち、relatedLines にこの路線が入っているものも「関連する測量ツール」として並べます。
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
@@ -14,21 +15,37 @@ export function getStaticPaths() {
 
 const { id } = Astro.params;
 const line = getLine(id!);
-const articles = (await getPublishedArticles()).filter((a) => a.data.category === line.id);
+const all = await getPublishedArticles();
+const articles = all.filter((a) => a.data.category === line.id);
+const relatedKiki =
+  line.id === 'kiki' ? [] : all.filter((a) => a.data.category === 'kiki' && a.data.relatedLines.includes(line.id));
 ---
 <BaseLayout title={line.name} description={`「${line.name}」の記事一覧です。`}>
   <StationSign kicker={`${line.code}線 ${line.mark}`} title={line.name} color={line.color} />
 
   <p><LineBadge id={line.id} /> の記事の一覧です。</p>
 
-  <ListControls />
-
   {articles.length > 0 ? (
-    <ul class="card-list">
-      {articles.map((a) => <ArticleCard article={a} />)}
-    </ul>
+    <>
+      <ListControls />
+      <ul class="card-list">
+        {articles.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    </>
   ) : (
-    <p class="empty">この路線には、まだ記事がありません。</p>
+    <aside class="notice notice--soon">
+      <p class="notice__title">この駅は準備中です</p>
+      <p>この路線の記事は、まだありません。記事が入るまで、もうしばらくお待ちください。</p>
+    </aside>
+  )}
+
+  {relatedKiki.length > 0 && (
+    <section aria-labelledby="kiki-h">
+      <h2 id="kiki-h">関連する測量ツール</h2>
+      <ul class="card-list">
+        {relatedKiki.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    </section>
   )}
 
   <p><a href="/news/">← ニュース一覧へ</a></p>

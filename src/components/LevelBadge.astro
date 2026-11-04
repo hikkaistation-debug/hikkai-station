@@ -4,10 +4,11 @@ import { LEVELS, type LevelId } from '../data/lines';
 
 interface Props {
   level: LevelId;
+  compact?: boolean; // 一覧のカードでは補足（一般向け など）を出さない
 }
-const { level } = Astro.props;
+const { level, compact = false } = Astro.props;
 const info = LEVELS[level];
 ---
 <span class={`level-badge level-badge--${level}`}>
-  <span class="visually-hidden">対象：</span>{info.label}{info.note && <span>（{info.note}）</span>}
+  <span class="visually-hidden">対象：</span>{info.label}{!compact && info.note && <span>（{info.note}）</span>}
 </span>

@@ -76,11 +76,11 @@ function draftMarkdown(item) {
 # 使わないときは、このファイルを削除してください。
 title: ${yamlStr(item.title || '（タイトルを書く）')}
 pubDate: ${date}
-category: seido   # seido / souzoku / kyokai / gijutsu / kiso / shiken
+category: seido   # seido / kyokai / sokuryo / kiki / toki / shiken / kiso
 level: normal     # easy / normal / expert
 sourceName: ${yamlStr(hostOf(item.url))}
 sourceUrl: ${yamlStr(item.url)}
-summary: "（要約を自分の言葉で書く）"
+summary: "（1〜2文・100字くらいで、何の話かを自分の言葉で書く）"
 comment: "（ひとことを書く）"
 tags: []
 draft: true

@@ -9,7 +9,9 @@ import { getPublishedArticles, isKiso } from '../data/articles';
 
 const all = await getPublishedArticles();
 const news = all.filter((a) => !isKiso(a));
-const newsLines = LINES.filter((l) => !l.isKiso);
+// 記事のある路線を先に、0件の路線は「準備中」として後ろに薄く表示する
+const count = (id: string) => all.filter((a) => a.data.category === id).length;
+const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.id) > 0) - Number(count(a.id) > 0));
 ---
 <BaseLayout title="ニュース" description="筆界・境界・登記まわりのニュースを、カテゴリ別にまとめています。">
   <StationSign kicker="3番のりば｜実務者の方" title="ニュース" sub="NEWS" color="#0b62b4" prev="トップ" next="基礎解説" />
@@ -18,9 +20,9 @@ const newsLines = LINES.filter((l) => !l.isKiso);
   <ul class="line-list">
     {newsLines.map((l) => (
       <li>
-        <a href={`/category/${l.id}/`} style={`--c:${l.color}`}>
+        <a href={`/category/${l.id}/`} style={`--c:${l.color}`} class={count(l.id) === 0 ? 'is-soon' : undefined}>
           <LineBadge id={l.id} />
-          <span class="count">{all.filter((a) => a.data.category === l.id).length}件</span>
+          <span class="count">{count(l.id) > 0 ? `${count(l.id)}件` : '準備中'}</span>
         </a>
       </li>
     ))}
