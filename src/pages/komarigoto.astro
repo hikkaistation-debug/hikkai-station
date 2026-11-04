@@ -1,0 +1,75 @@
+---
+// 2番のりば「お困りの方」向けのまとめページ
+// 境界・相続した土地・基礎解説の路線から、一般の方向けの記事を困りごと別に集めます。
+// （「専門」の記事は出しません。やさしい記事を先に並べます）
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getPublishedArticles, type Article } from '../data/articles';
+
+const all = (await getPublishedArticles()).filter((a) => a.data.level !== 'expert');
+const easyFirst = (list: Article[]) =>
+  [...list].sort((a, b) => Number(a.data.level !== 'easy') - Number(b.data.level !== 'easy'));
+
+const sections = [
+  {
+    id: 'kyokai',
+    title: '隣の土地との境目のこと',
+    desc: '境目がわからない、塀や木の枝が越えている、話し合いがまとまらない、など。',
+    articles: easyFirst(all.filter((a) => a.data.category === 'kyokai')),
+  },
+  {
+    id: 'souzoku',
+    title: '相続した土地のこと',
+    desc: '相続した土地の登記、使わない土地、共有になっている土地、など。',
+    articles: easyFirst(all.filter((a) => a.data.category === 'souzoku')),
+  },
+  {
+    id: 'kiso',
+    title: 'まずは基本の言葉から',
+    desc: '「筆界」「境界」「登記」など、知っておくと話がわかりやすくなる言葉の解説です。',
+    articles: easyFirst(all.filter((a) => a.data.category === 'kiso')),
+  },
+];
+---
+<BaseLayout title="お困りの方へ" description="隣の土地との境目や、相続した土地のことで困っている方向けに、やさしい記事を集めました。">
+  <StationSign kicker="2番のりば" title="お困りの方へ" sub="FOR YOUR TROUBLES" />
+
+  <p>
+    隣の土地との境目や、相続した土地のことで困っている方向けに、読みやすい記事を困りごと別に集めました。
+    気になるところから読んでみてください。
+  </p>
+
+  <nav aria-label="このページの目次">
+    <ol class="route-map">
+      {sections.map((s) => (
+        <li><a href={`#${s.id}`}>{s.title}<small>{s.articles.length}件</small></a></li>
+      ))}
+    </ol>
+  </nav>
+
+  {sections.map((s) => (
+    <section id={s.id} aria-labelledby={`${s.id}-h`}>
+      <h2 id={`${s.id}-h`}>{s.title}</h2>
+      <p>{s.desc}</p>
+      {s.articles.length > 0 ? (
+        <ul class="card-list">
+          {s.articles.map((a) => <ArticleCard article={a} />)}
+        </ul>
+      ) : (
+        <p class="empty">まだ記事はありません。</p>
+      )}
+    </section>
+  ))}
+
+  <aside class="notice">
+    <p class="notice__title">具体的なご相談は専門家へ</p>
+    <ul>
+      <li>境目の調査・測量、分筆などの登記 → <strong>土地家屋調査士</strong></li>
+      <li>相続登記などの手続き → <strong>司法書士</strong></li>
+      <li>争いになっている、話し合いがまとまらない → <strong>弁護士</strong></li>
+      <li>手続きの進め方を知りたい → 土地のある場所を担当する<strong>法務局</strong></li>
+    </ul>
+    <p>このサイトでは、個別の案件についてのご相談はお受けしていません。</p>
+  </aside>
+</BaseLayout>

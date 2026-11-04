@@ -8,7 +8,7 @@
 //   isKiso : true なら「基礎解説」コーナーに並びます
 export const LINES = [
   { id: 'seido', name: '制度・法改正・官公庁のお知らせ', short: '制度', code: 'H', mark: '◆', color: '#0b62b4', isKiso: false },
-  { id: 'souzoku', name: '相続登記・所有者不明土地', short: '相続', code: 'S', mark: '●', color: '#0a7d3e', isKiso: false },
+  { id: 'souzoku', name: '相続した土地・所有者不明土地', short: '相続', code: 'S', mark: '●', color: '#0a7d3e', isKiso: false },
   { id: 'kyokai', name: '境界トラブル・筆界特定・裁判', short: '境界', code: 'K', mark: '▲', color: '#c4122f', isKiso: false },
   { id: 'gijutsu', name: '測量・登記の実務と技術', short: '技術', code: 'G', mark: '■', color: '#b45309', isKiso: false },
   { id: 'kiso', name: '基礎解説', short: '基礎', code: 'B', mark: '★', color: '#6d28a8', isKiso: true },
