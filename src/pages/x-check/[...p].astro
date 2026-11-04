@@ -44,7 +44,7 @@ const items = stories.map((s) => {
 
   <aside class="notice notice--sample">
     <p class="notice__title">このページは、手元の確認用画面だけにあります</p>
-    <p>各駅停車の投稿文と画像です。「コピー」で本文をコピーして、画像（同じ日付のフォルダ）をつけて予約投稿してください。予約・投稿したら「Xに予約・投稿した」にチェックを入れると、次からは隠れます。投稿文や画像を直してほしいときは「直してほしい」を選んでメモを書き、下の「ここまでを Claude に渡す」を押してください。選んだ結果は、このパソコンの中に自動で保存されます。</p>
+    <p>各駅停車の投稿文と画像です。「コピー」で本文をコピーして、画像（同じ日付のフォルダ）をつけて予約投稿してください。予約・投稿したら「Xに予約・投稿した」にチェックを入れると、次からは隠れます。本文・投稿文・画像を直してほしいときは「直してほしい」を選んでメモを書いてください。選んだ結果は自動で保存されます（念のため下の「保存する」も押せます）。保存した内容は Claude がそのまま読めるので、チャットで「Xチェックしたよ」とだけ送れば直します。</p>
   </aside>
 
   <div class="xc-top">
@@ -81,7 +81,7 @@ const items = stories.map((s) => {
         )}
         <label class="xc-posted"><input type="checkbox" class="xc-posted-box" /> Xに予約・投稿した</label>
         <fieldset class="xc-status">
-          <legend>投稿文・画像のチェック</legend>
+          <legend>本文・投稿文・画像のチェック</legend>
           <label><input type="radio" name={`s-${it.id}`} value="" checked /> まだ</label>
           <label><input type="radio" name={`s-${it.id}`} value="ok" /> OK</label>
           <label><input type="radio" name={`s-${it.id}`} value="fix" /> 直してほしい</label>
@@ -96,15 +96,11 @@ const items = stories.map((s) => {
 
   <div class="xc-bar">
     <p class="xc-saved" id="xc-saved" aria-live="polite"></p>
-    <button type="button" class="xc-handoff-btn" id="xc-handoff-btn">ここまでを Claude に渡す</button>
+    <button type="button" class="xc-handoff-btn" id="xc-handoff-btn">保存する</button>
   </div>
 
   <section class="xc-handoff" id="xc-handoff" hidden aria-live="polite">
     <p class="xc-handoff__result" id="xc-handoff-result"></p>
-    <label class="xc-handoff__label">
-      Claude に送る文（チャットに貼り付けて送ってください）
-      <textarea id="xc-handoff-text" rows="7" readonly></textarea>
-    </label>
   </section>
 </BaseLayout>
 
@@ -221,11 +217,11 @@ const items = stories.map((s) => {
 
   showAll.addEventListener('change', paint);
 
-  // 「ここまでを Claude に渡す」
+  // 「保存する」：今の画面をすぐ保存し、ファイルを読み直して画面と一致するか確かめる。
+  // 保存したファイル（review/x-check.json）は Claude がそのまま読めるので、コピーや貼り付けは要らない。
   const handoffBtn = document.getElementById('xc-handoff-btn') as HTMLButtonElement;
   const handoffBox = document.getElementById('xc-handoff')!;
   const handoffResult = document.getElementById('xc-handoff-result')!;
-  const handoffText = document.getElementById('xc-handoff-text') as HTMLTextAreaElement;
   handoffBtn.addEventListener('click', async () => {
     window.clearTimeout(timer);
     for (const li of items) state[li.dataset.id!] = read(li);
@@ -240,32 +236,21 @@ const items = stories.map((s) => {
       return;
     }
     savedEl.textContent = `保存しました（${new Date().toLocaleTimeString('ja-JP')}）`;
-    const lines: string[] = [];
     const mismatch: string[] = [];
+    let fix = 0;
     for (const li of items) {
       const e = read(li);
       const f = saved[li.dataset.id!];
       if (!f || f.posted !== e.posted || f.status !== e.status || (f.note ?? '') !== e.note) mismatch.push(`第${e.no}話`);
-      if (e.status === 'fix') lines.push(`・第${e.no}話「${e.title}」→ 直してほしい${e.note ? `：${e.note.replace(/\s+/g, ' ')}` : ''}`);
+      if (e.status === 'fix') fix++;
     }
-    const posted = items.filter((li) => read(li).posted).map((li) => li.dataset.no);
-    handoffText.value = [
-      'X投稿チェックの結果です。review/x-check.json を見て、「直してほしい」を直してください。',
-      `投稿済み：${posted.length ? `第${posted.join('・')}話` : 'なし'}`,
-      ...(lines.length ? lines : ['（直してほしいものはありません）']),
-    ].join('\n');
-    let copied = false;
-    try {
-      await navigator.clipboard.writeText(handoffText.value);
-      copied = true;
-    } catch {}
     handoffBox.hidden = false;
     handoffBox.dataset.ok = String(mismatch.length === 0);
     handoffResult.textContent =
-      (mismatch.length === 0 ? '✓ ファイルに保存されていることを確かめました。' : `⚠ 画面とファイルが一致しません：${mismatch.join('、')}。もう一度押してください。`) +
-      '\n' +
-      (copied ? '送る文をコピーしました。Claude のチャットに貼り付けて送ってください。' : '下の欄の文をコピーして、Claude のチャットに貼り付けてください。');
-    handoffText.select();
+      mismatch.length === 0
+        ? `✓ 保存しました（${new Date().toLocaleTimeString('ja-JP')}）。` +
+          (fix ? `\n直してほしい：${fix}話。Claude のチャットで「Xチェックしたよ」とだけ送れば、Claude が保存した内容を読んで直します。` : '')
+        : `⚠ 画面とファイルが一致しません：${mismatch.join('、')}。もう一度「保存する」を押してください。`;
   });
 
   (async () => {
