@@ -34,7 +34,7 @@ const RAW: Term[] = [
     related: [{ label: '裁判をしなくても使える「筆界特定制度」のしくみ', href: '/articles/hikkai-tokutei-seido/' }] },
   { id: 'kakutei', term: '筆界確定訴訟', yomi: 'ひっかいかくていそしょう', desc: '裁判所に筆界を決めてもらう裁判です。筆界特定の結果に納得できないときにも使われます。',
     related: [{ label: '裁判をしなくても使える「筆界特定制度」のしくみ', href: '/articles/hikkai-tokutei-seido/' }] },
-  { id: 'tachiai', term: '境界の立ち会い', yomi: 'きょうかいのたちあい', desc: '隣の土地の持ち主などと現地で一緒に境目を確認することです。測量や分筆の前に行うことが多いです。' },
+  { id: 'tachiai', term: '境界の立ち会い', yomi: 'きょうかいのたちあい', desc: '隣の土地の持ち主などと現地で一緒に境目を確認することです。ふつうは、先に測量をして、図面や資料から境目の位置を調べたうえで行います。分筆などの登記の前に必要になることが多いです。' },
   { id: 'kanmin', term: '官民境界', yomi: 'かんみんきょうかい', desc: '道路や水路など、国や市町村の土地と、個人や会社の土地との境目です。',
     related: [{ label: '久留米市、官民境界確定図のダウンロードと無人の情報交付機を開始', href: '/articles/kurume-kanmin-kyokai-download/' }] },
   { id: 'ekkyo', term: '越境', yomi: 'えっきょう', desc: '塀・建物・木の枝などが、境目を越えて隣の土地に出ていることです。',
