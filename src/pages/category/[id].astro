@@ -17,11 +17,14 @@ const { id } = Astro.params;
 const line = getLine(id!);
 const all = await getPublishedArticles();
 const articles = all.filter((a) => a.data.category === line.id);
+// となりの駅：路線の並び順で前後の路線
+const li = LINES.findIndex((l) => l.id === line.id);
+const nb = (j: number) => (LINES[j] ? { label: LINES[j].short, href: `/category/${LINES[j].id}/` } : undefined);
 const relatedKiki =
   line.id === 'kiki' ? [] : all.filter((a) => a.data.category === 'kiki' && a.data.relatedLines.includes(line.id));
 ---
 <BaseLayout title={line.name} description={`「${line.name}」の記事一覧です。`}>
-  <StationSign kicker={`${line.code}線`} title={line.name} color={line.color} />
+  <StationSign kicker={`${line.code}線`} title={line.name} color={line.color} prev={nb(li - 1)} next={nb(li + 1)} />
 
   <p><LineBadge id={line.id} /> の記事の一覧です。</p>
 

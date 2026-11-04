@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import { neighbors } from '../data/site';
 import ComingSoon from '../components/ComingSoon.astro';
 ---
 <BaseLayout title="リンク集（準備中）" description="官公庁の資料や便利なツールへのリンク集です（準備中）。">
-  <StationSign title="リンク集" sub="LINKS" prev="通達ナビ" next="このサイトについて" />
+  <StationSign title="リンク集" sub="LINKS" {...neighbors('/links/')} />
   <ComingSoon what="官公庁の資料や、個人制作の便利ツールを絞り込んで探せるリンク集" />
 </BaseLayout>

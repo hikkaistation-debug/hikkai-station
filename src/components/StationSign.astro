@@ -1,14 +1,20 @@
 ---
 // 駅名標（駅の看板）風の見出し
+// 左右の「となりの駅」は、href を付けると押して移動できます。
+export type Neighbor = string | { label: string; href?: string };
+
 interface Props {
   title: string;
   kicker?: string; // 上の小さい文字
   sub?: string; // 下の小さい文字（ローマ字など）
   color?: string; // 下の帯の色
-  prev?: string; // 左の「となりの駅」
-  next?: string; // 右の「となりの駅」
+  prev?: Neighbor; // 左の「となりの駅」
+  next?: Neighbor; // 右の「となりの駅」
 }
 const { title, kicker, sub, color, prev, next } = Astro.props;
+const norm = (n?: Neighbor) => (n === undefined ? undefined : typeof n === 'string' ? { label: n } : n);
+const p = norm(prev);
+const n = norm(next);
 ---
 <header class="station-sign">
   <div class="station-sign__body">
@@ -17,10 +23,18 @@ const { title, kicker, sub, color, prev, next } = Astro.props;
     {sub && <p class="station-sign__sub">{sub}</p>}
   </div>
   <div class="station-sign__bar" style={color ? `--bar:${color}` : undefined} aria-hidden="true"></div>
-  {(prev || next) && (
-    <div class="station-sign__neighbors" aria-hidden="true">
-      <span>{prev ? `← ${prev}` : ''}</span>
-      <span>{next ? `${next} →` : ''}</span>
-    </div>
+  {(p || n) && (
+    <nav class="station-sign__neighbors" aria-label="となりの駅">
+      <span class="station-sign__prev">
+        {p && (p.href
+          ? <a href={p.href} rel="prev"><span aria-hidden="true">← </span><span class="visually-hidden">前の駅：</span>{p.label}</a>
+          : <span aria-hidden="true">← {p.label}</span>)}
+      </span>
+      <span class="station-sign__next">
+        {n && (n.href
+          ? <a href={n.href} rel="next"><span class="visually-hidden">次の駅：</span>{n.label}<span aria-hidden="true"> →</span></a>
+          : <span aria-hidden="true">{n.label} →</span>)}
+      </span>
+    </nav>
   )}
 </header>

@@ -26,3 +26,10 @@ export const STATIONS = [
   { href: '/about/', label: 'このサイトについて', ready: true },
   { href: '/contact/', label: 'お問い合わせ', ready: true },
 ] as const;
+
+// 駅名標の「となりの駅」：STATIONS の並び順で、前後の駅を返す（準備中の駅も含む）
+export function neighbors(href: string) {
+  const i = STATIONS.findIndex((s) => s.href === href);
+  const at = (j: number) => (j >= 0 && j < STATIONS.length ? { label: STATIONS[j].label, href: STATIONS[j].href } : undefined);
+  return { prev: i < 0 ? undefined : at(i - 1), next: i < 0 ? undefined : at(i + 1) };
+}

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import { neighbors } from '../data/site';
 import ArticleCard from '../components/ArticleCard.astro';
 import ListControls from '../components/ListControls.astro';
 import { getPublishedArticles, isKiso } from '../data/articles';
@@ -8,7 +9,7 @@ import { getPublishedArticles, isKiso } from '../data/articles';
 const kiso = (await getPublishedArticles()).filter(isKiso);
 ---
 <BaseLayout title="基礎知識について" description="境界や登記の基本を、はじめての方向けにやさしく解説します。">
-  <StationSign kicker="1番のりば｜はじめての方" title="基礎知識について" sub="BASICS" color="#6d28a8" prev="ニュース" next="調査士試験" />
+  <StationSign kicker="1番のりば｜はじめての方" title="基礎知識について" sub="BASICS" color="#6d28a8" {...neighbors('/kiso/')} />
 
   <p>「筆界ってなに？」「境界とどう違うの？」など、基本の言葉や考え方を、はじめての方向けにやさしく解説します。</p>
 

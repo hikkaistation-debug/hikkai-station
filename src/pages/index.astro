@@ -13,7 +13,7 @@ const latest = articles.slice(0, 6);
 const platforms = PLATFORMS;
 ---
 <BaseLayout>
-  <StationSign kicker="ようこそ" title={SITE.name} sub="HIKKAI STATION" prev="境界" next="登記" />
+  <StationSign kicker="ようこそ" title={SITE.name} sub="HIKKAI STATION" prev={{ label: '境界', href: '/category/kyokai/' }} next={{ label: '登記', href: '/category/toki/' }} />
 
   <p>{SITE.description}</p>
 

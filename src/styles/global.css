@@ -346,3 +346,13 @@ main { padding-bottom: 1rem; }
 @media (min-width: 760px) { .mark-legend ul { grid-template-columns: repeat(2, 1fr); } }
 .mark-legend li { display: flex; align-items: center; gap: 0.5rem; }
 .mark-legend .line-mark { width: 1.4em; height: 1.4em; color: var(--c); flex: none; }
+
+/* ---------- 駅名標の「となりの駅」リンク ---------- */
+.station-sign__neighbors a {
+  color: var(--ink); font-weight: 800; text-decoration: underline dotted; text-underline-offset: 0.25em;
+  display: inline-block; padding: 0.15rem 0.5rem; border-radius: 6px; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;
+}
+.station-sign__neighbors a:hover { background: var(--sign-yellow); color: var(--navy); }
+.station-sign__prev, .station-sign__next { min-width: 0; flex: 1; }
+.station-sign__next { text-align: right; }

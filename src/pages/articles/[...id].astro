@@ -10,14 +10,24 @@ import { getLine } from '../../data/lines';
 import { getPublishedArticles, formatDate, isoDate, isKiso, type Article } from '../../data/articles';
 
 export async function getStaticPaths() {
-  const articles = await getPublishedArticles();
-  return articles.map((article) => ({ params: { id: article.id }, props: { article } }));
+  const articles = await getPublishedArticles(); // 新しい順
+  return articles.map((article) => {
+    // となりの駅：同じ路線の、ひとつ古い記事（左）とひとつ新しい記事（右）
+    const same = articles.filter((a) => a.data.category === article.data.category);
+    const i = same.findIndex((a) => a.id === article.id);
+    const older = same[i + 1];
+    const newer = same[i - 1];
+    return { params: { id: article.id }, props: { article, older, newer } };
+  });
 }
 
 interface Props {
   article: Article;
+  older?: Article;
+  newer?: Article;
 }
-const { article } = Astro.props;
+const { article, older, newer } = Astro.props;
+const toNb = (a?: Article) => (a ? { label: a.data.title, href: `/articles/${a.id}/` } : undefined);
 const { data } = article;
 const line = getLine(data.category);
 const { Content } = await render(article);
@@ -28,7 +38,7 @@ const isKiki = data.category === 'kiki' && data.product;
 const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 ---
 <BaseLayout title={data.title} description={data.summary} type="article">
-  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} />
+  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} prev={toNb(older)} next={toNb(newer)} />
 
   {data.sample && (
     <aside class="notice notice--sample">

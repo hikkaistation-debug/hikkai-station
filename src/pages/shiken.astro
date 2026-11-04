@@ -2,6 +2,7 @@
 // 土地家屋調査士試験の「のりば」ページ
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import { neighbors } from '../data/site';
 import ArticleCard from '../components/ArticleCard.astro';
 import ListControls from '../components/ListControls.astro';
 import { getLine } from '../data/lines';
@@ -30,7 +31,7 @@ const officialLinks = [
 ];
 ---
 <BaseLayout title="土地家屋調査士試験" description="土地家屋調査士試験のしくみや、公式の情報へのリンク、試験に関するニュースをまとめています。">
-  <StationSign kicker="4番のりば｜受験生の方" title="土地家屋調査士試験" sub="EXAM" color={line.color} prev="基礎知識" next="逆引き案内所" />
+  <StationSign kicker="4番のりば｜受験生の方" title="土地家屋調査士試験" sub="EXAM" color={line.color} {...neighbors('/shiken/')} />
 
   <p>
     土地家屋調査士は、土地や建物の調査・測量をして、表示に関する登記の申請手続きを行う国家資格です。

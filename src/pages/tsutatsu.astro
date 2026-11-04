@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import { neighbors } from '../data/site';
 import ComingSoon from '../components/ComingSoon.astro';
 ---
 <BaseLayout title="通達ナビ（準備中）" description="登記に関する通達・先例を探しやすく整理するコーナーです（準備中）。">
-  <StationSign title="通達ナビ" sub="CIRCULARS" prev="逆引き案内所" next="リンク集" />
+  <StationSign title="通達ナビ" sub="CIRCULARS" {...neighbors('/tsutatsu/')} />
   <ComingSoon what="登記に関する通達・先例を、条文・分野・年で絞り込んで探せるコーナー" />
   <div class="page-body">
     <h2>「通達」とは？</h2>
