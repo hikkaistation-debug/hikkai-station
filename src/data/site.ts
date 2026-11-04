@@ -42,6 +42,7 @@ export const MENU: MenuGroup[] = [
       { href: '/tags/', label: 'テーマ一覧', ready: true },
       { href: '/annai/', label: '逆引き案内所', ready: true },
       { href: '/search/', label: 'さがす', ready: true },
+      { href: '/yomimono/', label: '車内の読み物', ready: true },
       { href: '/tsutatsu/', label: '通達ナビ', ready: false },
       { href: '/links/', label: 'リンク集', ready: false },
     ],

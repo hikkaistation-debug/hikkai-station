@@ -1,6 +1,6 @@
 // 記事（Markdown）に書く項目のルール
 // 書き忘れや書き間違いがあると、画面にエラーで教えてくれます。
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { LINE_IDS } from './data/lines';
@@ -46,4 +46,21 @@ const articles = defineCollection({
     }),
 });
 
-export const collections = { articles };
+// ─────────────────────────────────────────────
+// 車内の読み物（小説）… src/content/stories/<列車>/<番号>.md
+// ─────────────────────────────────────────────
+const stories = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/stories' }),
+  schema: z.object({
+    title: z.string(), // 話のタイトル（「第1話」は自動で付きます）
+    train: z.enum(['kakueki', 'tokkyu']), // 列車（src/data/trains.ts）
+    no: z.number(), // 第何話か
+    pubDate: z.coerce.date(), // 公開日（この日の朝7時の自動公開から出ます）
+    summary: z.string(), // ひとことあらすじ（一覧に出ます）
+    point: z.string(), // 今日のひとこと（この話で学べること）
+    learn: z.array(reference('articles')).default([]), // もっと知りたい方へ：関連する記事のファイル名（.md を除く）
+    draft: z.boolean().default(false), // true の間はサイトに出ません
+  }),
+});
+
+export const collections = { articles, stories };

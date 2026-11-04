@@ -7,9 +7,17 @@ import { LINES } from '../data/lines';
 import LineBadge from '../components/LineBadge.astro';
 import { getPublishedArticles } from '../data/articles';
 import { PLATFORMS } from '../data/platforms';
+import { TRAINS, getPublishedStories, storyHref } from '../data/trains';
 
 const articles = await getPublishedArticles();
 const latest = articles.slice(0, 6);
+
+// 車内の読み物：列車ごとに、いちばん新しい話
+const latestStories = (
+  await Promise.all(
+    Object.values(TRAINS).map(async (t) => ({ t, s: (await getPublishedStories(t.id)).at(-1) })),
+  )
+).filter((x): x is { t: (typeof x)['t']; s: NonNullable<(typeof x)['s']> } => Boolean(x.s));
 
 // 読者別の入口「のりば」（色などは src/data/platforms.ts にまとめています）
 const platforms = PLATFORMS;
@@ -57,6 +65,27 @@ const platforms = PLATFORMS;
       <p class="empty">まだ記事はありません。</p>
     )}
   </section>
+
+  {latestStories.length > 0 && (
+    <section aria-labelledby="stories-heading">
+      <h2 id="stories-heading">車内の読み物 ― 物語で知る筆界</h2>
+      <p>筆界や土地家屋調査士の仕事を、楽しく知りながら読める小説です。</p>
+      <ul class="story-latest">
+        {latestStories.map(({ t, s }) => (
+          <li style={`--tc:${t.color}`}>
+            <a href={storyHref(s)}>
+              <span class="train__kind">{t.kind}</span>
+              <span>
+                <span class="story-latest__train">{t.title}</span>
+                <span class="story-latest__title">第{s.data.no}話　{s.data.title}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p><a href="/yomimono/">車内の読み物の一覧へ →</a></p>
+    </section>
+  )}
 
   <section aria-labelledby="map-heading">
     <h2 id="map-heading">サイトの案内図</h2>

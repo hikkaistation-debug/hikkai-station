@@ -1,0 +1,80 @@
+---
+// 車内の読み物：1話ずつのページ
+// となりの駅：← 1つ前の話（第1話なら「車内の読み物」）／ 次の話 →
+import { render, getEntries } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { SITE } from '../../data/site';
+import { TRAINS, getTrain, getPublishedStories, storyHref, storyLabel, type Story } from '../../data/trains';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const t of Object.values(TRAINS)) {
+    const list = await getPublishedStories(t.id);
+    list.forEach((story, i) => {
+      paths.push({ params: { id: story.id }, props: { story, prev: list[i - 1], next: list[i + 1] } });
+    });
+  }
+  return paths;
+}
+
+interface Props {
+  story: Story;
+  prev?: Story;
+  next?: Story;
+}
+const { story, prev, next } = Astro.props;
+const { data } = story;
+const train = getTrain(data.train);
+const { Content } = await render(story);
+const learn = (await getEntries(data.learn)).filter((a) => a && !a.data.draft);
+const INDEX = { label: '車内の読み物', href: '/yomimono/' };
+const nb = (s?: Story) => (s ? { label: `第${s.data.no}話 ${s.data.title}`, href: storyHref(s) } : undefined);
+const pageTitle = `${storyLabel(story)}（${train.kind}「${train.title}」）`;
+const url = new URL(storyHref(story), Astro.site).toString();
+const shareText = `【${train.kind}】${train.title} 第${data.no}話「${data.title}」\n#筆界ステーション #車内の読み物`;
+const shareHref = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
+---
+<BaseLayout title={pageTitle} description={data.summary} type="article">
+  <StationSign
+    kicker={`${train.kind}｜${train.title}`}
+    title={`第${data.no}話　${data.title}`}
+    color={train.color}
+    prev={nb(prev) ?? INDEX}
+    next={nb(next) ?? (train.stops[0] ? `次は「${train.stops[0]}」（準備中）` : undefined)}
+  />
+
+  <p class="story-note">この物語はフィクションです。登場する人物・町・できごとは架空のものです。</p>
+
+  <article class="story" style={`--tc:${train.color}`}>
+    <Content />
+    {!next && train.stops.length === 0 && <p class="story__end">（つづく）</p>}
+  </article>
+
+  <section class="article-box article-box--comment" aria-labelledby="point-h">
+    <h2 id="point-h"><span aria-hidden="true">📍</span>今日のひとこと</h2>
+    <p>{data.point}</p>
+  </section>
+
+  {learn.length > 0 && (
+    <section aria-labelledby="learn-h">
+      <h2 id="learn-h">もっと知りたい方へ</h2>
+      <ul class="card-list">
+        {learn.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    </section>
+  )}
+
+  <nav class="story-nav" aria-label="前後の話">
+    {prev ? <a href={storyHref(prev)} rel="prev">← 第{prev.data.no}話へ</a> : <span></span>}
+    {next ? <a href={storyHref(next)} rel="next">第{next.data.no}話へ →</a> : <span></span>}
+  </nav>
+
+  <p class="story-share">
+    <a href={shareHref} rel="noopener" target="_blank">この話を X でシェアする<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+    {SITE.xUser && <small>毎日の更新は <a href={`https://x.com/${SITE.xUser}`} rel="noopener" target="_blank">@{SITE.xUser}</a> でもお知らせします。</small>}
+  </p>
+
+  <p><a href="/yomimono/">← 車内の読み物の一覧へ</a></p>
+</BaseLayout>

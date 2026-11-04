@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch: # GitHubの画面から手動でも実行できるようにする
+  schedule:
+    # 毎朝7時15分（日本時間）にも組み立てなおす。
+    # 「車内の読み物」で、公開日が今日になった話を自動で出すため。
+    - cron: '15 22 * * *'
 
 permissions:
   contents: read

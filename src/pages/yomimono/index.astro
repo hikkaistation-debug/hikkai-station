@@ -1,0 +1,66 @@
+---
+// 車内の読み物（小説）の入口
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import { TRAINS, getPublishedStories, storyHref, isScheduled } from '../../data/trains';
+
+const trains = await Promise.all(
+  Object.values(TRAINS).map(async (t) => ({ t, stories: await getPublishedStories(t.id) })),
+);
+---
+<BaseLayout title="車内の読み物" description="筆界や土地家屋調査士の仕事を、楽しく知りながら読める小説です。毎日1分の「各駅停車」と、じっくり読む「特急」があります。">
+  <StationSign kicker="駅の施設" title="車内の読み物" sub="STORIES" prev={TERMINAL} />
+
+  <p>
+    筆界や土地家屋調査士の仕事を、物語で楽しく知るコーナーです。
+    毎日1話ずつ進む<strong>各駅停車</strong>と、じっくり読む<strong>特急</strong>の2本が走っています。
+    どちらも同じ町が舞台で、ときどき登場人物が乗り入れます。
+  </p>
+
+  <aside class="notice notice--soon">
+    <p class="notice__title">この物語はフィクションです</p>
+    <p>登場する人物・町・事務所・できごとは架空のものです。話の中の制度の説明は、わかりやすくするために簡単にしています。実際の手続きは、各話の「もっと知りたい方へ」の記事や、一次資料でご確認ください。</p>
+  </aside>
+
+  {trains.map(({ t, stories }) => (
+    <section class="train" style={`--tc:${t.color}`} aria-labelledby={`train-${t.id}`}>
+      <header class="train__head">
+        <span class="train__kind">{t.kind}<small>{t.kindEn}</small></span>
+        <h2 class="train__title" id={`train-${t.id}`}>{t.title}</h2>
+        <span class="train__time">{t.time}</span>
+      </header>
+      <div class="train__body">
+        <p>{t.desc}</p>
+        <dl class="train__cast">
+          {t.cast.map((c) => (
+            <div><dt>{c.name}</dt><dd>{c.role}</dd></div>
+          ))}
+        </dl>
+        <h3 class="train__stops-h">停車駅</h3>
+        <ol class="story-stops">
+          {stories.map((s) => (
+            <li>
+              <a href={storyHref(s)}>
+                <span class="story-stops__no">第{s.data.no}話</span>
+                <span class="story-stops__title">{s.data.title}</span>
+                <small>{s.data.summary}</small>
+                {isScheduled(s) && <span class="story-stops__soon">公開予定（確認用の表示）</span>}
+              </a>
+            </li>
+          ))}
+          {t.stops.map((name, i) => (
+            <li class="is-soon">
+              <span class="stop">
+                <span class="story-stops__no">第{stories.length + i + 1}話</span>
+                <span class="story-stops__title">{name}</span>
+                <small>まだ到着していません</small>
+              </span>
+            </li>
+          ))}
+        </ol>
+        {stories.length === 0 && <p class="empty">まもなく発車します。</p>}
+      </div>
+    </section>
+  ))}
+</BaseLayout>
