@@ -12,7 +12,7 @@ import { getPublishedArticles, formatDate, isoDate, isKiso, type Article } from 
 export async function getStaticPaths() {
   const articles = await getPublishedArticles(); // 新しい順
   return articles.map((article) => {
-    // となりの駅：同じ路線の、ひとつ古い記事（左）とひとつ新しい記事（右）
+    // となりの駅：左＝ターミナル側（1つ新しい記事。いちばん新しい記事なら路線のページ）、右＝1つ古い記事（いちばん古い記事なら終点）
     const same = articles.filter((a) => a.data.category === article.data.category);
     const i = same.findIndex((a) => a.id === article.id);
     const older = same[i + 1];
@@ -38,7 +38,7 @@ const isKiki = data.category === 'kiki' && data.product;
 const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 ---
 <BaseLayout title={data.title} description={data.summary} type="article">
-  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} prev={toNb(older)} next={toNb(newer)} />
+  <StationSign kicker={`${line.code}線 ${line.short}`} title={data.title} color={line.color} prev={toNb(newer) ?? { label: line.name, href: `/category/${line.id}/` }} next={toNb(older)} />
 
   {data.sample && (
     <aside class="notice notice--sample">

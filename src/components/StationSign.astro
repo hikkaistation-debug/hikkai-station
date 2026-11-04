@@ -10,8 +10,9 @@ interface Props {
   color?: string; // 下の帯の色
   prev?: Neighbor; // 左の「となりの駅」
   next?: Neighbor; // 右の「となりの駅」
+  bars?: string[]; // 帯を複数の色に分けるとき（ターミナル駅のトップで使う）
 }
-const { title, kicker, sub, color, prev, next } = Astro.props;
+const { title, kicker, sub, color, prev, next, bars } = Astro.props;
 const norm = (n?: Neighbor) => (n === undefined ? undefined : typeof n === 'string' ? { label: n } : n);
 const p = norm(prev);
 const n = norm(next);
@@ -22,7 +23,13 @@ const n = norm(next);
     <h1 class="station-sign__title">{title}</h1>
     {sub && <p class="station-sign__sub">{sub}</p>}
   </div>
-  <div class="station-sign__bar" style={color ? `--bar:${color}` : undefined} aria-hidden="true"></div>
+  {bars && bars.length > 0 ? (
+    <div class="station-sign__bar station-sign__bar--multi" aria-hidden="true">
+      {bars.map((c) => <span style={`background:${c}`}></span>)}
+    </div>
+  ) : (
+    <div class="station-sign__bar" style={color ? `--bar:${color}` : undefined} aria-hidden="true"></div>
+  )}
   {(p || n) && (
     <nav class="station-sign__neighbors" aria-label="となりの駅">
       <span class="station-sign__prev">

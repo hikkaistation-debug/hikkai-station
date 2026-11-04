@@ -1,7 +1,7 @@
 ---
 // すべてのページの共通の枠（ヘッダー・メニュー・フッター・SNS共有用の情報）
 import '../styles/global.css';
-import { SITE, STATIONS } from '../data/site';
+import { SITE, MENU } from '../data/site';
 
 interface Props {
   title?: string;
@@ -55,16 +55,24 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
         </div>
       </div>
       <nav class="site-nav" id="site-nav" aria-label="サイト内メニュー" hidden>
-        <ul class="container">
-          {STATIONS.map((s) => (
-            <li>
-              <a href={s.href} aria-current={isCurrent(s.href) ? 'page' : undefined}>
-                {s.label}
-                {!s.ready && <span class="soon">（準備中）</span>}
-              </a>
-            </li>
+        <div class="container site-nav__inner">
+          {MENU.map((g) => (
+            <div class={`site-nav__group site-nav__group--${g.id}`}>
+              <p class="site-nav__title" id={`nav-${g.id}`}>{g.title}</p>
+              <ul aria-labelledby={`nav-${g.id}`}>
+                {g.items.map((s) => (
+                  <li>
+                    <a href={s.href} aria-current={isCurrent(s.href) ? 'page' : undefined}>
+                      {s.num && <span class="nav-num" style={`--pc:${s.color}`} aria-hidden="true">{s.num}</span>}
+                      {s.label}
+                      {!s.ready && <span class="soon">（準備中）</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </nav>
     </header>
 

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
-import { neighbors } from '../data/site';
+import { TERMINAL } from '../data/site';
 import ArticleCard from '../components/ArticleCard.astro';
 import ListControls from '../components/ListControls.astro';
 import LineBadge from '../components/LineBadge.astro';
@@ -26,7 +26,7 @@ const MARK_NOTE: Record<string, string> = {
 const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.id) > 0) - Number(count(a.id) > 0));
 ---
 <BaseLayout title="ニュース" description="筆界・境界・登記まわりのニュースを、カテゴリ別にまとめています。">
-  <StationSign kicker="3番のりば｜実務者の方" title="ニュース" sub="NEWS" color="#0b62b4" {...neighbors('/news/')} />
+  <StationSign kicker="3番のりば｜実務者の方" title="ニュース" sub="NEWS" color="#0b62b4" prev={TERMINAL} />
 
   <h2>路線（カテゴリ）からさがす</h2>
   <ul class="line-list">

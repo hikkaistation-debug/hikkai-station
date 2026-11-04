@@ -7,6 +7,7 @@ export const PLATFORMS = [
     short: 'はじめて',
     title: '境界ってそもそも何？',
     desc: '「筆界」「境界」「登記」など、まずは基本の言葉をやさしく解説します。',
+    dest: '基礎知識',
     href: '/kiso/',
     color: '#6d28a8', // 紫（基礎知識の路線と同じ）
   },
@@ -16,6 +17,7 @@ export const PLATFORMS = [
     short: 'お困り',
     title: '隣地との境界・相続した土地・登記のこと',
     desc: '隣の土地との境目や、相続した土地のことなど、困りごと別にやさしい記事を集めました。',
+    dest: 'お困りの方へ',
     href: '/komarigoto/',
     color: '#c4122f', // 赤（境界の路線と同じ）
   },
@@ -25,6 +27,7 @@ export const PLATFORMS = [
     short: '実務者',
     title: '法改正・通達・裁決・技術の情報',
     desc: '制度の動きや実務・技術のニュースを、出典リンク付きでまとめます。',
+    dest: 'ニュース',
     href: '/news/',
     color: '#0b62b4', // 青（制度の路線と同じ）
   },
@@ -34,6 +37,7 @@ export const PLATFORMS = [
     short: '受験生',
     title: '土地家屋調査士試験',
     desc: '試験のしくみや公式の情報へのリンク、試験に関するニュースをまとめます。',
+    dest: '調査士試験',
     href: '/shiken/',
     color: '#0f766e', // 青緑（試験の路線と同じ）
   },

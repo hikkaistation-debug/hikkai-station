@@ -2,7 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import { SITE, STATIONS } from '../data/site';
+import { SITE, MENU } from '../data/site';
+import { LINES } from '../data/lines';
+import LineBadge from '../components/LineBadge.astro';
 import { getPublishedArticles } from '../data/articles';
 import { PLATFORMS } from '../data/platforms';
 
@@ -13,7 +15,7 @@ const latest = articles.slice(0, 6);
 const platforms = PLATFORMS;
 ---
 <BaseLayout>
-  <StationSign kicker="ようこそ" title={SITE.name} sub="HIKKAI STATION" prev={{ label: '境界', href: '/category/kyokai/' }} next={{ label: '登記', href: '/category/toki/' }} />
+  <StationSign kicker="ようこそ｜ターミナル駅" title={SITE.name} sub="HIKKAI STATION" bars={platforms.map((p) => p.color)} />
 
   <p>{SITE.description}</p>
 
@@ -58,16 +60,33 @@ const platforms = PLATFORMS;
 
   <section aria-labelledby="map-heading">
     <h2 id="map-heading">サイトの案内図</h2>
-    <ol class="route-map">
-      {STATIONS.filter((s) => s.href !== '/').map((s) => (
-        <li class={s.ready ? '' : 'is-soon'}>
-          {s.ready ? (
-            <a href={s.href}>{s.label}</a>
-          ) : (
-            <span class="stop">{s.label}<small>準備中です。もうしばらくお待ちください。</small></span>
-          )}
-        </li>
+    <p>筆界ステーションは、すべての路線が集まるターミナル駅です。</p>
+    <div class="site-map">
+      {MENU.map((g) => (
+        <section class="site-map__group" aria-labelledby={`map-${g.id}`}>
+          <h3 id={`map-${g.id}`}>{g.title}</h3>
+          <ol class="route-map">
+            {g.items.map((s) => (
+              <li class={s.ready ? '' : 'is-soon'}>
+                {s.ready ? (
+                  <a href={s.href}>
+                    {s.num && <span class="nav-num" style={`--pc:${s.color}`} aria-hidden="true">{s.num}</span>}
+                    {s.label}
+                  </a>
+                ) : (
+                  <span class="stop">{s.label}<small>準備中です</small></span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
       ))}
-    </ol>
+      <section class="site-map__group" aria-labelledby="map-lines">
+        <h3 id="map-lines">路線</h3>
+        <ul class="site-map__lines">
+          {LINES.map((l) => <li><LineBadge id={l.id} link /></li>)}
+        </ul>
+      </section>
+    </div>
   </section>
 </BaseLayout>

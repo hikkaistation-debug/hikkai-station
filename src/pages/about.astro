@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
-import { SITE, neighbors } from '../data/site';
+import { SITE, TERMINAL } from '../data/site';
 ---
 <BaseLayout title="このサイトについて" description={`${SITE.name}の運営方針、免責事項、リンクについてのお約束です。`}>
-  <StationSign title="このサイトについて" sub="ABOUT" {...neighbors('/about/')} />
+  <StationSign title="このサイトについて" sub="ABOUT" prev={TERMINAL} />
 
   <div class="page-body">
     <h2>{SITE.name}とは</h2>

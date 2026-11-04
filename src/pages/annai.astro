@@ -2,7 +2,7 @@
 // 逆引き案内所：「こんなときは？」と「用語さくいん」
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
-import { neighbors } from '../data/site';
+import { TERMINAL } from '../data/site';
 import { GLOSSARY } from '../data/glossary';
 
 // こんなときは？（困りごと → 読むとよい記事・相談先）
@@ -61,7 +61,7 @@ const cases = [
 ];
 ---
 <BaseLayout title="逆引き案内所" description="困りごとから読むとよい記事や相談先を探したり、筆界・境界・登記の言葉を調べたりできます。">
-  <StationSign kicker="INFORMATION" title="逆引き案内所" sub="GUIDE & GLOSSARY" {...neighbors('/annai/')} />
+  <StationSign kicker="INFORMATION" title="逆引き案内所" sub="GUIDE & GLOSSARY" prev={TERMINAL} />
 
   <p>
     「こんなときはどうする？」という困りごとから、読むとよい記事と相談先を案内します。

@@ -5,10 +5,11 @@
 // 記事が増えたら、Pagefind などの本格的な検索に切り替えを検討します。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import { TERMINAL } from '../data/site';
 import ListControls from '../components/ListControls.astro';
 ---
 <BaseLayout title="サイト内検索" description="サイト内の記事や用語を、キーワードでさがせます。">
-  <StationSign kicker="SEARCH" title="サイト内検索" />
+  <StationSign kicker="SEARCH" title="サイト内検索" prev={TERMINAL} />
 
   <form class="search-box" action="/search/" method="get" role="search" id="search-form">
     <label for="q" class="visually-hidden">キーワード</label>

@@ -13,23 +13,46 @@ export const SITE = {
   xUser: 'hikkai_station',
 };
 
-// サイト内のおもな行き先（路線図ナビ・メニューで使います）
+// ─────────────────────────────────────────────
+// サイトの組み立て（駅にたとえています）
+//   筆界ステーション（トップ）＝ ターミナル駅
+//   のりば   … 読者別の入口（src/data/platforms.ts）
+//   路線     … 記事の分類。ターミナル → 路線のページ → 新しい記事 → … → 古い記事（終点）
+//   駅の施設 … 調べものの道具
+//   ご案内   … サイトについて
+// メニューとトップの「サイトの案内図」は、この MENU を使います。
 // ready: false のページは「準備中」と表示します。
-export const STATIONS = [
-  { href: '/', label: 'トップ', ready: true },
-  { href: '/news/', label: 'ニュース', ready: true },
-  { href: '/kiso/', label: '基礎知識', ready: true },
-  { href: '/shiken/', label: '調査士試験', ready: true },
-  { href: '/annai/', label: '逆引き案内所', ready: true },
-  { href: '/tsutatsu/', label: '通達ナビ', ready: false },
-  { href: '/links/', label: 'リンク集', ready: false },
-  { href: '/about/', label: 'このサイトについて', ready: true },
-  { href: '/contact/', label: 'お問い合わせ', ready: true },
-] as const;
+// ─────────────────────────────────────────────
+import { PLATFORMS } from './platforms';
 
-// 駅名標の「となりの駅」：STATIONS の並び順で、前後の駅を返す（準備中の駅も含む）
-export function neighbors(href: string) {
-  const i = STATIONS.findIndex((s) => s.href === href);
-  const at = (j: number) => (j >= 0 && j < STATIONS.length ? { label: STATIONS[j].label, href: STATIONS[j].href } : undefined);
-  return { prev: i < 0 ? undefined : at(i - 1), next: i < 0 ? undefined : at(i + 1) };
-}
+export type MenuItem = { href: string; label: string; ready: boolean; num?: string; color?: string };
+export type MenuGroup = { id: string; title: string; items: MenuItem[] };
+
+export const MENU: MenuGroup[] = [
+  {
+    id: 'platforms',
+    title: 'のりば',
+    items: PLATFORMS.map((p) => ({ href: p.href, label: p.dest, ready: true, num: p.num, color: p.color })),
+  },
+  {
+    id: 'facilities',
+    title: '駅の施設',
+    items: [
+      { href: '/annai/', label: '逆引き案内所', ready: true },
+      { href: '/search/', label: 'さがす', ready: true },
+      { href: '/tsutatsu/', label: '通達ナビ', ready: false },
+      { href: '/links/', label: 'リンク集', ready: false },
+    ],
+  },
+  {
+    id: 'info',
+    title: 'ご案内',
+    items: [
+      { href: '/about/', label: 'このサイトについて', ready: true },
+      { href: '/contact/', label: 'お問い合わせ', ready: true },
+    ],
+  },
+];
+
+// 駅名標の「となりの駅」で使う、ターミナル駅（トップ）
+export const TERMINAL = { label: SITE.name, href: '/' };
