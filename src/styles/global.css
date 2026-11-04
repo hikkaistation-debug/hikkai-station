@@ -441,3 +441,40 @@ main { padding-bottom: 1rem; }
 .rosen-track--branch { margin-top: 0.2rem; }
 .rosen-track--branch .rosen-stop::after { width: 4px; left: -1.1rem; }
 .rosen-track--branch .rosen-stop::before { width: 0.7rem; height: 0.7rem; left: -1.33rem; border-width: 2.5px; }
+
+/* ---------- タグ ---------- */
+.tag-group h2 { font-size: 1.1rem; margin: 1.4rem 0 0.5rem; }
+.tag-chips { list-style: none; padding: 0; margin: 0.5rem 0 1rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem; background: #fff; color: var(--ink); text-decoration: none;
+  border: 2px solid var(--navy); border-radius: 999px; padding: 0.15rem 0.75rem; font-weight: 700; font-size: 0.92rem;
+}
+.tag-chip:hover { background: var(--sign-yellow); color: var(--navy); }
+.tag-chip.is-empty { opacity: 0.5; border-style: dashed; }
+.tag-chip__count { font-size: 0.75rem; background: var(--navy); color: #fff; border-radius: 999px; padding: 0 0.45rem; }
+.tag-term { border-left: 8px solid var(--sign-yellow); }
+.tag-term h2 { font-size: 1rem; }
+.tags a { color: var(--ink); text-decoration: none; }
+.tags a:hover { text-decoration: underline; }
+
+/* ---------- 検索の絞り込みパネル ---------- */
+.facets { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.6rem 0.9rem; margin: 0.5rem 0 1rem; }
+.facets summary { cursor: pointer; font-weight: 800; }
+.facets summary span { font-weight: 600; color: var(--ink-soft); }
+.facets__row { display: grid; grid-template-columns: 7.5em 1fr; gap: 0.5rem; align-items: start; margin-top: 0.6rem; }
+.facets__row[hidden] { display: none; }
+@media (max-width: 600px) { .facets__row { grid-template-columns: 1fr; gap: 0.2rem; } }
+.facets__label { margin: 0.25rem 0 0; font-size: 0.82rem; font-weight: 800; color: var(--ink-soft); }
+.facet-chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.facet-chips li[hidden] { display: none; }
+.facet-chip {
+  display: inline-flex; align-items: center; gap: 0.3rem; font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+  padding: 0.2rem 0.65rem; border-radius: 999px; border: 2px solid var(--c, var(--navy)); background: #fff; color: var(--ink);
+}
+.facet-chip .line-mark { color: var(--c); width: 1em; height: 1em; }
+.facet-chip[aria-pressed='true'] { background: var(--c, var(--navy)); color: #fff; }
+.facet-chip[aria-pressed='true'] .line-mark { color: #fff; }
+.facet-chip:disabled { opacity: 0.4; cursor: default; }
+.facet-chip__count { font-size: 0.72rem; background: #ebeae4; color: var(--ink); border-radius: 999px; padding: 0 0.4rem; }
+.facets__foot { margin: 0.7rem 0 0; text-align: right; }
+.facets__clear { font: inherit; font-size: 0.85rem; background: none; border: 0; color: #0a55a0; text-decoration: underline; cursor: pointer; }

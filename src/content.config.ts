@@ -4,6 +4,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { LINE_IDS } from './data/lines';
+import { TAG_NAMES } from './data/tags';
 
 const articles = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
@@ -18,7 +19,7 @@ const articles = defineCollection({
       sourceUrl: z.string().url(), // 出典URL
       summary: z.string(), // 要約（自分の言葉で。1〜2文・100字くらい）
       comment: z.string(), // 一言コメント
-      tags: z.array(z.string()).default([]), // タグ（任意）
+      tags: z.array(z.enum(TAG_NAMES)).default([]), // タグ（任意。src/data/tags.ts の一覧から選ぶ）
       relatedLines: z.array(z.enum(LINE_IDS)).default([]), // 関連する駅（路線）（任意）
       station: z.string().optional(), // 路線図に出す短い駅名（任意。なければタイトルを短くして使う）
       // ▼ 支線：ある記事から枝分かれしたシリーズ記事にするとき（任意）

@@ -2,20 +2,56 @@
 // サイト内検索（ブラウザの中だけで動く、かんたんな検索）
 // ・記事はタイトル・要約・ひとこと・タグに加えて、本文の中身も探します。
 // ・用語さくいんの言葉とよみを「関連ワード」として使います（「ぶんぴつ」→「分筆」を含む記事も出ます）。
+// ・「絞り込みパネル」で、路線・タグを組み合わせられます（対象とならび順は記事一覧の上のボタン）。
+// ・キーワードが空でも、絞り込みだけで記事をさがせます。
 // 記事が増えたら、Pagefind などの本格的な検索に切り替えを検討します。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
-import { TERMINAL } from '../data/site';
 import ListControls from '../components/ListControls.astro';
+import LineMark from '../components/LineMark.astro';
+import { TERMINAL } from '../data/site';
+import { LINES } from '../data/lines';
+import { TAG_GROUPS } from '../data/tags';
 ---
-<BaseLayout title="サイト内検索" description="サイト内の記事や用語を、キーワードでさがせます。">
-  <StationSign kicker="SEARCH" title="サイト内検索" prev={TERMINAL} />
+<BaseLayout title="サイト内検索" description="サイト内の記事や用語を、キーワード・路線・タグでさがせます。">
+  <StationSign kicker="駅の施設" title="サイト内検索" sub="SEARCH" prev={TERMINAL} />
 
   <form class="search-box" action="/search/" method="get" role="search" id="search-form">
     <label for="q" class="visually-hidden">キーワード</label>
-    <input id="q" name="q" type="search" placeholder="例：相続登記、筆界特定、ぶんぴつ" />
+    <input id="q" name="q" type="search" placeholder="例：相続登記、筆界特定、ぶんぴつ（空でもOK）" />
     <button type="submit">さがす</button>
   </form>
+
+  <details class="facets" id="facets" open>
+    <summary>絞り込みパネル（路線・タグ）<span id="facet-summary"></span></summary>
+    <div class="facets__row">
+      <p class="facets__label">路線</p>
+      <ul class="facet-chips">
+        {LINES.map((l) => (
+          <li>
+            <button type="button" class="facet-chip" data-facet="line" data-value={l.id} aria-pressed="false" style={`--c:${l.color}`}>
+              <LineMark mark={l.mark} />{l.short}<span class="facet-chip__count"></span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+    {TAG_GROUPS.map((g) => (
+      <div class="facets__row" data-tag-group>
+        <p class="facets__label">{g.title}</p>
+        <ul class="facet-chips">
+          {g.tags.map((t) => (
+            <li>
+              <button type="button" class="facet-chip facet-chip--tag" data-facet="tag" data-value={t.name} aria-pressed="false">
+                #{t.name}<span class="facet-chip__count"></span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+    <p class="facets__foot"><button type="button" id="facet-clear" class="facets__clear">絞り込みをすべて外す</button></p>
+  </details>
 
   <p id="search-status" aria-live="polite"></p>
   <p id="search-related" class="search-related" hidden></p>
@@ -34,7 +70,7 @@ import ListControls from '../components/ListControls.astro';
 
 <script>
   type Term = { url: string; title: string; summary: string; text: string };
-  type Article = Term & { category: string; level: string; color: string; date: string; dateISO: string };
+  type Article = Term & { category: string; level: string; line: string; tags: string[]; color: string; date: string; dateISO: string };
   type Data = { terms: Term[]; articles: Article[]; synonyms: { words: string[] }[] };
 
   const LEVEL: Record<string, string> = { easy: 'やさしい', normal: 'ふつう', expert: '専門' };
@@ -47,12 +83,15 @@ import ListControls from '../components/ListControls.astro';
   const termList = document.getElementById('term-results')!;
   const articleSection = document.getElementById('article-section')!;
   const articleList = document.getElementById('search-results')!;
+  const facetSummary = document.getElementById('facet-summary')!;
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.facet-chip'));
 
   // 全角・半角、大文字・小文字、カタカナ・ひらがなの違いを気にせず探せるようにする
   const normalize = (s: string) =>
     s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
   let data: Data = { terms: [], articles: [], synonyms: [] };
+  const selected = { line: new Set<string>(), tag: new Set<string>() };
 
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
     const e = document.createElement(tag);
@@ -91,32 +130,66 @@ import ListControls from '../components/ListControls.astro';
     return li;
   }
 
+  // 路線は「どれか」（OR）、タグは「すべて」（AND）で絞り込む
+  const passLine = (a: Article) => selected.line.size === 0 || selected.line.has(a.line);
+  const passTags = (a: Article) => [...selected.tag].every((t) => a.tags.includes(t));
+
+  function updateUrl(q: string) {
+    const p = new URLSearchParams();
+    if (q) p.set('q', q);
+    selected.line.forEach((v) => p.append('line', v));
+    selected.tag.forEach((v) => p.append('tag', v));
+    const s = p.toString();
+    history.replaceState(null, '', s ? `?${s}` : location.pathname);
+  }
+
   function run(q: string) {
     termList.replaceChildren();
     articleList.replaceChildren();
     related.hidden = true;
     const words = normalize(q).split(/\s+/).filter(Boolean);
-    if (words.length === 0) {
-      status.textContent = 'キーワードを入れて「さがす」を押してください。';
-      termSection.hidden = articleSection.hidden = true;
-      return;
-    }
     const groups = words.map(expand);
     const match = (text: string) => {
       const t = normalize(text);
       return groups.every((alts) => alts.some((w) => t.includes(w)));
     };
-    // 言葉そのものが一致する用語を先に出す
+
+    // キーワードだけで絞った記事（件数の計算にも使う）
+    const byWord = data.articles.filter((a) => match(a.text));
+    const articles = byWord.filter((a) => passLine(a) && passTags(a));
+
+    // それぞれのボタンの件数：ほかの絞り込みはそのままで、そのボタンを押したら何件になるか
+    for (const c of chips) {
+      const v = c.dataset.value!;
+      const n =
+        c.dataset.facet === 'line'
+          ? byWord.filter((a) => a.line === v && passTags(a)).length
+          : byWord.filter((a) => passLine(a) && passTags(a) && a.tags.includes(v)).length;
+      c.querySelector('.facet-chip__count')!.textContent = String(n);
+      const on = c.getAttribute('aria-pressed') === 'true';
+      c.disabled = n === 0 && !on;
+      // タグは0件のものを隠してすっきりさせる（押しているものは出す）
+      if (c.dataset.facet === 'tag') c.closest('li')!.hidden = n === 0 && !on;
+    }
+    document.querySelectorAll<HTMLElement>('[data-tag-group]').forEach((row) => {
+      row.hidden = !row.querySelector('li:not([hidden])');
+    });
+    const nSel = selected.line.size + selected.tag.size;
+    facetSummary.textContent = nSel > 0 ? `：${nSel}件えらび中` : '';
+
+    // 用語（キーワードがあるときだけ）
     const inTitle = (t: Term) => (groups.some((alts) => alts.some((w) => normalize(t.title).includes(w))) ? 0 : 1);
-    const terms = data.terms.filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b));
-    const articles = data.articles.filter((a) => match(a.text));
+    const terms = words.length > 0 ? data.terms.filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b)) : [];
 
     const extra = [...new Set(groups.flat())].filter((w) => !words.includes(w));
     if (extra.length > 0) {
       related.textContent = `関連ワード「${extra.join('」「')}」でもさがしました。`;
       related.hidden = false;
     }
-    status.textContent = `「${q}」の検索結果：用語 ${terms.length}件・記事 ${articles.length}件`;
+    const conds = [q && `「${q}」`, ...[...selected.line].map((v) => chips.find((c) => c.dataset.value === v)?.textContent?.replace(/\d+$/, '').trim()), ...[...selected.tag].map((t) => `#${t}`)].filter(Boolean);
+    status.textContent = conds.length > 0
+      ? `${conds.join(' × ')} の検索結果：用語 ${terms.length}件・記事 ${articles.length}件`
+      : `すべての記事：${articles.length}件（キーワードや絞り込みでさがせます）`;
     termSection.hidden = terms.length === 0;
     articleSection.hidden = articles.length === 0;
     terms.forEach((t) => termList.append(card(t, false)));
@@ -124,21 +197,45 @@ import ListControls from '../components/ListControls.astro';
     document.dispatchEvent(new Event('cards-updated'));
   }
 
+  const current = () => input.value.trim();
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const q = input.value.trim();
-    history.replaceState(null, '', q ? `?q=${encodeURIComponent(q)}` : location.pathname);
-    run(q);
+    updateUrl(current());
+    run(current());
   });
 
-  const initial = new URLSearchParams(location.search).get('q') ?? '';
-  input.value = initial;
+  for (const c of chips) {
+    c.addEventListener('click', () => {
+      const set = selected[c.dataset.facet as 'line' | 'tag'];
+      const v = c.dataset.value!;
+      if (set.has(v)) set.delete(v); else set.add(v);
+      c.setAttribute('aria-pressed', String(set.has(v)));
+      updateUrl(current());
+      run(current());
+    });
+  }
+  document.getElementById('facet-clear')!.addEventListener('click', () => {
+    selected.line.clear();
+    selected.tag.clear();
+    chips.forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    updateUrl(current());
+    run(current());
+  });
+
+  // アドレスに書かれた条件（?q=…&line=…&tag=…）を読み込む
+  const params = new URLSearchParams(location.search);
+  input.value = params.get('q') ?? '';
+  params.getAll('line').forEach((v) => selected.line.add(v));
+  params.getAll('tag').forEach((v) => selected.tag.add(v));
+  chips.forEach((c) => c.setAttribute('aria-pressed', String(selected[c.dataset.facet as 'line' | 'tag'].has(c.dataset.value!))));
+
   status.textContent = '読み込み中…';
   fetch('/search-index.json')
     .then((r) => r.json())
     .then((d: Data) => {
       data = d;
-      run(initial);
+      run(current());
     })
     .catch(() => {
       status.textContent = '検索データを読み込めませんでした。時間をおいてお試しください。';

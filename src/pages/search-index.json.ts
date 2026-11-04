@@ -37,6 +37,8 @@ export async function GET() {
     text: [a.data.title, a.data.summary, a.data.comment, a.data.sourceName, ...a.data.tags, getLine(a.data.category).name, plainText(a.body)].join(' '),
     category: getLine(a.data.category).name,
     level: a.data.level,
+    line: a.data.category,
+    tags: a.data.tags,
     color: getLine(a.data.category).color,
     date: formatDate(a.data.pubDate),
     dateISO: isoDate(a.data.pubDate),

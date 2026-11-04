@@ -1,0 +1,31 @@
+---
+// テーマ一覧：タグ辞書（src/data/tags.ts）のテーマごとに、タグと記事の件数を並べます。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import { TAG_GROUPS } from '../../data/tags';
+import { getPublishedArticles } from '../../data/articles';
+
+const all = await getPublishedArticles();
+const count = (name: string) => all.filter((a) => (a.data.tags as string[]).includes(name)).length;
+---
+<BaseLayout title="テーマ一覧" description="記事に付いているタグを、テーマごとにまとめた一覧です。気になるタグから記事をさがせます。">
+  <StationSign kicker="駅の施設" title="テーマ一覧" sub="THEMES" prev={TERMINAL} />
+
+  <p>記事に付いているタグを、テーマごとにまとめました。タグを押すと、そのタグの記事の一覧が開きます。</p>
+
+  {TAG_GROUPS.map((g) => (
+    <section class="tag-group" aria-labelledby={`tg-${g.id}`}>
+      <h2 id={`tg-${g.id}`}>{g.title}</h2>
+      <ul class="tag-chips">
+        {g.tags.map((t) => (
+          <li>
+            <a class={count(t.name) === 0 ? 'tag-chip is-empty' : 'tag-chip'} href={`/tags/${t.id}/`}>
+              #{t.name}<span class="tag-chip__count">{count(t.name)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>

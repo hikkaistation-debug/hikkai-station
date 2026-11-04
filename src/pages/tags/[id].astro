@@ -1,0 +1,52 @@
+---
+// タグごとの記事一覧。タグの言葉が用語さくいんにあれば、その説明もいっしょに出します。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import ListControls from '../../components/ListControls.astro';
+import { TAGS } from '../../data/tags';
+import { GLOSSARY } from '../../data/glossary';
+import { getPublishedArticles } from '../../data/articles';
+
+export function getStaticPaths() {
+  return TAGS.map((t) => ({ params: { id: t.id }, props: { tag: t } }));
+}
+
+const { tag } = Astro.props;
+const all = await getPublishedArticles();
+const articles = all.filter((a) => (a.data.tags as string[]).includes(tag.name));
+const term = tag.glossary ? GLOSSARY.find((g) => g.id === tag.glossary) : undefined;
+// 同じテーマのほかのタグ
+const siblings = TAGS.filter((t) => t.group === tag.group && t.id !== tag.id);
+---
+<BaseLayout title={`#${tag.name}`} description={`「${tag.name}」のタグが付いた記事の一覧です。`}>
+  <StationSign kicker={`テーマ｜${tag.group}`} title={`#${tag.name}`} sub="TAG" prev={{ label: 'テーマ一覧', href: '/tags/' }} />
+
+  {term && (
+    <aside class="article-box tag-term">
+      <h2>用語さくいん：{term.term}<span class="glossary__yomi">（{term.yomi}）</span></h2>
+      <p>{term.desc}</p>
+      <p><a href={`/annai/#g-${term.id}`}>逆引き案内所で見る →</a></p>
+    </aside>
+  )}
+
+  {articles.length > 0 ? (
+    <>
+      <ListControls />
+      <ul class="card-list">
+        {articles.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    </>
+  ) : (
+    <p class="empty">このタグの記事は、まだありません。</p>
+  )}
+
+  {siblings.length > 0 && (
+    <section aria-labelledby="sib-h">
+      <h2 id="sib-h">同じテーマのタグ（{tag.group}）</h2>
+      <ul class="tag-chips">
+        {siblings.map((t) => <li><a class="tag-chip" href={`/tags/${t.id}/`}>#{t.name}</a></li>)}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

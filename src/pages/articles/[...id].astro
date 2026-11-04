@@ -7,6 +7,8 @@ import LineBadge from '../../components/LineBadge.astro';
 import LevelBadge from '../../components/LevelBadge.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
 import { getLine } from '../../data/lines';
+import { tagHref } from '../../data/tags';
+import ArticleCard from '../../components/ArticleCard.astro';
 import { getPublishedArticles, buildTracks, formatDate, isoDate, isKiso, type Article } from '../../data/articles';
 
 export async function getStaticPaths() {
@@ -31,7 +33,19 @@ export async function getStaticPaths() {
       away = main[i + 1];
     }
     const branchStart = tracks.branchOf(article.id)[0]; // この記事から分かれる支線の最初の駅
-    return { params: { id: article.id }, props: { article, toward, away, branchStart, parent } };
+    // 関連する記事：同じタグが多い順（同じ路線なら少しだけ優先）。上位3件
+    const myTags = new Set(article.data.tags as string[]);
+    const related = articles
+      .filter((a) => a.id !== article.id)
+      .map((a) => ({
+        a,
+        score: (a.data.tags as string[]).filter((x) => myTags.has(x)).length + (a.data.category === article.data.category ? 0.5 : 0),
+      }))
+      .filter((r) => r.score >= 1)
+      .sort((x, y) => y.score - x.score || y.a.data.pubDate.getTime() - x.a.data.pubDate.getTime())
+      .slice(0, 3)
+      .map((r) => r.a);
+    return { params: { id: article.id }, props: { article, toward, away, branchStart, parent, related } };
   });
 }
 
@@ -41,8 +55,9 @@ interface Props {
   away?: Article;
   branchStart?: Article;
   parent?: Article;
+  related: Article[];
 }
-const { article, toward, away, branchStart, parent } = Astro.props;
+const { article, toward, away, branchStart, parent, related } = Astro.props;
 const toNb = (a?: Article) => (a ? { label: a.data.title, href: `/articles/${a.id}/` } : undefined);
 const { data } = article;
 const line = getLine(data.category);
@@ -141,8 +156,17 @@ const relatedLines = [...new Set([data.category, ...data.relatedLines])];
 
   {data.tags.length > 0 && (
     <ul class="tags" aria-label="タグ">
-      {data.tags.map((t) => <li>#{t}</li>)}
+      {data.tags.map((t) => <li><a href={tagHref(t)}>#{t}</a></li>)}
     </ul>
+  )}
+
+  {related.length > 0 && (
+    <section aria-labelledby="related-h">
+      <h2 id="related-h">関連する記事</h2>
+      <ul class="card-list">
+        {related.map((a) => <ArticleCard article={a} />)}
+      </ul>
+    </section>
   )}
 
   <section class="article-box" aria-labelledby="stations-h">
