@@ -55,7 +55,7 @@ const stories = defineCollection({
     title: z.string(), // 話のタイトル（「第1話」は自動で付きます）
     train: z.enum(['kakueki', 'tokkyu']), // 列車（src/data/trains.ts）
     no: z.number(), // 第何話か
-    pubDate: z.coerce.date(), // 公開日（この日の朝6時ごろの自動公開から出ます）
+    pubDate: z.coerce.date(), // 公開日（この日の0時すぎの自動公開から出ます）
     summary: z.string(), // ひとことあらすじ（一覧に出ます）
     point: z.string(), // 今日のひとこと（この話で学べること）
     learn: z.array(reference('articles')).default([]), // もっと知りたい方へ：関連する記事のファイル名（.md を除く）
