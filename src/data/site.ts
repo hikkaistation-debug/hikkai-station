@@ -8,7 +8,7 @@ export const SITE = {
   operator: '筆界ステーション運営者',
   lang: 'ja',
   // お問い合わせ用の Googleフォームのアドレス（空のままなら「準備中」と表示）
-  contactFormUrl: '',
+  contactFormUrl: 'https://forms.gle/5qNVMSbHERXpndb66',
   // サイト専用の Xアカウントのユーザー名（@は付けない。空のままなら表示しない）
   xUser: 'hikkai_station',
 };
