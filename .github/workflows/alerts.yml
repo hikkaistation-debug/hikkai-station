@@ -1,0 +1,40 @@
+# 毎朝7時（日本時間）に Googleアラートを読み込み、新しい話題を「下書き記事」として保存します。
+# 下書き（draft: true）はサイトには表示されません。
+# フィードのアドレスは、リポジトリの Secrets に「ALERT_FEEDS」という名前で入れておきます。
+name: Googleアラートから下書きを作る
+
+on:
+  schedule:
+    - cron: '0 22 * * *' # 世界標準時22時 ＝ 日本時間 朝7時
+  workflow_dispatch: # GitHubの画面から手動でも実行できる
+
+permissions:
+  contents: write
+
+concurrency:
+  group: alerts
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: アラートを読み込んで下書きを作る
+        env:
+          ALERT_FEEDS: ${{ secrets.ALERT_FEEDS }}
+        run: node scripts/fetch-alerts.mjs
+      - name: 新しい下書きがあれば保存（コミット）する
+        run: |
+          git add src/content/articles/inbox src/data/alerts-seen.json
+          if git diff --cached --quiet; then
+            echo "新しい下書きはありません"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Googleアラートから下書きを追加"
+          git push

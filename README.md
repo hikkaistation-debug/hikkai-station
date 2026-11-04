@@ -57,3 +57,12 @@
 | `src/pages/` | 各ページ |
 | `src/styles/global.css` | デザイン |
 | `astro.config.mjs` | 設定（公開アドレス：https://hikkai-station.com） |
+
+## Googleアラートから下書きを作る仕組み
+
+- 毎朝7時（日本時間）に、GitHubが Googleアラートを読み込みます。
+- 新しい話題ごとに、`src/content/articles/inbox/` に下書き（`draft: true`）ができます。サイトには出ません。
+- 使う話題は、元記事を確認して要約・ひとこと・カテゴリ・対象を書き、`draft: false` にして公開します。
+- 使わない話題は、ファイルを削除します（同じリンクは二度と下書きになりません）。
+- フィードのアドレスは、GitHubの Settings → Secrets and variables → Actions に `ALERT_FEEDS` という名前で入れます（1行に1つ）。公開されるファイルには書かないでください。
+- GitHubで作られた下書きを手元に持ってくるときは `git pull` をします。
