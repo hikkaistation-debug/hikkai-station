@@ -1,0 +1,342 @@
+---
+// 作図の練習（座標から図をかく）
+// 点の座標と「筆（土地）ごとの点の順番」を入れると、縮尺どおりの図・辺長・面積（座標法）を表示する。
+// 土地家屋調査士試験の記述式（作図）の答え合わせ用。登記の申請に使う地積測量図ではない。
+// 入力はブラウザの中だけで使い、どこにも送らない。地積の端数は 不動産登記規則100条。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="作図の練習（座標から図をかく）" description="点の座標を入れると、縮尺どおりの図・辺の長さ・面積（座標法）を表示します。土地家屋調査士試験の作図の答え合わせに。分筆のように複数の土地も描けます。">
+  <StationSign kicker="便利ツール" title="作図の練習" sub="PLOT FROM COORDINATES" prev={TOOLS_TOP} />
+
+  <p>点の座標と、土地（筆）ごとの点の順番を入れると、<strong>縮尺どおりの図</strong>と、辺の長さ・面積を表示します。手で書いた図の答え合わせに使ってください。入れた内容はどこにも送りません。</p>
+
+  <section class="tool" aria-labelledby="s-h1">
+    <h2 id="s-h1">1. 点の座標</h2>
+    <p class="tool__note">1点ずつ、点名・X・Y をそれぞれの欄に入れます。X は北向き、Y は東向きです。</p>
+    <div class="sk-grid-wrap"><table class="sk-grid" id="s-pts-grid">
+      <thead><tr><th>点名</th><th>X（m）</th><th>Y（m）</th><th><span class="visually-hidden">消す</span></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <button type="button" class="tool__btn tool__btn--sub" id="s-pts-add">＋ 点を足す</button>
+    <details class="sk-bulk">
+      <summary>まとめて入れる（Excel などから貼り付け）</summary>
+      <p class="tool__note">1行に1点ずつ「点名　X　Y」（区切りは空白・タブ・カンマのどれでも）。ここを書きかえると上の表も変わります。</p>
+      <textarea id="s-pts" rows="6" spellcheck="false" aria-label="点の座標をまとめて（点名 X Y）"></textarea>
+    </details>
+
+    <h2 id="s-h2">2. 土地（筆）ごとの点の順番</h2>
+    <p class="tool__note">1筆ずつ、名前と、土地をひと回りする順の点名（空白で区切る）を入れます。分筆なら2行にします。</p>
+    <div class="sk-grid-wrap"><table class="sk-grid" id="s-lots-grid">
+      <thead><tr><th>名前</th><th>点の順番（例：K1 K2 K3 K4）</th><th><span class="visually-hidden">消す</span></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <button type="button" class="tool__btn tool__btn--sub" id="s-lots-add">＋ 土地を足す</button>
+    <details class="sk-bulk">
+      <summary>まとめて入れる</summary>
+      <p class="tool__note">1行に1筆ずつ「名前：点名 点名 点名 …」。</p>
+      <textarea id="s-lots" rows="3" spellcheck="false" aria-label="土地ごとの点の順番をまとめて"></textarea>
+    </details>
+
+    <div class="tool__row">
+      <label for="s-scale">縮尺</label>
+      <select id="s-scale">
+        <option value="0">自動</option>
+        <option value="100">1/100</option>
+        <option value="250">1/250</option>
+        <option value="500">1/500</option>
+        <option value="1000">1/1000</option>
+      </select>
+      <label for="s-kind">地目</label>
+      <select id="s-kind">
+        <option value="taku">宅地・鉱泉地</option>
+        <option value="other">それ以外（田・畑・山林など）</option>
+      </select>
+    </div>
+    <div class="tool__row">
+      <label><input type="checkbox" id="s-len" checked /> 辺の長さ</label>
+      <label><input type="checkbox" id="s-name" checked /> 点名</label>
+      <label><input type="checkbox" id="s-grid" /> 方眼（1cm）</label>
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn tool__btn--sub" id="s-sample1">例：四角い土地</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="s-sample2">例：分筆（2筆）</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="s-clear">すべて消す</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="s-print">図を印刷</button>
+    </div>
+  </section>
+
+  <section class="tool sakuzu-out" aria-labelledby="s-h3">
+    <h2 id="s-h3">3. 図と面積</h2>
+    <div id="s-msg" aria-live="polite"></div>
+    <div class="sakuzu-paper" id="s-paper"></div>
+    <p class="tool__note" id="s-paper-note"></p>
+    <div id="s-table"></div>
+  </section>
+
+  <div class="page-body">
+    <h2>使い方とご注意</h2>
+    <ul>
+      <li>図は、紙（A4縦）に印刷したときに、選んだ縮尺どおりの大きさになるように描いています（印刷の設定で「実際のサイズ」「100%」を選んでください）。</li>
+      <li>縮尺の「自動」は、1/250 から順に、紙に収まるものを選びます。地積測量図は、原則として 1/250 で作ることになっています（不動産登記規則77条4項）。</li>
+      <li>面積は座標法（倍面積 ＝ Σ Xn ×（Yn+1 − Yn−1））で計算し、登記の地積は不動産登記規則100条の端数処理で表示します。</li>
+      <li>これは試験勉強の答え合わせ用です。<strong>登記の申請に使う地積測量図ではありません</strong>（地積測量図に書くことは不動産登記規則77条などで決められています）。</li>
+    </ul>
+    <p>面積の計算だけなら <a href="/tools/zahyo-menseki/">座標から面積を計算</a>、条文の暗記は <a href="/tools/anaume/">条文の穴埋め練習</a> もどうぞ。</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .sk-grid-wrap { overflow-x: auto; }
+  .sk-grid { border-collapse: collapse; margin: 0.3rem 0 0.4rem; }
+  .sk-grid th { font-size: 0.8rem; color: var(--ink-soft); text-align: left; padding: 0 0.3rem 0.2rem; font-weight: 700; }
+  .sk-grid td { padding: 0.15rem 0.2rem; }
+  .sk-grid input { font: inherit; font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; border: 2px solid var(--navy); border-radius: 6px; padding: 0.3rem 0.4rem; box-sizing: border-box; }
+  #s-pts-grid input.sk-name { width: 5.5em; }
+  #s-pts-grid input.sk-num { width: 8.5em; text-align: right; }
+  #s-lots-grid input.sk-name { width: 6em; }
+  #s-lots-grid input.sk-order { width: 18em; max-width: 60vw; }
+  .sk-del { font: inherit; border: 1px solid var(--line); background: var(--card); border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; color: var(--ink-soft); }
+  .sk-bulk { margin: 0.4rem 0 0.8rem; }
+  .sk-bulk summary { cursor: pointer; font-size: 0.9rem; color: var(--ink-soft); }
+  #s-pts, #s-lots { width: 100%; box-sizing: border-box; font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; border: 2px solid var(--navy); border-radius: 8px; padding: 0.5rem 0.6rem; }
+  .sakuzu-paper { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; margin: 0.6rem 0; }
+  .sakuzu-paper svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  @media print {
+    body * { visibility: hidden; }
+    .sakuzu-paper, .sakuzu-paper * { visibility: visible; }
+    .sakuzu-paper { position: absolute; left: 0; top: 0; border: 0; margin: 0; }
+    .sakuzu-paper svg { max-width: none; width: 210mm; height: 297mm; }
+    @page { size: A4 portrait; margin: 0; }
+  }
+</style>
+
+<script>
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const ptsEl = $<HTMLTextAreaElement>('s-pts');
+  const lotsEl = $<HTMLTextAreaElement>('s-lots');
+  const scaleEl = $<HTMLSelectElement>('s-scale');
+  const kindEl = $<HTMLSelectElement>('s-kind');
+  const lenEl = $<HTMLInputElement>('s-len');
+  const nameEl = $<HTMLInputElement>('s-name');
+  const gridEl = $<HTMLInputElement>('s-grid');
+  const msg = $('s-msg');
+  const paper = $('s-paper');
+  const paperNote = $('s-paper-note');
+  const table = $('s-table');
+
+  const SAMPLES = {
+    one: { pts: 'K1 100.000 100.000\nK2 100.000 120.000\nK3 85.000 120.000\nK4 85.000 100.000', lots: '1番：K1 K2 K3 K4' },
+    two: {
+      pts: 'K1 100.000 100.000\nK2 100.000 124.500\nK3 82.300 126.800\nK4 81.000 100.000\nP1 100.000 112.000\nP2 81.600 112.000',
+      lots: '1番1：K1 P1 P2 K4\n1番2：P1 K2 K3 P2',
+    },
+  };
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const floorTo = (v: number, unit: number) => Math.floor(Math.round((v / unit) * 1e6) / 1e6) * unit;
+  const f3 = (v: number) => v.toFixed(3);
+
+  type P = { name: string; x: number; y: number };
+  function parsePts(text: string) {
+    const pts = new Map<string, P>();
+    const errors: string[] = [];
+    text.normalize('NFKC').split(/\r?\n/).forEach((line, i) => {
+      const t = line.trim();
+      if (!t) return;
+      const c = t.split(/[\s,，、]+/);
+      if (c.length < 3) { errors.push(`点の${i + 1}行目：「点名 X Y」の3つを入れてください。`); return; }
+      const x = Number(c[1]), y = Number(c[2]);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) { errors.push(`点の${i + 1}行目：X・Y を数字で入れてください。`); return; }
+      if (pts.has(c[0])) errors.push(`点名「${c[0]}」が2回あります（あとの方を使います）。`);
+      pts.set(c[0], { name: c[0], x, y });
+    });
+    return { pts, errors };
+  }
+  function parseLots(text: string, pts: Map<string, P>) {
+    const lots: { name: string; pts: P[] }[] = [];
+    const errors: string[] = [];
+    text.normalize('NFKC').split(/\r?\n/).forEach((line, i) => {
+      const t = line.trim();
+      if (!t) return;
+      const m = t.match(/^(.*?)[:：]\s*(.*)$/);
+      const name = m ? m[1].trim() || `土地${i + 1}` : `土地${i + 1}`;
+      const names = (m ? m[2] : t).split(/[\s,，、→\-]+/).filter(Boolean);
+      const missing = names.filter((n) => !pts.has(n));
+      if (missing.length) { errors.push(`「${name}」：点名 ${missing.join('・')} が、1. の表にありません。`); return; }
+      if (names.length < 3) { errors.push(`「${name}」：3点以上入れてください。`); return; }
+      lots.push({ name, pts: names.map((n) => pts.get(n)!) });
+    });
+    return { lots, errors };
+  }
+  const areaOf = (ps: P[]) => {
+    let s = 0;
+    for (let i = 0; i < ps.length; i++) {
+      const prev = ps[(i - 1 + ps.length) % ps.length], next = ps[(i + 1) % ps.length];
+      s += ps[i].x * (next.y - prev.y);
+    }
+    return Math.abs(s) / 2;
+  };
+  const toki = (a: number) => (kindEl.value === 'other' && a > 10 ? floorTo(a, 1).toFixed(0) : floorTo(a, 0.01).toFixed(2));
+
+  // A4縦（210×297mm）の紙に描く。図を置ける範囲は 余白を除いた 180×240mm。
+  const PAPER_W = 210, PAPER_H = 297, AREA_W = 180, AREA_H = 240, OX = 15, OY = 30;
+  const SCALES = [250, 500, 1000, 2500, 5000]; // 自動のとき：地積測量図の原則の縮尺（1/250）から順に試す
+
+  function draw() {
+    const { pts, errors: e1 } = parsePts(ptsEl.value);
+    const { lots, errors: e2 } = parseLots(lotsEl.value, pts);
+    const errors = [...e1, ...e2];
+    msg.innerHTML = errors.map((e) => `<p class="tool__error">${esc(e)}</p>`).join('');
+    try { localStorage.setItem('hikkai-sakuzu-v1', JSON.stringify({ pts: ptsEl.value, lots: lotsEl.value })); } catch {}
+    if (!lots.length) {
+      paper.innerHTML = '';
+      table.innerHTML = '';
+      paperNote.textContent = pts.size ? '2. に土地ごとの点の順番を入れると、図をかきます。' : '';
+      return;
+    }
+    const used = [...new Map(lots.flatMap((l) => l.pts).map((p) => [p.name, p])).values()];
+    const minX = Math.min(...used.map((p) => p.x)), maxX = Math.max(...used.map((p) => p.x));
+    const minY = Math.min(...used.map((p) => p.y)), maxY = Math.max(...used.map((p) => p.y));
+    const wM = Math.max(maxY - minY, 0.001), hM = Math.max(maxX - minX, 0.001); // 横＝Y、縦＝X
+    let scale = Number(scaleEl.value);
+    if (!scale) scale = SCALES.find((s) => (wM * 1000) / s <= AREA_W * 0.8 && (hM * 1000) / s <= AREA_H * 0.8) ?? 5000;
+    const k = 1000 / scale; // 1m が紙の上で何mmか
+    const figW = wM * k, figH = hM * k;
+    const over = figW > AREA_W || figH > AREA_H;
+    const cx = OX + AREA_W / 2, cy = OY + AREA_H / 2;
+    const tx = (p: P) => cx + (p.y - (minY + maxY) / 2) * k;
+    const ty = (p: P) => cy - (p.x - (minX + maxX) / 2) * k;
+
+    const colors = ['#1f2a44', '#c4122f', '#0f766e', '#6d28a8'];
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAPER_W} ${PAPER_H}" width="${PAPER_W * 2.4}" font-family="'Hiragino Sans','Yu Gothic','Meiryo',sans-serif" role="img" aria-label="座標から描いた図（縮尺1/${scale}）">`;
+    svg += `<rect x="0" y="0" width="${PAPER_W}" height="${PAPER_H}" fill="#fff"/>`;
+    if (gridEl.checked) {
+      for (let x = OX; x <= OX + AREA_W + 0.01; x += 10) svg += `<line x1="${x}" y1="${OY}" x2="${x}" y2="${OY + AREA_H}" stroke="#e4e8f0" stroke-width="0.2"/>`;
+      for (let y = OY; y <= OY + AREA_H + 0.01; y += 10) svg += `<line x1="${OX}" y1="${y}" x2="${OX + AREA_W}" y2="${y}" stroke="#e4e8f0" stroke-width="0.2"/>`;
+    }
+    svg += `<rect x="${OX}" y="${OY}" width="${AREA_W}" height="${AREA_H}" fill="none" stroke="#8a93a3" stroke-width="0.3"/>`;
+    svg += `<text x="${OX}" y="${OY - 8}" font-size="6" font-weight="700" fill="#1a1d24">座標から描いた図（練習用）</text>`;
+    svg += `<text x="${OX + AREA_W}" y="${OY - 8}" font-size="5" text-anchor="end" fill="#1a1d24">縮尺 1/${scale}</text>`;
+    // 方位（北）
+    const nx = OX + AREA_W - 10, ny = OY + 16;
+    svg += `<path d="M${nx},${ny - 9} L${nx - 3},${ny + 3} L${nx},${ny + 1} L${nx + 3},${ny + 3} Z" fill="#1a1d24"/><text x="${nx}" y="${ny - 11}" font-size="4.5" text-anchor="middle" fill="#1a1d24">北</text>`;
+    // 縮尺の目盛り（紙の上で約40mmに近い切りのよい長さ）
+    const barM = [1, 2, 5, 10, 20, 50, 100, 200].find((m) => m * k >= 25) ?? 500;
+    const bx = OX + 6, by = OY + AREA_H - 8;
+    svg += `<line x1="${bx}" y1="${by}" x2="${bx + barM * k}" y2="${by}" stroke="#1a1d24" stroke-width="0.6"/><line x1="${bx}" y1="${by - 1.5}" x2="${bx}" y2="${by + 1.5}" stroke="#1a1d24" stroke-width="0.4"/><line x1="${bx + barM * k}" y1="${by - 1.5}" x2="${bx + barM * k}" y2="${by + 1.5}" stroke="#1a1d24" stroke-width="0.4"/><text x="${bx + (barM * k) / 2}" y="${by - 2.5}" font-size="3.5" text-anchor="middle" fill="#1a1d24">${barM} m</text>`;
+
+    const drawnEdges = new Set<string>();
+    lots.forEach((lot, li) => {
+      const col = colors[li % colors.length];
+      const d = lot.pts.map((p, i) => `${i ? 'L' : 'M'}${tx(p).toFixed(2)},${ty(p).toFixed(2)}`).join(' ') + ' Z';
+      svg += `<path d="${d}" fill="${col}" fill-opacity="0.06" stroke="${col}" stroke-width="0.5"/>`;
+      if (lenEl.checked) {
+        lot.pts.forEach((p, i) => {
+          const q = lot.pts[(i + 1) % lot.pts.length];
+          const key = [p.name, q.name].sort().join('|');
+          if (drawnEdges.has(key)) return;
+          drawnEdges.add(key);
+          const L = Math.hypot(q.x - p.x, q.y - p.y);
+          const mx = (tx(p) + tx(q)) / 2, my = (ty(p) + ty(q)) / 2;
+          let ang = (Math.atan2(ty(q) - ty(p), tx(q) - tx(p)) * 180) / Math.PI;
+          if (ang > 90) ang -= 180;
+          if (ang < -90) ang += 180;
+          svg += `<text x="${mx.toFixed(2)}" y="${my.toFixed(2)}" font-size="3" text-anchor="middle" fill="#464c58" transform="rotate(${ang.toFixed(1)} ${mx.toFixed(2)} ${my.toFixed(2)}) translate(0 -1)">${L.toFixed(2)}</text>`;
+        });
+      }
+      const gx = lot.pts.reduce((s, p) => s + tx(p), 0) / lot.pts.length;
+      const gy = lot.pts.reduce((s, p) => s + ty(p), 0) / lot.pts.length;
+      svg += `<text x="${gx.toFixed(2)}" y="${gy.toFixed(2)}" font-size="4.5" font-weight="700" text-anchor="middle" fill="${col}">${esc(lot.name)}</text>`;
+      svg += `<text x="${gx.toFixed(2)}" y="${(gy + 5).toFixed(2)}" font-size="3.5" text-anchor="middle" fill="${col}">${toki(areaOf(lot.pts))}㎡</text>`;
+    });
+    used.forEach((p) => {
+      svg += `<circle cx="${tx(p).toFixed(2)}" cy="${ty(p).toFixed(2)}" r="0.7" fill="#1a1d24"/>`;
+      if (nameEl.checked) svg += `<text x="${(tx(p) + 1.4).toFixed(2)}" y="${(ty(p) - 1.2).toFixed(2)}" font-size="3.2" fill="#1a1d24">${esc(p.name)}</text>`;
+    });
+    svg += `<text x="${OX}" y="${PAPER_H - 12}" font-size="3.2" fill="#464c58">試験勉強の答え合わせ用の図です。登記の申請に使う地積測量図ではありません。（筆界ステーション）</text>`;
+    svg += `</svg>`;
+    paper.innerHTML = svg;
+    paperNote.textContent = over
+      ? `図が紙からはみ出しています。縮尺を小さく（数字を大きく）してください。（いまの大きさ：横 ${figW.toFixed(0)}mm × 縦 ${figH.toFixed(0)}mm）`
+      : `縮尺 1/${scale}：紙の上で 横 約${figW.toFixed(0)}mm × 縦 約${figH.toFixed(0)}mm（1m ＝ ${k.toFixed(1)}mm）`;
+
+    // 面積の表
+    let total = 0;
+    const rows = lots.map((lot) => {
+      const a = areaOf(lot.pts);
+      total += a;
+      const sides = lot.pts.map((p, i) => {
+        const q = lot.pts[(i + 1) % lot.pts.length];
+        return `${esc(p.name)}→${esc(q.name)} ${f3(Math.hypot(q.x - p.x, q.y - p.y))}`;
+      }).join('<br>');
+      return `<tr><td>${esc(lot.name)}</td><td>${a.toFixed(6)}</td><td><strong>${toki(a)}</strong></td><td style="text-align:left">${sides}</td></tr>`;
+    });
+    table.innerHTML = `<div class="calc-wrap"><table class="calc-table">
+      <thead><tr><th>土地</th><th>面積（㎡）</th><th>登記の地積（㎡）</th><th>辺の長さ（m）</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+      ${lots.length > 1 ? `<tfoot><tr><td>合計</td><td>${total.toFixed(6)}</td><td>${toki(total)}</td><td></td></tr></tfoot>` : ''}
+    </table></div>
+    <p class="tool__note">登記の地積は、不動産登記規則100条の端数処理（${kindEl.value === 'other' ? 'それ以外の土地で10㎡を超えるもの：1㎡未満を切り捨て' : '宅地・鉱泉地：1㎡の100分の1未満を切り捨て'}）です。</p>`;
+  }
+
+  // ── 入力欄（表）：点名・X・Y、名前・点の順番を、それぞれの欄に分けて入れる。
+  //    中身は下の「まとめて入れる」テキスト（ptsEl・lotsEl）と同じものを持ち、計算はそちらを使う。
+  const ptsBody = document.querySelector<HTMLTableSectionElement>('#s-pts-grid tbody')!;
+  const lotsBody = document.querySelector<HTMLTableSectionElement>('#s-lots-grid tbody')!;
+  const cell = (cls: string, v: string, label: string, mode = 'text') =>
+    `<td><input class="${cls}" value="${esc(v)}" aria-label="${label}" inputmode="${mode}" spellcheck="false" /></td>`;
+  const delBtn = '<td><button type="button" class="sk-del" aria-label="この行を消す">×</button></td>';
+  function rowsFromText(text: string, split: (l: string) => string[]) {
+    const rows = text.normalize('NFKC').split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map(split);
+    return rows.length ? rows : [];
+  }
+  function renderGrids() {
+    const pr = rowsFromText(ptsEl.value, (l) => l.split(/[\s,，、]+/));
+    if (!pr.length) pr.push(['', '', '']);
+    ptsBody.innerHTML = pr.map((c, i) => `<tr>${cell('sk-name', c[0] ?? '', `${i + 1}行目の点名`)}${cell('sk-num', c[1] ?? '', `${i + 1}行目のX`, 'decimal')}${cell('sk-num', c[2] ?? '', `${i + 1}行目のY`, 'decimal')}${delBtn}</tr>`).join('');
+    const lr = rowsFromText(lotsEl.value, (l) => { const m = l.split(/[:：]/); return m.length > 1 ? [m[0].trim(), m.slice(1).join(':').trim()] : ['', l]; });
+    if (!lr.length) lr.push(['', '']);
+    lotsBody.innerHTML = lr.map((c, i) => `<tr>${cell('sk-name', c[0] ?? '', `${i + 1}行目の土地の名前`)}${cell('sk-order', c[1] ?? '', `${i + 1}行目の点の順番`)}${delBtn}</tr>`).join('');
+  }
+  function syncFromGrids() {
+    ptsEl.value = [...ptsBody.rows].map((r) => [...r.querySelectorAll('input')].map((i) => i.value.trim())).filter((c) => c.some(Boolean)).map((c) => c.join(' ')).join('\n');
+    lotsEl.value = [...lotsBody.rows].map((r) => [...r.querySelectorAll('input')].map((i) => i.value.trim())).filter((c) => c.some(Boolean)).map(([n, o]) => `${n || '土地'}：${o}`).join('\n');
+    draw();
+  }
+  for (const body of [ptsBody, lotsBody]) {
+    body.addEventListener('input', syncFromGrids);
+    body.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest('.sk-del');
+      if (!b) return;
+      const tr = b.closest('tr')!;
+      if (body.rows.length > 1) tr.remove(); else tr.querySelectorAll('input').forEach((i) => (i.value = ''));
+      syncFromGrids();
+    });
+    // Excel などから何行も貼り付けたときは、まとめて取りこむ
+    body.addEventListener('paste', (e) => {
+      const t = e.clipboardData?.getData('text') ?? '';
+      if (!/[\n\t]/.test(t.trim())) return;
+      e.preventDefault();
+      if (body === ptsBody) ptsEl.value = [ptsEl.value, t].filter((s) => s.trim()).join('\n');
+      else lotsEl.value = [lotsEl.value, t].filter((s) => s.trim()).join('\n');
+      renderGrids(); draw();
+    });
+  }
+  $('s-pts-add').addEventListener('click', () => { ptsBody.insertAdjacentHTML('beforeend', `<tr>${cell('sk-name', '', '点名')}${cell('sk-num', '', 'X', 'decimal')}${cell('sk-num', '', 'Y', 'decimal')}${delBtn}</tr>`); ptsBody.rows[ptsBody.rows.length - 1].querySelector('input')!.focus(); });
+  $('s-lots-add').addEventListener('click', () => { lotsBody.insertAdjacentHTML('beforeend', `<tr>${cell('sk-name', '', '土地の名前')}${cell('sk-order', '', '点の順番')}${delBtn}</tr>`); lotsBody.rows[lotsBody.rows.length - 1].querySelector('input')!.focus(); });
+
+  const setSample = (s: { pts: string; lots: string }) => { ptsEl.value = s.pts; lotsEl.value = s.lots; renderGrids(); draw(); };
+  $('s-sample1').addEventListener('click', () => setSample(SAMPLES.one));
+  $('s-sample2').addEventListener('click', () => setSample(SAMPLES.two));
+  $('s-clear').addEventListener('click', () => setSample({ pts: '', lots: '' }));
+  $('s-print').addEventListener('click', () => window.print());
+  [ptsEl, lotsEl].forEach((el) => el.addEventListener('input', () => { renderGrids(); draw(); }));
+  [scaleEl, kindEl, lenEl, nameEl, gridEl].forEach((el) => el.addEventListener('change', draw));
+
+  try {
+    const s = JSON.parse(localStorage.getItem('hikkai-sakuzu-v1') || 'null');
+    if (s && (s.pts || s.lots)) { ptsEl.value = s.pts; lotsEl.value = s.lots; renderGrids(); draw(); } else setSample(SAMPLES.two);
+  } catch { setSample(SAMPLES.two); }
+</script>
