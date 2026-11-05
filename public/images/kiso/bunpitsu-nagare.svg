@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 250" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">分筆登記の流れ。1 土地家屋調査士に相談、2 境界確定測量、3 分ける線を決めて境界標、4 地積測量図を作って申請、5 登記完了で新しい地番。名義を変えるなら司法書士へ</title>
+  <rect width="640" height="250" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">分筆登記の流れ</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+  <g font-size="13" font-weight="700" text-anchor="middle" fill="#1a1d24">
+    <g transform="translate(14,60)"><rect width="108" height="120" rx="10" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/><circle cx="22" cy="22" r="14" fill="#1f2a44"/><text x="22" y="27" fill="#fff" font-size="14">1</text><text x="54" y="70">土地家屋</text><text x="54" y="88">調査士に相談</text></g>
+    <line x1="124" y1="120" x2="136" y2="120" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+    <g transform="translate(140,60)"><rect width="108" height="120" rx="10" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/><circle cx="22" cy="22" r="14" fill="#1f2a44"/><text x="22" y="27" fill="#fff" font-size="14">2</text><text x="54" y="62">境界確定測量</text><text x="54" y="84" font-weight="400" font-size="11" fill="#464c58">お隣・役所と</text><text x="54" y="100" font-weight="400" font-size="11" fill="#464c58">境目を確認</text></g>
+    <line x1="250" y1="120" x2="262" y2="120" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+    <g transform="translate(266,60)"><rect width="108" height="120" rx="10" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/><circle cx="22" cy="22" r="14" fill="#1f2a44"/><text x="22" y="27" fill="#fff" font-size="14">3</text><text x="54" y="62">分ける線を</text><text x="54" y="80">決める</text><text x="54" y="100" font-weight="400" font-size="11" fill="#464c58">新しい角に境界標</text></g>
+    <line x1="376" y1="120" x2="388" y2="120" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+    <g transform="translate(392,60)"><rect width="108" height="120" rx="10" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/><circle cx="22" cy="22" r="14" fill="#1f2a44"/><text x="22" y="27" fill="#fff" font-size="14">4</text><text x="54" y="62">地積測量図を</text><text x="54" y="80">作って申請</text><text x="54" y="100" font-weight="400" font-size="11" fill="#464c58">法務局へ</text></g>
+    <line x1="502" y1="120" x2="514" y2="120" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+    <g transform="translate(518,60)"><rect width="108" height="120" rx="10" fill="#fff3f4" stroke="#c4122f" stroke-width="2"/><circle cx="22" cy="22" r="14" fill="#c4122f"/><text x="22" y="27" fill="#fff" font-size="14">5</text><text x="54" y="62">登記完了</text><text x="54" y="84" font-weight="400" font-size="11" fill="#464c58">新しい地番が</text><text x="54" y="100" font-weight="400" font-size="11" fill="#464c58">付く</text></g>
+  </g>
+  <text x="320" y="216" font-size="12" text-anchor="middle" fill="#464c58">分けた土地の名義を変える（売る・相続で分ける）ときは、そのあと司法書士が所有権移転の登記をします。</text>
+</svg>

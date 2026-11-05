@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 280" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">境界標の印の読み方。十字は交わったところ、矢印は矢の先、鋲は中心が、たいてい境目の角（筆界点）の位置を示す。種類や設置のしかたによってちがうこともある</title>
+  <rect width="640" height="280" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">印は、たいていこの位置を示します</text>
+
+  <!-- 十字 -->
+  <g transform="translate(40,56)">
+    <rect width="160" height="160" rx="8" fill="#d9dbdf" stroke="#464c58" stroke-width="2"/>
+    <line x1="30" y1="80" x2="130" y2="80" stroke="#c4122f" stroke-width="5"/>
+    <line x1="80" y1="30" x2="80" y2="130" stroke="#c4122f" stroke-width="5"/>
+    <circle cx="80" cy="80" r="11" fill="none" stroke="#1f2a44" stroke-width="3"/>
+    <text x="80" y="190" font-size="15" font-weight="700" text-anchor="middle" fill="#1f2a44">十字：交わったところ</text>
+  </g>
+
+  <!-- 矢印 -->
+  <g transform="translate(240,56)">
+    <rect width="160" height="160" rx="8" fill="#e9c46a" stroke="#464c58" stroke-width="2"/>
+    <line x1="80" y1="135" x2="80" y2="45" stroke="#c4122f" stroke-width="5"/>
+    <polygon points="80,28 66,52 94,52" fill="#c4122f"/>
+    <circle cx="80" cy="28" r="11" fill="none" stroke="#1f2a44" stroke-width="3"/>
+    <text x="80" y="190" font-size="15" font-weight="700" text-anchor="middle" fill="#1f2a44">矢印：矢の先</text>
+  </g>
+
+  <!-- 鋲 -->
+  <g transform="translate(440,56)">
+    <rect width="160" height="160" rx="8" fill="#5b616b"/>
+    <circle cx="80" cy="80" r="44" fill="#d9a441" stroke="#1a1d24" stroke-width="2"/>
+    <line x1="58" y1="80" x2="102" y2="80" stroke="#c4122f" stroke-width="4"/>
+    <line x1="80" y1="58" x2="80" y2="102" stroke="#c4122f" stroke-width="4"/>
+    <circle cx="80" cy="80" r="11" fill="none" stroke="#ffffff" stroke-width="3"/>
+    <text x="80" y="190" font-size="15" font-weight="700" text-anchor="middle" fill="#1f2a44">鋲：まん中</text>
+  </g>
+
+  <text x="320" y="268" font-size="13" text-anchor="middle" fill="#464c58">丸のところが、たいてい境目の角を示します（ちがうこともあります）。</text>
+</svg>

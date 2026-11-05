@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 500" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">おもな境界標6種類のイラスト。コンクリート杭、石杭、金属プレート、金属鋲、プラスチック杭、刻印。どれも頭に十字や矢印の印がある</title>
+  <rect width="640" height="500" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">おもな境界標（きょうかいひょう）</text>
+
+  <!-- 1 コンクリート杭 -->
+  <g transform="translate(20,52)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <!-- 地面 -->
+    <rect x="10" y="118" width="170" height="52" fill="#c8b49a"/>
+    <!-- 杭（横から） -->
+    <polygon points="75,70 115,70 115,150 95,166 75,150" fill="#b9bcc2" stroke="#464c58" stroke-width="2"/>
+    <!-- 頭（上から見た形） -->
+    <polygon points="62,62 95,46 128,62 95,78" fill="#d9dbdf" stroke="#464c58" stroke-width="2"/>
+    <line x1="80" y1="54" x2="110" y2="70" stroke="#c4122f" stroke-width="3"/>
+    <line x1="110" y1="54" x2="80" y2="70" stroke="#c4122f" stroke-width="3"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">コンクリート杭</text>
+    <text x="95" y="30" font-size="12" text-anchor="middle" fill="#464c58">土の地面に打ちこむ</text>
+  </g>
+
+  <!-- 2 石杭 -->
+  <g transform="translate(225,52)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <rect x="10" y="118" width="170" height="52" fill="#c8b49a"/>
+    <polygon points="75,70 115,70 115,158 75,158" fill="#e4e0d8" stroke="#464c58" stroke-width="2"/>
+    <circle cx="86" cy="100" r="2" fill="#8a93a3"/><circle cx="104" cy="118" r="2" fill="#8a93a3"/><circle cx="92" cy="138" r="2" fill="#8a93a3"/>
+    <polygon points="62,62 95,46 128,62 95,78" fill="#f1eee8" stroke="#464c58" stroke-width="2"/>
+    <line x1="80" y1="54" x2="110" y2="70" stroke="#c4122f" stroke-width="3"/>
+    <line x1="110" y1="54" x2="80" y2="70" stroke="#c4122f" stroke-width="3"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">石杭（御影石など）</text>
+    <text x="95" y="30" font-size="12" text-anchor="middle" fill="#464c58">硬くて長もちする</text>
+  </g>
+
+  <!-- 3 金属プレート -->
+  <g transform="translate(430,52)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <!-- ブロック塀の上面 -->
+    <rect x="20" y="78" width="150" height="70" fill="#cfd2d8" stroke="#464c58" stroke-width="2"/>
+    <line x1="20" y1="113" x2="170" y2="113" stroke="#8a93a3"/>
+    <line x1="70" y1="78" x2="70" y2="113" stroke="#8a93a3"/><line x1="120" y1="113" x2="120" y2="148" stroke="#8a93a3"/>
+    <!-- プレート -->
+    <rect x="70" y="86" width="50" height="50" rx="4" fill="#e9c46a" stroke="#464c58" stroke-width="2"/>
+    <line x1="95" y1="128" x2="95" y2="96" stroke="#c4122f" stroke-width="3"/>
+    <polygon points="95,90 88,101 102,101" fill="#c4122f"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">金属プレート</text>
+    <text x="95" y="30" font-size="12" text-anchor="middle" fill="#464c58">塀やコンクリートに貼る</text>
+  </g>
+
+  <!-- 4 金属鋲 -->
+  <g transform="translate(20,276)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <!-- アスファルト -->
+    <rect x="10" y="60" width="170" height="100" fill="#5b616b"/>
+    <circle cx="40" cy="80" r="2" fill="#8a93a3"/><circle cx="150" cy="140" r="2" fill="#8a93a3"/><circle cx="130" cy="75" r="2" fill="#8a93a3"/>
+    <circle cx="95" cy="110" r="26" fill="#d9a441" stroke="#1a1d24" stroke-width="2"/>
+    <line x1="80" y1="110" x2="110" y2="110" stroke="#c4122f" stroke-width="3"/>
+    <line x1="95" y1="95" x2="95" y2="125" stroke="#c4122f" stroke-width="3"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">金属鋲（びょう）</text>
+    <text x="95" y="38" font-size="12" text-anchor="middle" fill="#464c58">道路やコンクリートに打つ</text>
+  </g>
+
+  <!-- 5 プラスチック杭 -->
+  <g transform="translate(225,276)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <rect x="10" y="118" width="170" height="52" fill="#9cbf7a"/>
+    <polygon points="80,70 110,70 110,150 95,166 80,150" fill="#e76f51" stroke="#464c58" stroke-width="2"/>
+    <polygon points="68,63 95,50 122,63 95,76" fill="#f4a261" stroke="#464c58" stroke-width="2"/>
+    <line x1="83" y1="57" x2="107" y2="69" stroke="#1f2a44" stroke-width="3"/>
+    <line x1="107" y1="57" x2="83" y2="69" stroke="#1f2a44" stroke-width="3"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">プラスチック杭</text>
+    <text x="95" y="38" font-size="12" text-anchor="middle" fill="#464c58">山林や、かりの目印に</text>
+  </g>
+
+  <!-- 6 刻印 -->
+  <g transform="translate(430,276)">
+    <rect width="190" height="210" rx="12" fill="#f7f6f2" stroke="#d5d3cc"/>
+    <rect x="20" y="62" width="150" height="96" fill="#cfd2d8" stroke="#464c58" stroke-width="2"/>
+    <line x1="20" y1="110" x2="170" y2="110" stroke="#8a93a3"/>
+    <line x1="95" y1="62" x2="95" y2="110" stroke="#8a93a3"/>
+    <!-- 刻んだ十字（くぼみ） -->
+    <line x1="60" y1="86" x2="90" y2="86" stroke="#1a1d24" stroke-width="4"/>
+    <line x1="75" y1="72" x2="75" y2="100" stroke="#1a1d24" stroke-width="4"/>
+    <line x1="61" y1="88" x2="91" y2="88" stroke="#ffffff" stroke-width="1" opacity="0.7"/>
+    <text x="95" y="192" font-size="16" font-weight="700" text-anchor="middle" fill="#1f2a44">刻印（こくいん）</text>
+    <text x="95" y="38" font-size="12" text-anchor="middle" fill="#464c58">塀などに十字を直接刻む</text>
+  </g>
+</svg>

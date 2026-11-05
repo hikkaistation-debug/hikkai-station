@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">分筆の前と後。1番の土地を分けると、1番1と1番2の2つの土地になり、分けた線に新しい筆界と境界標ができる</title>
+  <rect width="640" height="300" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">分筆の前と後</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+
+  <text x="150" y="66" font-size="15" font-weight="700" text-anchor="middle" fill="#464c58">分ける前</text>
+  <rect x="50" y="80" width="200" height="150" fill="#eef1f8" stroke="#1f2a44" stroke-width="3"/>
+  <text x="150" y="163" font-size="26" font-weight="700" text-anchor="middle" fill="#1f2a44">1番</text>
+
+  <line x1="272" y1="155" x2="352" y2="155" stroke="#464c58" stroke-width="3" marker-end="url(#a)"/>
+  <text x="312" y="142" font-size="14" font-weight="700" text-anchor="middle" fill="#464c58">分筆</text>
+
+  <text x="490" y="66" font-size="15" font-weight="700" text-anchor="middle" fill="#464c58">分けた後</text>
+  <rect x="390" y="80" width="200" height="150" fill="#eef1f8" stroke="#1f2a44" stroke-width="3"/>
+  <rect x="490" y="80" width="100" height="150" fill="#fff3f4"/>
+  <rect x="390" y="80" width="200" height="150" fill="none" stroke="#1f2a44" stroke-width="3"/>
+  <line x1="490" y1="80" x2="490" y2="230" stroke="#c4122f" stroke-width="4" stroke-dasharray="8 5"/>
+  <rect x="484" y="74" width="12" height="12" fill="#b9bcc2" stroke="#464c58"/>
+  <rect x="484" y="224" width="12" height="12" fill="#b9bcc2" stroke="#464c58"/>
+  <text x="440" y="163" font-size="20" font-weight="700" text-anchor="middle" fill="#1f2a44">1番1</text>
+  <text x="540" y="163" font-size="20" font-weight="700" text-anchor="middle" fill="#c4122f">1番2</text>
+
+  <text x="490" y="262" font-size="13" font-weight="700" text-anchor="middle" fill="#c4122f">赤い線＝新しい筆界（角に境界標）</text>
+  <text x="150" y="262" font-size="13" text-anchor="middle" fill="#464c58">登記の上では1つの土地</text>
+  <text x="320" y="290" font-size="13" text-anchor="middle" fill="#464c58">地番は「1番1」「1番2」のように、枝番が付くのがふつうです。</text>
+</svg>

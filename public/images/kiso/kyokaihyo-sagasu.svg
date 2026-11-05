@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 230" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">境界標が見つからないときの順番。1 草や土をどけてまわりを探す、2 地積測量図の距離を手がかりに探す、3 それでも見つからない・動いていそうなら土地家屋調査士に相談する</title>
+  <rect width="640" height="230" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">境界標が見つからないとき</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+
+  <g transform="translate(20,56)">
+    <rect width="180" height="130" rx="12" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/>
+    <circle cx="28" cy="28" r="16" fill="#1f2a44"/><text x="28" y="34" font-size="16" font-weight="700" text-anchor="middle" fill="#fff">1</text>
+    <text x="90" y="70" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">草や土をどけて</text>
+    <text x="90" y="92" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">まわりを探す</text>
+    <text x="90" y="116" font-size="12" text-anchor="middle" fill="#464c58">埋もれていることが多い</text>
+  </g>
+  <line x1="204" y1="121" x2="226" y2="121" stroke="#464c58" stroke-width="3" marker-end="url(#a)"/>
+
+  <g transform="translate(230,56)">
+    <rect width="180" height="130" rx="12" fill="#f7f6f2" stroke="#1f2a44" stroke-width="2"/>
+    <circle cx="28" cy="28" r="16" fill="#1f2a44"/><text x="28" y="34" font-size="16" font-weight="700" text-anchor="middle" fill="#fff">2</text>
+    <text x="90" y="70" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">地積測量図の距離を</text>
+    <text x="90" y="92" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">手がかりに探す</text>
+    <text x="90" y="116" font-size="12" text-anchor="middle" fill="#464c58">ほかの境界標から測る</text>
+  </g>
+  <line x1="414" y1="121" x2="436" y2="121" stroke="#464c58" stroke-width="3" marker-end="url(#a)"/>
+
+  <g transform="translate(440,56)">
+    <rect width="180" height="130" rx="12" fill="#fff3f4" stroke="#c4122f" stroke-width="2"/>
+    <circle cx="28" cy="28" r="16" fill="#c4122f"/><text x="28" y="34" font-size="16" font-weight="700" text-anchor="middle" fill="#fff">3</text>
+    <text x="90" y="70" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">土地家屋調査士に</text>
+    <text x="90" y="92" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">相談する</text>
+    <text x="90" y="116" font-size="12" text-anchor="middle" fill="#464c58">動いていそうなときも</text>
+  </g>
+  <text x="320" y="216" font-size="13" text-anchor="middle" fill="#464c58">見つけても、自分で動かしたり打ち直したりはしません。</text>
+</svg>
