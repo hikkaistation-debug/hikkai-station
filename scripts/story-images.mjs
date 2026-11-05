@@ -118,7 +118,9 @@ const build = (withNote, withNext) => [
   ...(withNote ? ['▼解説つきで、サイトでも読めます'] : []),
   url,
   ...(withNext ? [nextTitle ? `次の駅▶第${Number(nextNo)}話「${nextTitle}」` : '次の駅は、ただいま準備中です'] : []),
-  `#連載小説${hook ? ` #${hook.tag}` : ' #土地家屋調査士'} #筆界ステーション`,
+  // ハッシュタグは3つまで。「土地家屋調査士」は必ず入れる（運営者の指示・2026-11-05）。
+  // 内容のタグが「土地家屋調査士」と同じか、ないときは「連載小説」を入れる。
+  `#土地家屋調査士 #${hook && hook.tag !== '土地家屋調査士' ? hook.tag : '連載小説'} #筆界ステーション`,
 ].join('\n');
 let post = build(true, true);
 if (weight(post) > 280) post = build(false, true); // 長すぎたら短くする
