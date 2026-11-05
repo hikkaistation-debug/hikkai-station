@@ -1,0 +1,91 @@
+---
+// 通達チェック：「気になる」印とメモ（手元の確認用画面だけ。本物のサイトには出ません）
+// 使い方：{import.meta.env.DEV && <DevTsutatsuMark />} をページに置き、
+//         通達のカード（または詳しいページの本文）に data-tsutatsu-id="ID" data-tsutatsu-title="名称" を付ける。
+// 押した印とメモは review/tsutatsu-check.json に自動で保存されます（astro.config.mjs の tsutatsuCheck）。
+// まとめて見る・チェックするのは /tsutatsu-check/ 。
+---
+<aside class="tmark-bar">
+  <span class="tmark-bar__tag">手元だけ</span>
+  気になる通達に <strong>☆</strong> を付けて、メモを残せます。
+  <a href="/tsutatsu-check/">通達チェックの一覧へ（<span id="tmark-count">0</span>件）</a>
+</aside>
+
+<script is:inline>
+  (() => {
+    const API = '/__tsutatsu';
+    let data = {};
+    const save = (id, entry) =>
+      fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ [id]: entry }) })
+        .then((r) => r.json())
+        .then((d) => { data = d; count(); });
+    const count = () => {
+      const el = document.getElementById('tmark-count');
+      if (el) el.textContent = String(Object.values(data).filter((e) => e && e.mark).length);
+    };
+    function build(card) {
+      const id = card.dataset.tsutatsuId;
+      const title = card.dataset.tsutatsuTitle || '';
+      const box = document.createElement('div');
+      box.className = 'tmark';
+      box.innerHTML =
+        '<button type="button" class="tmark__btn" aria-pressed="false"></button>' +
+        '<label class="tmark__note" hidden>メモ（気になったこと・直したいこと）<textarea rows="2" placeholder="例：説明の「〜」は本文とちがう？"></textarea></label>' +
+        '<span class="tmark__saved" aria-live="polite"></span>';
+      card.append(box);
+      const btn = box.querySelector('button');
+      const note = box.querySelector('.tmark__note');
+      const ta = box.querySelector('textarea');
+      const saved = box.querySelector('.tmark__saved');
+      const show = () => {
+        const e = data[id];
+        const on = !!(e && e.mark);
+        btn.textContent = on ? '★ 気になる（印あり）' : '☆ 気になる';
+        btn.setAttribute('aria-pressed', String(on));
+        note.hidden = !on;
+        if (document.activeElement !== ta) ta.value = (e && e.note) || '';
+      };
+      btn.addEventListener('click', () => {
+        const e = data[id];
+        if (e && e.mark) {
+          if (e.note && !confirm('メモも消えます。印を外しますか？')) return;
+          save(id, null).then(show);
+        } else {
+          save(id, { title, mark: true, note: '', status: '', at: new Date().toISOString() }).then(() => { show(); ta.focus(); });
+        }
+      });
+      let timer;
+      ta.addEventListener('input', () => {
+        clearTimeout(timer);
+        saved.textContent = '…';
+        timer = setTimeout(() => {
+          const e = data[id] || { title, mark: true, status: '' };
+          save(id, { ...e, note: ta.value, at: new Date().toISOString() }).then(() => { saved.textContent = '保存しました'; });
+        }, 600);
+      });
+      return show;
+    }
+    fetch(API)
+      .then((r) => r.json())
+      .then((d) => {
+        data = d;
+        const shows = [...document.querySelectorAll('[data-tsutatsu-id]')].map(build);
+        shows.forEach((f) => f());
+        count();
+      })
+      .catch(() => {});
+  })();
+</script>
+
+<style is:inline>
+  .tmark-bar { margin: 0.8rem 0; padding: 0.5rem 0.8rem; border: 2px dashed #c4122f; border-radius: 8px; background: #ffeef0; font-size: 0.9rem; }
+  .tmark-bar__tag { display: inline-block; margin-right: 0.4rem; padding: 0 0.5rem; border-radius: 999px; background: #c4122f; color: #fff; font-weight: 800; font-size: 0.8rem; }
+  .tmark-bar a { font-weight: 800; margin-left: 0.3rem; }
+  .tmark { margin-top: 0.5rem; padding-top: 0.4rem; border-top: 1px dashed #e3b5bd; }
+  .tmark__btn { font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; padding: 0.1rem 0.7rem; border: 2px solid #c4122f; border-radius: 999px; background: #fff; color: #c4122f; }
+  .tmark__btn[aria-pressed='true'] { background: #c4122f; color: #fff; }
+  .tmark__note { display: block; margin-top: 0.4rem; font-size: 0.85rem; font-weight: 700; }
+  .tmark__note[hidden] { display: none; }
+  .tmark__note textarea { display: block; width: 100%; margin-top: 0.2rem; font: inherit; font-size: 0.92rem; padding: 0.3rem 0.5rem; border: 2px solid #c4122f; border-radius: 6px; }
+  .tmark__saved { font-size: 0.8rem; color: #0f766e; margin-left: 0.4rem; }
+</style>

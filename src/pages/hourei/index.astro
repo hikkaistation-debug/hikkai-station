@@ -18,7 +18,7 @@ const lawKeys = Object.keys(LAWS) as LawKey[];
     説明はこのサイトがやさしく言いかえたものです。正確な内容は、リンク先の e-Gov法令検索（政府の法令データベース）の原文で確かめてください。
   </p>
 
-  <NaviFilter used={used} placeholder="例）外気分断性、地目、過料" />
+  <NaviFilter used={used} quick={["筆界", "地目", "床面積", "地積測量図", "相続登記", "住所変更", "過料"]} placeholder="例）外気分断性、地目、過料" />
 
   {lawKeys.map((k) => {
     const list = HOUREI.filter((h) => h.law === k);
@@ -28,14 +28,14 @@ const lawKeys = Object.keys(LAWS) as LawKey[];
         <ul class="tsutatsu-list navi-list">
           {list.map((h) => (
             <li class="tsutatsu" id={h.id} data-fields={h.fields.join('|')} data-text={[LAWS[h.law].name, h.article, h.heading, h.summary, ...h.fields, ...h.keywords].join(' ')}>
-              <p class="tsutatsu__meta">{LAWS[h.law].name}</p>
-              <h3 class="tsutatsu__title">{h.article}（{h.heading}）</h3>
-              <p class="tsutatsu__summary">{h.summary}</p>
+              <p class="tsutatsu__meta navi-hl">{LAWS[h.law].name}</p>
+              <h3 class="tsutatsu__title navi-hl">{h.article}（{h.heading}）</h3>
+              <p class="tsutatsu__summary navi-hl">{h.summary}</p>
               <p class="tsutatsu__links">
                 <a href={lawUrl(h)} rel="noopener" target="_blank">原文を読む（e-Gov）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
                 {h.links?.map((l) => <a href={l.href}>{l.label}</a>)}
               </p>
-              <ul class="tsutatsu__fields">{h.fields.map((f) => <li>{f}</li>)}</ul>
+              <ul class="tsutatsu__fields">{h.fields.map((f) => <li><button type="button" data-pick-field={f} title={`「${f}」の条文だけを表示`}>{f}</button></li>)}</ul>
             </li>
           ))}
         </ul>

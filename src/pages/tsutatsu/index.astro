@@ -5,10 +5,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
 import { TERMINAL } from '../../data/site';
 import NaviFilter from '../../components/NaviFilter.astro';
-import { sortedTsutatsu, wareki } from '../../data/tsutatsu';
+import DevTsutatsuMark from '../../components/DevTsutatsuMark.astro';
+import { sortedTsutatsu, wareki, nenMidashi } from '../../data/tsutatsu';
 
 const list = sortedTsutatsu();
 const used = [...new Set(list.flatMap((t) => t.fields))];
+// 年ごとにまとめる（新しい順）
+const years = [...new Set(list.map((t) => nenMidashi(t.date)))].map((y) => ({ y, items: list.filter((t) => nenMidashi(t.date) === y) }));
+const quick = ['筆界特定', '地積測量図', '閲覧', '建物の認定', '相続登記', '住所変更', '過料', '所有不動産記録証明書'];
 ---
 <BaseLayout title="通達ナビ" description="登記に関する法務省の通達を、分野やキーワードで探せるコーナーです。名称・日付・番号と公式の本文へのリンクをまとめています。">
   <StationSign title="通達ナビ" sub="CIRCULARS" prev={TERMINAL} />
@@ -18,18 +22,28 @@ const used = [...new Set(list.flatMap((t) => t.fields))];
     本文は転載せず、公式の資料（法務省など）へのリンクで紹介します。少しずつ増やしていきます。
   </p>
 
-  <NaviFilter used={used} />
+  {import.meta.env.DEV && <DevTsutatsuMark />}
 
-  <ul class="tsutatsu-list navi-list">
-    {list.map((t) => (
-      <li class="tsutatsu" data-fields={t.fields.join('|')} data-text={[t.title, t.number, wareki(t.date), t.date.slice(0, 4), t.summary, ...t.laws, ...t.fields, ...t.keywords].join(' ')}>
-        <p class="tsutatsu__meta">{wareki(t.date)}付け　{t.number}</p>
-        <h2 class="tsutatsu__title"><a href={`/tsutatsu/${t.id}/`}>{t.title}</a></h2>
-        <p class="tsutatsu__summary">{t.summary}</p>
-        <ul class="tsutatsu__fields">{t.fields.map((f) => <li>{f}</li>)}</ul>
-      </li>
+  <NaviFilter used={used} quick={quick} sortable placeholder="例）筆界特定、閲覧、住所変更" />
+
+  <div class="navi-years">
+    {years.map(({ y, items }) => (
+      <section class="navi-year" aria-label={y}>
+        <h2 class="navi-year__h">{y}</h2>
+        <ul class="tsutatsu-list navi-list">
+          {items.map((t) => (
+            <li class="tsutatsu" data-tsutatsu-id={import.meta.env.DEV ? t.id : undefined} data-tsutatsu-title={import.meta.env.DEV ? t.title : undefined} data-fields={t.fields.join('|')} data-text={[t.title, t.number, wareki(t.date), t.date.slice(0, 4), t.summary, ...t.laws, ...t.fields, ...t.keywords].join(' ')}>
+              <p class="tsutatsu__meta navi-hl">{wareki(t.date)}付け　{t.number}</p>
+              <h3 class="tsutatsu__title navi-hl"><a href={`/tsutatsu/${t.id}/`}>{t.title}</a></h3>
+              <p class="tsutatsu__summary navi-hl">{t.summary}</p>
+              <p class="tsutatsu__laws navi-hl"><span>関係する法令：</span>{t.laws.join('、')}</p>
+              <ul class="tsutatsu__fields">{t.fields.map((f) => <li><button type="button" data-pick-field={f} title={`「${f}」の通達だけを表示`}>{f}</button></li>)}</ul>
+            </li>
+          ))}
+        </ul>
+      </section>
     ))}
-  </ul>
+  </div>
 
   <div class="page-body">
     <h2>「通達」とは？</h2>

@@ -1,0 +1,337 @@
+---
+// 通達チェックのページ（手元の確認用画面だけ。本物のサイトには作られません）
+// アドレス：http://localhost:4321/tsutatsu-check/
+// 通達ナビで「☆ 気になる」を付けた通達をまとめて、メモと「OK／直してほしい」を付けられます。
+// 結果は review/tsutatsu-check.json に自動で保存されます（astro.config.mjs の tsutatsuCheck）。
+// 運営者が「通達チェックしたよ」と言ったら、Claude がこのファイルを読んで直します。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import { sortedTsutatsu, wareki } from '../../data/tsutatsu';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { p: undefined } }] : [];
+}
+const list = sortedTsutatsu();
+---
+<BaseLayout title="通達チェック（手元だけ）" description="通達ナビの確認用ページ">
+  <StationSign kicker="手元だけのページ" title="通達チェック" sub="CIRCULAR CHECK" color="#c4122f" prev={TERMINAL} />
+
+  <aside class="notice notice--sample">
+    <p class="notice__title">このページは、手元の確認用画面だけにあります</p>
+    <p>
+      <a href="/tsutatsu/">通達ナビ</a>で「☆ 気になる」を付けた通達が、ここに集まります。メモと「OK／直してほしい」を選ぶと、このパソコンの中に自動で保存されます。
+      まとめてチェックできたら、Claude に<strong>「通達チェックしたよ」</strong>と伝えてください。直し終わった分は、Claude がこの一覧から外します。
+    </p>
+  </aside>
+
+  <section class="tc-cands" id="tc-cands" data-existing={JSON.stringify(list.map((t) => t.number))}>
+    <h2 class="tc-cands__h">通達の候補<span id="tc-cand-count"></span></h2>
+    <p class="tc-cands__lead">まだ通達ナビに載っていない通達です（毎週月曜に Claude が公式ページで探して足します）。「載せる」を選んで「保存して Claude に渡す」を押すと、Claude が公式ページで確かめ直してから通達ナビに足します。「載せない」にしたものは隠れます（「すべて表示」で出せます）。</p>
+    <ol class="tc-list" id="tc-cand-list"></ol>
+    <p class="empty" id="tc-cand-empty" hidden>いまは候補がありません。</p>
+  </section>
+
+  <h2 class="tc-cands__h">載っている通達のチェック</h2>
+  <p class="tc-summary" id="tc-summary">読み込み中…</p>
+  <p><label class="tc-showall"><input type="checkbox" id="tc-all" /> すべて表示（印のない通達も。ここからチェックやメモを付けると、自動で「気になる」印が付きます）</label></p>
+
+  <ol class="tc-list">
+    {list.map((t) => (
+      <li class="tc-item" data-id={t.id} data-title={t.title} hidden>
+        <p class="tc-item__meta">{wareki(t.date)}付け　{t.number}</p>
+        <h2 class="tc-item__title"><a href={`/tsutatsu/${t.id}/`} target="_blank" rel="noopener">{t.title}</a></h2>
+        <p class="tc-item__links"><a href={t.url} target="_blank" rel="noopener">本文（公式）↗</a>　このサイトで確かめた日：{t.checkedDate}</p>
+        <p class="tc-item__summary">{t.summary}</p>
+        <div class="tc-item__ctrl">
+          <button type="button" class="tc-mark" aria-pressed="false"></button>
+          <fieldset class="tc-status">
+            <legend>チェック</legend>
+            <label><input type="radio" name={`s-${t.id}`} value="" checked /> まだ</label>
+            <label><input type="radio" name={`s-${t.id}`} value="ok" /> OK（直さなくてよい）</label>
+            <label><input type="radio" name={`s-${t.id}`} value="fix" /> 直してほしい</label>
+          </fieldset>
+          <label class="tc-note">メモ（気になったこと・直したいこと）
+            <textarea rows="3" placeholder="例：説明の2文目は、本文のどこに書いてある？"></textarea>
+          </label>
+          <span class="tc-saved" aria-live="polite"></span>
+        </div>
+      </li>
+    ))}
+  </ol>
+  <p class="empty" id="tc-empty" hidden>「☆ 気になる」を付けた通達はまだありません。<a href="/tsutatsu/">通達ナビ</a>で付けるか、上の「すべて表示」から選んでください。</p>
+
+  <div class="tc-bar">
+    <span class="tc-watch" id="tc-watch" data-on="false">Claude の待機を確認中…</span>
+    <p class="tc-barsaved" id="tc-barsaved" aria-live="polite"></p>
+    <button type="button" class="tc-handoff-btn" id="tc-handoff-btn">保存して Claude に渡す</button>
+  </div>
+  <section class="tc-handoff" id="tc-handoff" hidden aria-live="polite">
+    <p class="tc-handoff__result" id="tc-handoff-result"></p>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const API = '/__tsutatsu';
+      let data = {};
+      const items = [...document.querySelectorAll('.tc-item')];
+      const all = document.getElementById('tc-all');
+      const barSaved = document.getElementById('tc-barsaved');
+      const stamp = () => { barSaved.textContent = `保存しました（${new Date().toLocaleTimeString('ja-JP')}）`; };
+      // 変えた通達の分だけ送る（ほかの通達の行はファイルのまま残る）
+      const post = (id, entry) =>
+        fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ [id]: entry }) })
+          .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+          .then((d) => { data = d; render(); stamp(); return true; })
+          .catch(() => { barSaved.textContent = '保存できませんでした（確認用画面が止まっているかもしれません）'; return false; });
+      const read = (li) => ({
+        status: li.querySelector('.tc-status input:checked')?.value ?? '',
+        note: li.querySelector('textarea').value,
+      });
+      function render() {
+        let marked = 0, fix = 0, ok = 0;
+        items.forEach((li) => {
+          const e = data[li.dataset.id];
+          const on = !!(e && e.mark);
+          if (on) { marked++; if (e.status === 'fix') fix++; if (e.status === 'ok') ok++; }
+          li.hidden = !on && !all.checked;
+          li.classList.toggle('is-marked', on);
+          li.classList.toggle('is-fix', on && e.status === 'fix');
+          li.classList.toggle('is-ok', on && e.status === 'ok');
+          const btn = li.querySelector('.tc-mark');
+          btn.textContent = on ? '★ 印を外す' : '☆ 気になる';
+          btn.setAttribute('aria-pressed', String(on));
+          const st = (e && e.status) || '';
+          li.querySelectorAll('.tc-status input').forEach((r) => { r.checked = r.value === st; });
+          const ta = li.querySelector('textarea');
+          if (document.activeElement !== ta) ta.value = (e && e.note) || '';
+        });
+        document.getElementById('tc-summary').textContent = `気になる ${marked}件（OK ${ok}件・直してほしい ${fix}件・まだ ${marked - fix - ok}件）／通達は全${items.length}件`;
+        document.getElementById('tc-empty').hidden = marked > 0 || all.checked;
+        renderCands();
+      }
+
+      // ---- 通達の候補（まだ載せていない通達）。「載せる」を選んで渡すと、Claude が確かめて通達ナビに足す ----
+      const candBox = document.getElementById('tc-cands');
+      const existing = new Set(JSON.parse(candBox.dataset.existing || '[]'));
+      const candList = document.getElementById('tc-cand-list');
+      let cands = [];
+      const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      const ckey = (c) => 'cand:' + c.id;
+      const candTimers = {};
+      function buildCands() {
+        candList.innerHTML = '';
+        cands.forEach((c) => {
+          const li = document.createElement('li');
+          li.className = 'tc-item tc-cand';
+          li.dataset.key = ckey(c);
+          li.innerHTML =
+            `<p class="tc-item__meta"><span class="tc-cand__tag">候補</span>${esc(c.dateLabel || c.date)}付け　${esc(c.number)}</p>` +
+            `<h3 class="tc-item__title">${esc(c.title)}</h3>` +
+            `<p class="tc-item__links">${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">本文（公式）↗</a>` : ''}${c.sourcePage ? `　<a href="${esc(c.sourcePage.href)}" target="_blank" rel="noopener">${esc(c.sourcePage.label)}</a>` : ''}</p>` +
+            `<p class="tc-item__summary">${esc(c.summary)}</p>` +
+            (c.reason ? `<p class="tc-cand__why"><b>載せるとよい理由：</b>${esc(c.reason)}</p>` : '') +
+            (c.fields && c.fields.length ? `<p class="tc-cand__why"><b>分野の案：</b>${esc(c.fields.join('、'))}</p>` : '') +
+            (c.verified ? `<p class="tc-cand__verified"><b>確かめたこと：</b>${esc(c.verified)}</p>` : '') +
+            `<div class="tc-item__ctrl"><fieldset class="tc-status"><legend>この通達を</legend>` +
+            `<label><input type="radio" name="${esc(ckey(c))}" value="" checked /> まだ</label>` +
+            `<label><input type="radio" name="${esc(ckey(c))}" value="add" /> 載せる</label>` +
+            `<label><input type="radio" name="${esc(ckey(c))}" value="skip" /> 載せない</label></fieldset>` +
+            `<label class="tc-note">メモ（任意）<textarea rows="2" placeholder="例：説明は一般の方向けにやさしく"></textarea></label>` +
+            `<span class="tc-saved" aria-live="polite"></span></div>`;
+          candList.append(li);
+          const k = ckey(c);
+          const entry = () => ({ kind: 'candidate', title: c.title, number: c.number, decision: li.querySelector('input:checked')?.value ?? '', note: li.querySelector('textarea').value, at: new Date().toISOString() });
+          li._entry = entry;
+          li.querySelectorAll('input').forEach((r) => r.addEventListener('change', () => post(k, entry())));
+          const ta = li.querySelector('textarea');
+          const saved = li.querySelector('.tc-saved');
+          ta.addEventListener('input', () => {
+            clearTimeout(candTimers[k]);
+            saved.textContent = '…';
+            barSaved.textContent = '保存待ち…';
+            candTimers[k] = setTimeout(() => { delete candTimers[k]; post(k, entry()).then(() => { saved.textContent = '保存しました'; }); }, 600);
+          });
+        });
+      }
+      function renderCands() {
+        let open = 0, add = 0;
+        [...candList.children].forEach((li) => {
+          const e = data[li.dataset.key];
+          const d = (e && e.decision) || '';
+          if (d === 'add') add++;
+          if (d !== 'skip') open++;
+          li.hidden = d === 'skip' && !all.checked;
+          li.classList.toggle('is-ok', d === 'add');
+          li.querySelectorAll('input').forEach((r) => { r.checked = r.value === d; });
+          const ta = li.querySelector('textarea');
+          if (document.activeElement !== ta) ta.value = (e && e.note) || '';
+        });
+        document.getElementById('tc-cand-count').textContent = cands.length ? `（${open}件・載せる ${add}件）` : '';
+        document.getElementById('tc-cand-empty').hidden = cands.length > 0;
+      }
+      const timers = {};
+      items.forEach((li) => {
+        const id = li.dataset.id;
+        // チェックやメモを付けたら、自動で「気になる」印も付ける
+        const entry = () => ({ ...(data[id] || {}), title: li.dataset.title, mark: true, ...read(li), at: new Date().toISOString() });
+        li.querySelector('.tc-mark').addEventListener('click', () => {
+          const e = data[id];
+          if (e && e.mark) {
+            if (e.note && !confirm('メモも消えます。印を外しますか？')) return;
+            post(id, null);
+          } else post(id, { title: li.dataset.title, mark: true, note: '', status: '', at: new Date().toISOString() });
+        });
+        li.querySelectorAll('.tc-status input').forEach((r) => r.addEventListener('change', () => post(id, entry())));
+        const ta = li.querySelector('textarea');
+        const saved = li.querySelector('.tc-saved');
+        ta.addEventListener('input', () => {
+          clearTimeout(timers[id]);
+          saved.textContent = '…';
+          barSaved.textContent = '保存待ち…';
+          timers[id] = setTimeout(() => { delete timers[id]; post(id, entry()).then(() => { saved.textContent = '保存しました'; }); }, 600);
+        });
+        li.dataset.entryFn = '';
+        li._entry = entry;
+      });
+      all.addEventListener('change', render);
+
+      // Claude が待機しているか（scripts/check-watch.sh tsutatsu が動いていると「待機中」）
+      const watchEl = document.getElementById('tc-watch');
+      const checkWatch = async () => {
+        try {
+          const { watching } = await (await fetch(API + '/status', { cache: 'no-store' })).json();
+          watchEl.dataset.on = String(Boolean(watching));
+          watchEl.textContent = watching ? 'Claude が待機中（押すと自動で届きます）' : 'Claude は待機していません';
+          return Boolean(watching);
+        } catch {
+          watchEl.dataset.on = 'false';
+          watchEl.textContent = '確認用画面に つながりません';
+          return false;
+        }
+      };
+      checkWatch();
+      setInterval(checkWatch, 10000);
+
+      // 「保存して Claude に渡す」：すぐ保存 → ファイルを読み直して画面と一致するか確かめる →
+      // review/tsutatsu-handoff.json に書く（待機中の Claude が自動で読みに来る）。
+      const hBtn = document.getElementById('tc-handoff-btn');
+      const hBox = document.getElementById('tc-handoff');
+      const hRes = document.getElementById('tc-handoff-result');
+      hBtn.addEventListener('click', async () => {
+        hBtn.disabled = true;
+        // 保存待ちのメモをすぐ保存
+        let okAll = true;
+        for (const li of items) {
+          const id = li.dataset.id;
+          if (timers[id]) { clearTimeout(timers[id]); delete timers[id]; okAll = (await post(id, li._entry())) && okAll; }
+        }
+        for (const li of candList.children) {
+          const k = li.dataset.key;
+          if (candTimers[k]) { clearTimeout(candTimers[k]); delete candTimers[k]; okAll = (await post(k, li._entry())) && okAll; }
+        }
+        let saved = {};
+        try {
+          if (!okAll) throw new Error();
+          saved = await (await fetch(API, { cache: 'no-store' })).json();
+        } catch {
+          hBox.hidden = false; hBox.dataset.ok = 'false';
+          hRes.textContent = '保存できませんでした。確認用画面（npm run dev）が止まっているかもしれません。';
+          hBtn.disabled = false;
+          return;
+        }
+        stamp();
+        const mismatch = [];
+        const lines = [];
+        items.forEach((li) => {
+          const f = saved[li.dataset.id];
+          const scr = read(li);
+          const marked = li.classList.contains('is-marked');
+          if (marked && (!f || (f.status ?? '') !== scr.status || (f.note ?? '') !== scr.note)) mismatch.push(li.dataset.title.slice(-24));
+          if (f && f.mark && (f.status === 'fix' || (f.status === '' && f.note)))
+            lines.push(`・${li.dataset.title} → ${f.status === 'fix' ? '直してほしい' : 'まだ（メモあり）'}${f.note ? `：${f.note.replace(/\s+/g, ' ')}` : ''}`);
+        });
+        const addLines = [];
+        [...candList.children].forEach((li) => {
+          const f = saved[li.dataset.key];
+          const scr = li._entry();
+          if (f && ((f.decision ?? '') !== scr.decision || (f.note ?? '') !== scr.note)) mismatch.push('候補：' + scr.title.slice(-24));
+          if (!f && (scr.decision || scr.note)) mismatch.push('候補：' + scr.title.slice(-24));
+          if (f && (f.decision === 'add' || (f.decision === '' && f.note)))
+            addLines.push(`・【候補】${f.title}（${f.number}）→ ${f.decision === 'add' ? '載せる' : 'まだ（メモあり）'}${f.note ? `：${f.note.replace(/\s+/g, ' ')}` : ''}`);
+        });
+        data = saved;
+        render();
+        const text = [
+          '通達チェックの結果です。review/tsutatsu-check.json を見てください。「直してほしい」とメモ付きの通達は直し、「載せる」の候補は review/tsutatsu-candidates.json の内容を公式ページで確かめ直して通達ナビに足してください。',
+          ...(lines.length ? lines : ['（直してほしい通達はありません）']),
+          ...(addLines.length ? addLines : ['（載せる候補はありません）']),
+        ].join('\n');
+        const watching = await checkWatch();
+        let sent = false;
+        try { sent = (await fetch(API + '/handoff', { method: 'POST', body: JSON.stringify({ text }) })).ok; } catch {}
+        hBox.hidden = false;
+        hBox.dataset.ok = String(mismatch.length === 0);
+        hRes.textContent =
+          (mismatch.length === 0 ? '✓ 保存しました（ファイルと画面が一致）。' : `⚠ 画面とファイルが一致しません：${mismatch.join('、')}。もう一度押してください。`) +
+          '\n' +
+          (sent && watching
+            ? 'Claude に自動で渡しました。'
+            : 'Claude が待機していないので、チャットで「通達チェックしたよ」とだけ送ってください（保存した内容を Claude が読みます）。');
+        hBtn.disabled = false;
+      });
+
+      Promise.all([
+        fetch(API).then((r) => r.json()),
+        fetch(API + '/candidates').then((r) => r.json()).catch(() => ({})),
+      ]).then(([d, c]) => {
+        data = d;
+        // もう通達ナビに載っている番号の候補は出さない
+        cands = (c.items || []).filter((x) => x && x.id && !existing.has(x.number));
+        buildCands();
+        render();
+      });
+    })();
+  </script>
+
+
+  <style is:global>
+    .tc-summary { font-weight: 800; }
+    .tc-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.8rem; }
+    .tc-item[hidden] { display: none; }
+    .tc-item { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; }
+    .tc-item.is-marked { border-left-color: #c4122f; }
+    .tc-item.is-fix { background: #fff6f7; }
+    .tc-item.is-ok { border-left-color: #0f766e; }
+    .tc-item__meta { margin: 0; font-size: 0.85rem; color: var(--ink-soft); font-weight: 700; }
+    .tc-item__title { margin: 0.2rem 0; font-size: 1.05rem; }
+    .tc-item__links { margin: 0; font-size: 0.85rem; }
+    .tc-item__summary { margin: 0.4rem 0; font-size: 0.93rem; }
+    .tc-item__ctrl { border-top: 1px dashed #e3b5bd; padding-top: 0.5rem; display: grid; gap: 0.4rem; }
+    .tc-mark { justify-self: start; font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; padding: 0.1rem 0.7rem; border: 2px solid #c4122f; border-radius: 999px; background: #fff; color: #c4122f; }
+    .tc-mark[aria-pressed='true'] { background: #c4122f; color: #fff; }
+    .tc-status { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; font-weight: 700; font-size: 0.92rem; }
+    .tc-status legend { font-weight: 800; float: left; margin-right: 0.6rem; }
+    .tc-note { font-size: 0.85rem; font-weight: 700; }
+    .tc-note textarea { display: block; width: 100%; margin-top: 0.2rem; font: inherit; font-size: 0.92rem; padding: 0.3rem 0.5rem; border: 2px solid #c4122f; border-radius: 6px; }
+    .tc-saved { font-size: 0.8rem; color: #0f766e; }
+    .tc-showall { font-weight: 700; cursor: pointer; }
+    .tc-bar { position: sticky; bottom: 0.5rem; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.4rem 0.8rem; margin-top: 1rem; padding: 0.5rem 0.7rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); }
+    .tc-watch { font-size: 0.8rem; font-weight: 700; border-radius: 999px; padding: 0.15rem 0.7rem; background: #eee; color: #464c58; }
+    .tc-watch[data-on='true'] { background: #e6f4ea; color: #1a7f37; }
+    .tc-barsaved { margin: 0 auto 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+    .tc-handoff-btn { font: inherit; font-weight: 700; color: #fff; background: #1f2a44; border: 0; border-radius: 999px; padding: 0.5rem 1.1rem; cursor: pointer; }
+    .tc-handoff-btn:disabled { opacity: 0.6; cursor: default; }
+    .tc-handoff { margin-top: 0.8rem; background: var(--card); border: 1px solid var(--line); border-left: 8px solid #1f2a44; border-radius: var(--radius); padding: 0.8rem 1rem; }
+    .tc-handoff[data-ok='false'] { border-left-color: #c4122f; }
+    .tc-handoff__result { font-weight: 700; margin: 0; white-space: pre-line; }
+    .tc-cands { margin: 1rem 0 1.6rem; }
+    .tc-cands__h { font-size: 1.15rem; margin: 1.2rem 0 0.4rem; padding-left: 0.6rem; border-left: 6px solid #c4122f; }
+    .tc-cands__lead { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
+    .tc-cand { border-left-color: #f0b429; }
+    .tc-cand.is-ok { border-left-color: #0f766e; background: #f2fbf7; }
+    .tc-cand__tag { display: inline-block; margin-right: 0.4rem; padding: 0 0.5rem; border-radius: 999px; background: #f0b429; color: #1f2a44; font-weight: 800; font-size: 0.78rem; }
+    .tc-cand__why, .tc-cand__verified { margin: 0.2rem 0; font-size: 0.88rem; }
+    .tc-cand__verified { color: var(--ink-soft); }
+  </style>
+</BaseLayout>

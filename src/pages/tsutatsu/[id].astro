@@ -3,6 +3,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
+import DevTsutatsuMark from '../../components/DevTsutatsuMark.astro';
 import { TSUTATSU, wareki, seireki, type Tsutatsu } from '../../data/tsutatsu';
 
 export function getStaticPaths() {
@@ -21,7 +22,9 @@ const { t } = Astro.props as { t: Tsutatsu };
     <div><dt>関係する法令</dt><dd>{t.laws.join('、')}</dd></div>
   </dl>
 
-  <section class="article-box" aria-labelledby="s-h">
+  {import.meta.env.DEV && <DevTsutatsuMark />}
+
+  <section class="article-box" aria-labelledby="s-h" data-tsutatsu-id={import.meta.env.DEV ? t.id : undefined} data-tsutatsu-title={import.meta.env.DEV ? t.title : undefined}>
     <h2 id="s-h">どんな通達？</h2>
     <p>{t.summary}</p>
   </section>

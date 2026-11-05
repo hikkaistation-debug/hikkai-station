@@ -126,9 +126,88 @@ function xCheck() {
   };
 }
 
+// 通達チェック（/tsutatsu-check/）のしくみ。確認用画面（npm run dev）のときだけ動きます。
+//   /__tsutatsu … 「気になる」印・メモ・チェック結果を review/tsutatsu-check.json に保存／読み出し
+//   送られてきた通達の分だけ書きかえる（null は削除）。
+//   /__tsutatsu/handoff … 「保存して Claude に渡す」で review/tsutatsu-handoff.json に書く（待機中の Claude が読みに来る）
+//   /__tsutatsu/status … Claude が待機中か（scripts/check-watch.sh tsutatsu が review/.claude-watching-tsutatsu を更新している）
+const tsutatsuCheckFile = fileURLToPath(new URL('./review/tsutatsu-check.json', import.meta.url));
+const tsutatsuHandoffFile = fileURLToPath(new URL('./review/tsutatsu-handoff.json', import.meta.url));
+const tsutatsuWatchingFile = fileURLToPath(new URL('./review/.claude-watching-tsutatsu', import.meta.url));
+//   /__tsutatsu/candidates … まだ載せていない通達の候補（review/tsutatsu-candidates.json。毎週の予定タスクや Claude が書く）
+//   候補への「載せる／載せない」は、tsutatsu-check.json に "cand:<候補のid>" の行として保存する。
+const tsutatsuCandidatesFile = fileURLToPath(new URL('./review/tsutatsu-candidates.json', import.meta.url));
+// 通達チェック用の読み書き（ほかのチェックのしくみに頼らず、これだけで動くようにしておく）
+const tsRead = (f) => {
+  try {
+    return JSON.parse(fs.readFileSync(f, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+const tsWrite = (f, data) => {
+  fs.mkdirSync(fileURLToPath(new URL('./review/', import.meta.url)), { recursive: true });
+  fs.writeFileSync(f, JSON.stringify(data, null, 2) + '\n');
+};
+function tsutatsuCheck() {
+  return {
+    name: 'tsutatsu-check',
+    /** @param {import('vite').ViteDevServer} server */
+    configureServer(server) {
+      server.middlewares.use('/__tsutatsu', (req, res) => {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        const path = (req.url ?? '/').split('?')[0];
+        if (req.method === 'GET' && path === '/status') {
+          let watching = false;
+          try {
+            watching = Date.now() - fs.statSync(tsutatsuWatchingFile).mtimeMs < 15000;
+          } catch {}
+          res.end(JSON.stringify({ watching }));
+          return;
+        }
+        if (req.method === 'GET' && path === '/candidates') {
+          res.end(JSON.stringify(tsRead(tsutatsuCandidatesFile)));
+          return;
+        }
+        if (req.method === 'GET') {
+          res.end(JSON.stringify(tsRead(tsutatsuCheckFile)));
+          return;
+        }
+        if (req.method === 'POST') {
+          let body = '';
+          req.on('data', (c) => (body += c));
+          req.on('end', () => {
+            try {
+              const data = JSON.parse(body);
+              if (path === '/handoff') {
+                tsWrite(tsutatsuHandoffFile, { at: new Date().toISOString(), text: String(data.text ?? '') });
+                res.end('{"ok":true}');
+                return;
+              }
+              const current = tsRead(tsutatsuCheckFile);
+              for (const [id, entry] of Object.entries(data)) {
+                if (entry === null) delete current[id];
+                else current[id] = entry;
+              }
+              tsWrite(tsutatsuCheckFile, current);
+              res.end(JSON.stringify(current));
+            } catch {
+              res.statusCode = 400;
+              res.end('{"ok":false}');
+            }
+          });
+          return;
+        }
+        res.statusCode = 405;
+        res.end('{}');
+      });
+    },
+  };
+}
+
 // site: 公開するときのアドレス（RSS・サイトマップ・SNS共有の表示に使います）
 export default defineConfig({
   site: 'https://hikkai-station.com',
   integrations: [sitemap({ filter: (page) => !page.includes('/shitagaki-check/') })],
-  vite: { plugins: [shitagakiReview(), xCheck()] },
+  vite: { plugins: [shitagakiReview(), xCheck(), tsutatsuCheck()] },
 });

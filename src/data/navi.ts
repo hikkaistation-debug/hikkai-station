@@ -5,7 +5,7 @@ export const NAVI_FIELD_GROUPS = [
   { title: '土地の登記', fields: ['土地の表示登記', '地目', '地積', '分筆・合筆'] },
   { title: '建物の登記', fields: ['建物の表示登記', '建物の認定', '建物の種類・床面積'] },
   { title: '相続・名義', fields: ['相続登記', '相続人申告登記', '住所・氏名の変更登記', '職権による登記'] },
-  { title: 'そのほか', fields: ['申請の期限・過料', '登記官の調査', '登記事務全般'] },
+  { title: 'そのほか', fields: ['申請の期限・過料', '証明書・閲覧', '共有・財産管理', '登記官の調査', '登記事務全般'] },
 ] as const;
 
 export type NaviField = (typeof NAVI_FIELD_GROUPS)[number]['fields'][number];

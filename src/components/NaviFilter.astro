@@ -9,18 +9,30 @@ import { GLOSSARY } from '../data/glossary';
 // 用語さくいんの言葉とよみを関連ワードにする（「がいきぶんだんせい」→「外気分断性」）
 const synonyms = GLOSSARY.map((t) => [t.term.replace(/（.*?）/g, ''), t.yomi]);
 
+// ・quick：検索欄の下に並べる「よく探される言葉」。押すとその言葉で探します
+// ・sortable：true なら「新しい順／古い順」の切り替えを出す（一覧の <section class="navi-year"> ごと並べ替え）
+// ・一覧の中の <button data-pick-field="分野"> を押すと、キーワードを消して、その分野だけにしぼりこみます
+// ・キーワードに当たった言葉は、.navi-hl の中で色がつきます
 interface Props {
   used: string[]; // 一覧で実際に使われている分野（使われていない分野のボタンは出さない）
   placeholder?: string;
+  quick?: string[];
+  sortable?: boolean;
 }
-const { used, placeholder = '例）相続人申告、外気分断性' } = Astro.props;
+const { used, placeholder = '例）相続人申告、外気分断性', quick = [], sortable = false } = Astro.props;
 const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.filter((f) => used.includes(f)) })).filter((g) => g.fields.length);
 ---
-<div class="navi-filter" data-synonyms={JSON.stringify(synonyms)}>
+<div class="navi-filter" id="navi-filter" data-synonyms={JSON.stringify(synonyms)}>
   <div class="navi-filter__q">
     <label for="navi-q">キーワード</label>
     <input type="search" id="navi-q" placeholder={placeholder} />
   </div>
+  {quick.length > 0 && (
+    <div class="navi-quick">
+      <span class="navi-quick__label">よく探される言葉：</span>
+      <ul>{quick.map((w) => <li><button type="button" data-quick={w}>{w}</button></li>)}</ul>
+    </div>
+  )}
   <details class="facets" open>
     <summary>分野でしぼりこむ<span id="navi-sel"></span></summary>
     {groups.map((g) => (
@@ -35,7 +47,18 @@ const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.
     ))}
     <p class="facets__foot"><button type="button" class="facets__clear" id="navi-clear">しぼりこみを外す</button></p>
   </details>
-  <p id="navi-count" aria-live="polite"></p>
+  <div class="navi-bar">
+    <p id="navi-count" aria-live="polite"></p>
+    {sortable && (
+      <p class="navi-sort">
+        <label for="navi-sort">並び順</label>
+        <select id="navi-sort">
+          <option value="new">新しい順</option>
+          <option value="old">古い順</option>
+        </select>
+      </p>
+    )}
+  </div>
 </div>
 
 <script>
@@ -51,6 +74,64 @@ const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.
   const syn: string[][] = JSON.parse(document.querySelector<HTMLElement>('.navi-filter')!.dataset.synonyms ?? '[]').map((w: string[]) => w.map(norm));
   // 入力した言葉と、その関連ワード（どれかに当たればよい）
   const expand = (w: string) => [...new Set([w, ...syn.filter((ws) => ws.some((x) => x === w || (w.length >= 2 && x.includes(w)))).flat()])];
+
+  const quickBtns = [...document.querySelectorAll<HTMLButtonElement>('[data-quick]')];
+  const sortSel = document.getElementById('navi-sort') as HTMLSelectElement | null;
+
+  // キーワードに当たった言葉に色をつける（.navi-hl の中だけ。リンクなどの形はそのまま）
+  const hlAreas = [...document.querySelectorAll<HTMLElement>('.navi-list .navi-hl')];
+  const hlOrig = hlAreas.map((el) => el.innerHTML);
+  function highlight(words: string[]) {
+    hlAreas.forEach((el, i) => { el.innerHTML = hlOrig[i]; });
+    const ws = words.filter((w) => w.length > 0);
+    if (!ws.length) return;
+    hlAreas.forEach((el) => {
+      if (el.closest('li')?.hidden) return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      const nodes: Text[] = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+      nodes.forEach((node) => {
+        const src = node.data;
+        // 1文字ずつ正規化して、元の位置との対応表を作る
+        let nz = ''; const pos: number[] = [];
+        for (let i = 0; i < src.length; i++) { const c = norm(src[i]); nz += c; for (let k = 0; k < c.length; k++) pos.push(i); }
+        const marks: [number, number][] = [];
+        ws.forEach((w) => {
+          let at = nz.indexOf(w);
+          while (at >= 0) { marks.push([pos[at], pos[at + w.length - 1] + 1]); at = nz.indexOf(w, at + w.length); }
+        });
+        if (!marks.length) return;
+        marks.sort((a, b) => a[0] - b[0]);
+        const merged: [number, number][] = [];
+        marks.forEach((m) => { const last = merged[merged.length - 1]; if (last && m[0] <= last[1]) last[1] = Math.max(last[1], m[1]); else merged.push([...m]); });
+        const frag = document.createDocumentFragment();
+        let cur = 0;
+        merged.forEach(([a, b]) => {
+          if (a > cur) frag.append(src.slice(cur, a));
+          const mk = document.createElement('mark'); mk.textContent = src.slice(a, b); frag.append(mk);
+          cur = b;
+        });
+        if (cur < src.length) frag.append(src.slice(cur));
+        node.replaceWith(frag);
+      });
+    });
+  }
+
+  // 並び順（新しい順／古い順）：年の見出しごと、中の並びも入れかえる
+  let order = 'new';
+  function sortTo(v: string) {
+    if (v === order) return;
+    const secs = [...document.querySelectorAll<HTMLElement>('.navi-year')];
+    const parent = secs[0]?.parentElement;
+    if (parent) {
+      const anchor = secs[secs.length - 1].nextSibling;
+      secs.reverse().forEach((s) => parent.insertBefore(s, anchor));
+    }
+    document.querySelectorAll<HTMLElement>('.navi-list').forEach((ul) => {
+      [...ul.children].reverse().forEach((li) => ul.append(li));
+    });
+    order = v;
+  }
 
   function apply() {
     const words = norm(q.value).trim().split(/\s+/).filter(Boolean);
@@ -74,11 +155,14 @@ const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.
       const sec = ul.closest('section');
       if (sec) sec.hidden = !ul.querySelector(':scope > li:not([hidden])');
     });
+    highlight(groups.flat());
     count.textContent = `${n}件`;
     sel.textContent = selected.size ? `：${selected.size}件えらび中` : '';
     const p = new URLSearchParams();
     if (q.value.trim()) p.set('q', q.value.trim());
     selected.forEach((f) => p.append('field', f));
+    if (sortSel?.value === 'old') p.set('sort', 'old');
+    quickBtns.forEach((b) => b.setAttribute('aria-pressed', String(norm(q.value).trim() === norm(b.dataset.quick!))));
     const s = p.toString();
     history.replaceState(null, '', s ? `?${s}` : location.pathname);
   }
@@ -98,7 +182,32 @@ const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.
   });
   q.addEventListener('input', apply);
 
+  // よく探される言葉：押すとその言葉で探す（もう一度押すと外す）
+  quickBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      q.value = norm(q.value).trim() === norm(b.dataset.quick!) ? '' : b.dataset.quick!;
+      apply();
+    }),
+  );
+
+  // 一覧の中の分野の印：押すと、その分野だけにしぼりこむ
+  document.querySelectorAll<HTMLButtonElement>('[data-pick-field]').forEach((b) =>
+    b.addEventListener('click', () => {
+      selected.clear();
+      selected.add(b.dataset.pickField!);
+      q.value = ''; // その分野の一覧をまるごと見せる
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(selected.has(c.dataset.field!))));
+      const det = document.querySelector<HTMLDetailsElement>('.navi-filter details');
+      if (det) det.open = true;
+      apply();
+      document.getElementById('navi-filter')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }),
+  );
+
+  sortSel?.addEventListener('change', () => { sortTo(sortSel.value); apply(); });
+
   const params = new URLSearchParams(location.search);
+  if (sortSel && params.get('sort') === 'old') { sortSel.value = 'old'; sortTo('old'); }
   q.value = params.get('q') ?? '';
   params.getAll('field').forEach((f) => selected.add(f));
   chips.forEach((c) => c.setAttribute('aria-pressed', String(selected.has(c.dataset.field!))));

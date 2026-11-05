@@ -625,3 +625,22 @@ main { padding-bottom: 1rem; }
 .tsutatsu__links { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0.4rem 0 0; font-size: 0.92rem; font-weight: 700; }
 .tsutatsu:target { box-shadow: 0 0 0 3px var(--sign-yellow); border-color: var(--navy); }
 .tsutatsu { scroll-margin-top: 1rem; }
+/* 法令ナビ・通達ナビ：よく探される言葉・並び順・年の見出し・当たった言葉の色・分野の印 */
+.navi-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; margin: 0 0 0.7rem; }
+.navi-quick__label { font-size: 0.88rem; font-weight: 800; color: var(--ink-soft); }
+.navi-quick ul { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.navi-quick button { font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; padding: 0.15rem 0.7rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--navy); }
+.navi-quick button:hover { border-color: var(--navy); background: #eef2f8; }
+.navi-quick button[aria-pressed='true'] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.navi-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.6rem; }
+.navi-bar #navi-count { margin: 0; font-weight: 800; }
+.navi-sort { margin: 0; display: flex; align-items: center; gap: 0.4rem; font-size: 0.92rem; font-weight: 700; }
+.navi-sort select { font: inherit; padding: 0.2rem 0.4rem; border: 2px solid var(--navy); border-radius: 8px; background: #fff; }
+.navi-year[hidden] { display: none; }
+.navi-year__h { margin: 1.4rem 0 0.4rem; font-size: 1.05rem; padding: 0.15rem 0 0.15rem 0.6rem; border-left: 6px solid var(--navy); }
+.navi-list mark { background: #fff1a8; color: inherit; padding: 0 0.05em; border-radius: 2px; }
+.tsutatsu__laws { margin: 0.35rem 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+.tsutatsu__laws span { font-weight: 800; }
+.tsutatsu__fields li:has(button) { border: 0; padding: 0; }
+.tsutatsu__fields button { font: inherit; font-size: 0.78rem; font-weight: 800; color: var(--navy); background: #fff; border: 2px solid var(--navy); border-radius: 999px; padding: 0 0.5rem; cursor: pointer; }
+.tsutatsu__fields button:hover { background: var(--navy); color: #fff; }
