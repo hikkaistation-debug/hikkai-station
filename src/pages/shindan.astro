@@ -4,7 +4,7 @@
 // JavaScript が動かない環境では、すべての質問と結果が一覧で表示されます。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
-import { TERMINAL } from '../data/site';
+import { TOOLS_TOP } from '../data/tools';
 
 type Choice = { label: string; next: string };
 type Step = { id: string; q: string; choices: Choice[] };
@@ -166,7 +166,7 @@ const RESULTS: Result[] = [
 ];
 ---
 <BaseLayout title="境界トラブル診断" description="質問に答えていくと、境目・越境・相続した土地などの困りごとについて、相談先と次にやることがわかります。">
-  <StationSign kicker="駅の施設" title="境界トラブル診断" sub="TROUBLE GUIDE" color="#c4122f" prev={TERMINAL} />
+  <StationSign kicker="便利ツール" title="境界トラブル診断" sub="TROUBLE GUIDE" color="#c4122f" prev={TOOLS_TOP} />
 
   <p>
     いくつかの質問に答えると、相談先と、次にやることの目安がわかります。

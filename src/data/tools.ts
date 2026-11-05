@@ -1,12 +1,37 @@
-// 計算ツールの一覧（駅の施設「計算ツール」）
+// 便利ツールの一覧（駅の施設「便利ツール」。2026-11-05 に「計算ツール」から名前を変えた）
 // ツールを増やしたら、ここに1行足してください。トップの一覧と、各ツールの駅名標に使います。
+export type ToolGroupId = 'keisan' | 'shiraberu' | 'benkyou';
+
 export type Tool = {
   id: string; // アドレス（/tools/○○/）
   name: string;
   short: string; // 駅名標の「となりの駅」などに使う短い名前
   desc: string;
   who: string; // だれ向けか
+  group: ToolGroupId; // 一覧での分け方（計算する／調べる・診断する／勉強する）
 };
+
+// 一覧ページの分け方。/tools/ の外にあるページ（境界トラブル診断など）は extra に書く。
+export const TOOL_GROUPS: {
+  id: ToolGroupId;
+  label: string;
+  extra?: { name: string; href: string; desc: string; who: string }[];
+}[] = [
+  { id: 'keisan', label: '計算する' },
+  {
+    id: 'shiraberu',
+    label: '調べる・診断する',
+    extra: [
+      {
+        name: '境界トラブル診断',
+        href: '/shindan/',
+        desc: 'いくつかの質問に答えると、境界の困りごとをどこに相談すればよいか（土地家屋調査士・法務局・弁護士など）の目安がわかります。',
+        who: 'どなたでも',
+      },
+    ],
+  },
+  { id: 'benkyou', label: '勉強する' },
+];
 
 export const TOOLS: Tool[] = [
   {
@@ -15,6 +40,7 @@ export const TOOLS: Tool[] = [
     short: '坪⇔㎡',
     desc: '坪と平方メートル（㎡）を相互に換算します。畝（せ）・反（たん）・町（ちょう）、アール・ヘクタールにも対応しています。',
     who: 'どなたでも',
+    group: 'keisan',
   },
   {
     id: 'zahyo-menseki',
@@ -22,6 +48,7 @@ export const TOOLS: Tool[] = [
     short: '座標面積',
     desc: '筆界点の座標（X・Y）から、面積・倍面積・辺の長さを計算し、求積表の形で表示します。',
     who: '実務者・受験生',
+    group: 'keisan',
   },
   {
     id: 'kousa',
@@ -29,6 +56,7 @@ export const TOOLS: Tool[] = [
     short: '公差',
     desc: '国土調査法施行令 別表第四の精度区分（甲一〜乙三）にもとづいて、地積測定の公差と、筆界点間の距離の公差を計算します。',
     who: '実務者・受験生',
+    group: 'keisan',
   },
   {
     id: 'benkyou',
@@ -36,8 +64,11 @@ export const TOOLS: Tool[] = [
     short: '勉強プランナー',
     desc: '試験日までの残り日数と、平日・休日の勉強時間から、目標の勉強時間に届くかを計算します。過去問（令和3〜7年度）のチェック表つき。入力はブラウザの中だけに保存されます。',
     who: '受験生',
+    group: 'benkyou',
   },
 ];
 
 export const toolHref = (id: string) => `/tools/${id}/`;
-export const TOOLS_TOP = { label: '計算ツール', href: '/tools/' };
+export const TOOLS_TOP = { label: '便利ツール', href: '/tools/' };
+// 一覧ページの名前の下に出す短い説明
+export const TOOLS_LEAD = '面積の計算・公差・境界トラブルの診断・勉強の計画など';

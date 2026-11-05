@@ -1,34 +1,53 @@
 ---
-// 駅の施設「計算ツール」の入口
+// 駅の施設「便利ツール」の入口（2026-11-05 に「計算ツール」から名前を変え、計算する／調べる・診断する／勉強する に分けた）
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
 import { TERMINAL } from '../../data/site';
-import { TOOLS, toolHref } from '../../data/tools';
----
-<BaseLayout title="計算ツール" description="坪⇔㎡の換算、座標からの面積計算、公差の計算など、土地や境界の計算ツールです。">
-  <StationSign title="計算ツール" sub="CALCULATORS" prev={TERMINAL} />
+import { TOOLS, TOOL_GROUPS, TOOLS_LEAD, toolHref } from '../../data/tools';
 
+const groups = TOOL_GROUPS.map((g) => ({
+  ...g,
+  cards: [
+    ...TOOLS.filter((t) => t.group === g.id).map((t) => ({ name: t.name, href: toolHref(t.id), desc: t.desc, who: t.who })),
+    ...(g.extra ?? []),
+  ],
+})).filter((g) => g.cards.length > 0);
+---
+<BaseLayout title="便利ツール" description={`${TOOLS_LEAD}、土地や境界・調査士試験に役立つ便利ツールです。`}>
+  <StationSign title="便利ツール" sub="TOOLS" prev={TERMINAL} />
+
+  <p class="tools-lead">{TOOLS_LEAD}</p>
   <p>
-    土地や境界にかかわる計算を、その場でできるツールです。入力した数字はこのページの中だけで計算し、どこにも送りません。
+    土地や境界、土地家屋調査士試験に役立つ道具を集めました。入力した内容は、このブラウザの中だけで使い、どこにも送りません。
   </p>
 
-  <ul class="tool-list">
-    {TOOLS.map((t) => (
-      <li>
-        <a class="tool-card" href={toolHref(t.id)}>
-          <span class="tool-card__name">{t.name}</span>
-          <span class="tool-card__who">{t.who}</span>
-          <span class="tool-card__desc">{t.desc}</span>
-        </a>
-      </li>
-    ))}
-  </ul>
+  {groups.map((g) => (
+    <section class="tool-group" aria-labelledby={`g-${g.id}`}>
+      <h2 id={`g-${g.id}`}>{g.label}</h2>
+      <ul class="tool-list">
+        {g.cards.map((c) => (
+          <li>
+            <a class="tool-card" href={c.href}>
+              <span class="tool-card__name">{c.name}</span>
+              <span class="tool-card__who">{c.who}</span>
+              <span class="tool-card__desc">{c.desc}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
 
   <aside class="notice">
     <p class="notice__title">ご利用にあたって</p>
     <ul>
-      <li>計算結果は目安です。登記の申請や測量の成果として使う場合は、必ず専門家や一次資料で確認してください。</li>
-      <li>計算のまちがいに気づいたときは、<a href="/contact/">お問い合わせ</a>から教えていただけると助かります。</li>
+      <li>計算や診断の結果は目安です。登記の申請や測量の成果として使う場合は、必ず専門家や一次資料で確認してください。</li>
+      <li>まちがいに気づいたときは、<a href="/contact/">お問い合わせ</a>から教えていただけると助かります。</li>
     </ul>
   </aside>
 </BaseLayout>
+
+<style>
+  .tools-lead { font-weight: 800; font-size: 1.05rem; color: var(--navy); margin-bottom: 0.2rem; }
+  .tool-group h2 { font-size: 1.15rem; border-bottom: 2px solid var(--line); padding-bottom: 0.25rem; margin-top: 1.6rem; }
+</style>
