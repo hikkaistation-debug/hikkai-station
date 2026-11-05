@@ -66,6 +66,14 @@ export const TOOLS: Tool[] = [
     who: '受験生',
     group: 'benkyou',
   },
+  {
+    id: 'anaume',
+    name: '条文の穴埋め練習（土地家屋調査士試験）',
+    short: '穴埋め練習',
+    desc: '土地家屋調査士法・不動産登記法の大事な条文を、穴埋めで覚えます。空欄を押すと答えが出て、「覚えた」の印も付けられます。条文は e-Gov の原文どおり。',
+    who: '受験生',
+    group: 'benkyou',
+  },
 ];
 
 export const toolHref = (id: string) => `/tools/${id}/`;

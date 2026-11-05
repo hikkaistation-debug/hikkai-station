@@ -1,0 +1,153 @@
+---
+// 条文の穴埋め練習（土地家屋調査士法・不動産登記法）
+// 空欄を押すと答えが出る。「覚えた」の印は、使う人のブラウザの中（localStorage）にだけ保存する。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+import { ANAUME, anaumeLawName, anaumeUrl, splitAnaume } from '../../data/anaume';
+
+const laws = [...new Set(ANAUME.map((a) => anaumeLawName(a)))];
+const blanks = ANAUME.reduce((n, a) => n + splitAnaume(a.text).filter((p) => p.type === 'blank').length, 0);
+---
+<BaseLayout title="条文の穴埋め練習（土地家屋調査士試験）" description="土地家屋調査士法・不動産登記法の大事な条文を、穴埋めで覚える練習ページです。空欄を押すと答えが出ます。条文は e-Gov 法令検索の原文どおり。">
+  <StationSign kicker="便利ツール" title="条文の穴埋め練習" sub="FILL IN THE BLANKS" prev={TOOLS_TOP} />
+
+  <p>土地家屋調査士試験でよく問われる条文を、穴埋めで覚えましょう。<strong>空欄を押すと答えが出ます</strong>（もう一度押すと隠れます）。全{ANAUME.length}条・空欄{blanks}こ。</p>
+
+  <section class="tool" aria-label="表示の切りかえ">
+    <div class="tool__row">
+      <label for="a-law">法律</label>
+      <select id="a-law">
+        <option value="">すべて</option>
+        {laws.map((l) => <option value={l}>{l}</option>)}
+      </select>
+      <label><input type="checkbox" id="a-hide-done" /> 「覚えた」を隠す</label>
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="a-shuffle">順番をまぜる</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="a-open">答えを全部見る</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="a-close">全部かくす</button>
+    </div>
+    <p class="tool__note" id="a-count" aria-live="polite"></p>
+  </section>
+
+  <ol class="anaume-list" id="a-list">
+    {ANAUME.map((a) => (
+      <li class="anaume" data-id={a.id} data-law={anaumeLawName(a)}>
+        <p class="anaume__head">
+          <span class="anaume__law">{anaumeLawName(a)} {a.article}</span>
+          <span class="anaume__title">（{a.heading}）</span>
+        </p>
+        <p class="anaume__text">
+          {splitAnaume(a.text).map((p) =>
+            p.type === 'text' ? (
+              p.value.split('\n').map((line, i) => (i > 0 ? [<br />, line] : line))
+            ) : (
+              <button type="button" class="anaume__blank" data-answer={p.value} aria-label="空欄。押すと答えが出ます" aria-pressed="false">
+                <span class="anaume__ans">{p.value}</span>
+              </button>
+            ),
+          )}
+        </p>
+        <p class="anaume__foot">
+          <label><input type="checkbox" class="anaume__done" /> 覚えた</label>
+          <button type="button" class="anaume__row-open">この条の答え</button>
+          <a href={anaumeUrl(a)} target="_blank" rel="noopener">e-Gov で原文を見る ↗</a>
+        </p>
+      </li>
+    ))}
+  </ol>
+
+  <div class="page-body">
+    <h2>使い方とご注意</h2>
+    <ul>
+      <li>条文は、e-Gov 法令検索の原文のとおりです（{ANAUME[0].checkedDate} に確認）。「（略）」は、このページで省いたかっこ書きなどです。</li>
+      <li>「覚えた」の印は、このブラウザの中にだけ保存されます。</li>
+      <li>法律が改正されることがあります。試験の前には、必ず最新の条文を e-Gov で確かめてください。</li>
+    </ul>
+    <p>条文の意味は <a href="/hourei/">法令ナビ</a>、試験のしくみは <a href="/articles/shiken-shikumi/">土地家屋調査士試験のしくみ</a> で紹介しています。勉強の計画には <a href="/tools/benkyou/">勉強プランナー</a> もどうぞ。</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .anaume-list { list-style: none; padding: 0; display: grid; gap: 0.9rem; margin: 1rem 0; }
+  .anaume { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--navy); border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .anaume[data-done='1'] { border-left-color: #0f766e; }
+  .anaume[hidden] { display: none; }
+  .anaume__head { margin: 0 0 0.4rem; }
+  .anaume__law { font-weight: 800; color: var(--navy); }
+  .anaume__title { font-size: 0.9rem; color: var(--ink-soft); }
+  .anaume__text { margin: 0; line-height: 2.1; }
+  .anaume__blank { font: inherit; display: inline-block; min-width: 4.5em; margin: 0 0.15em; padding: 0 0.4em; line-height: 1.6; border: 0; border-bottom: 2px solid var(--navy); background: #eef2f8; border-radius: 4px; cursor: pointer; color: transparent; vertical-align: baseline; }
+  .anaume__blank .anaume__ans { visibility: hidden; }
+  .anaume__blank[aria-pressed='true'] { color: #c4122f; font-weight: 800; background: #fff3f4; }
+  .anaume__blank[aria-pressed='true'] .anaume__ans { visibility: visible; }
+  .anaume__blank:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .anaume__foot { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; align-items: center; margin: 0.6rem 0 0; font-size: 0.9rem; }
+  .anaume__foot label { font-weight: 700; cursor: pointer; }
+  .anaume__row-open { font: inherit; font-size: 0.85rem; cursor: pointer; border: 1px solid var(--navy); color: var(--navy); background: #fff; border-radius: 6px; padding: 0.1rem 0.6rem; }
+</style>
+
+<script>
+  const KEY = 'hikkai-anaume-v1';
+  const load = (): Record<string, boolean> => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; }
+  };
+  let done = load();
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch {} };
+
+  const list = document.getElementById('a-list')!;
+  const items = [...list.querySelectorAll<HTMLLIElement>('.anaume')];
+  const lawSel = document.getElementById('a-law') as HTMLSelectElement;
+  const hideDone = document.getElementById('a-hide-done') as HTMLInputElement;
+  const count = document.getElementById('a-count')!;
+
+  const setBlank = (b: HTMLButtonElement, open: boolean) => {
+    b.setAttribute('aria-pressed', String(open));
+    b.setAttribute('aria-label', open ? `答え：${b.dataset.answer}` : '空欄。押すと答えが出ます');
+  };
+
+  const paint = () => {
+    let shown = 0;
+    for (const li of items) {
+      const isDone = !!done[li.dataset.id!];
+      li.dataset.done = isDone ? '1' : '';
+      (li.querySelector('.anaume__done') as HTMLInputElement).checked = isDone;
+      const show = (!lawSel.value || li.dataset.law === lawSel.value) && !(hideDone.checked && isDone);
+      li.hidden = !show;
+      if (show) shown++;
+    }
+    const n = items.filter((li) => done[li.dataset.id!]).length;
+    count.textContent = `表示中 ${shown}条／覚えた ${n}条（全${items.length}条）`;
+  };
+
+  for (const li of items) {
+    li.querySelectorAll<HTMLButtonElement>('.anaume__blank').forEach((b) =>
+      b.addEventListener('click', () => setBlank(b, b.getAttribute('aria-pressed') !== 'true')),
+    );
+    li.querySelector('.anaume__row-open')!.addEventListener('click', () => {
+      const bs = [...li.querySelectorAll<HTMLButtonElement>('.anaume__blank')];
+      const allOpen = bs.every((b) => b.getAttribute('aria-pressed') === 'true');
+      bs.forEach((b) => setBlank(b, !allOpen));
+    });
+    li.querySelector('.anaume__done')!.addEventListener('change', (e) => {
+      done[li.dataset.id!] = (e.target as HTMLInputElement).checked;
+      if (!done[li.dataset.id!]) delete done[li.dataset.id!];
+      save();
+      paint();
+    });
+  }
+  lawSel.addEventListener('change', paint);
+  hideDone.addEventListener('change', paint);
+  document.getElementById('a-open')!.addEventListener('click', () => list.querySelectorAll<HTMLButtonElement>('.anaume__blank').forEach((b) => setBlank(b, true)));
+  document.getElementById('a-close')!.addEventListener('click', () => list.querySelectorAll<HTMLButtonElement>('.anaume__blank').forEach((b) => setBlank(b, false)));
+  document.getElementById('a-shuffle')!.addEventListener('click', () => {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    arr.forEach((li) => list.appendChild(li));
+  });
+  paint();
+</script>
