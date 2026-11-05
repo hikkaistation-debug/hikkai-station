@@ -1,6 +1,6 @@
 ---
 title: 登記の面積と、測った面積がちがうのはなぜ？ 「公差」のはなし
-pubDate: 2026-11-04
+pubDate: 2026-11-05
 category: kiso
 level: easy
 sourceName: e-Gov法令検索「国土調査法施行令」（別表第四）
@@ -11,8 +11,6 @@ tags:
   - 入門
   - 地積測量図
   - 分筆
-draft: true
-draftNo: 16
 ---
 
 ## 面積がちがうのは、めずらしくない

@@ -43,4 +43,4 @@ tags:
 - お隣の持ち主が亡くなっていたり、連絡がつかなかったりすると、時間がかかります。
 - 話がまとまらないときは、法務局の筆界特定制度を使う方法もあります。
 
-関連する記事：[裁判とどうちがう？「筆界特定制度」のしくみ](/articles/hikkai-tokutei-seido/)
+関連する記事：[官民境界の協議とは？](/articles/kanmin-kyokai-kyogi/)／[裁判とどうちがう？「筆界特定制度」のしくみ](/articles/hikkai-tokutei-seido/)
