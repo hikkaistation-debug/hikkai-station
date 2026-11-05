@@ -328,6 +328,21 @@ main { padding-bottom: 1rem; }
   .header-actions { gap: 0.35rem; }
   .header-search, .menu-toggle { padding: 0.3rem 0.5rem; font-size: 0.9rem; }
 }
+/* サイト名・ボタンの文字は改行しない（iPhone は文字の幅が広めなので、せまい画面では少し小さくする） */
+.brand { min-width: 0; }
+.brand__name, .header-search, .menu-toggle { white-space: nowrap; }
+@media (max-width: 400px) {
+  .site-header__inner { gap: 0.5rem; }
+  .brand { gap: 0.45rem; }
+  .brand__name { font-size: 0.95rem; letter-spacing: 0; }
+  .brand__mark { width: 1.9rem; height: 1.9rem; font-size: 0.95rem; }
+  .header-actions { gap: 0.3rem; }
+  .header-search, .menu-toggle { padding: 0.3rem 0.45rem; font-size: 0.85rem; }
+}
+/* とてもせまい画面では「さがす」を虫めがねだけに（読み上げでは「さがす」と読まれる） */
+@media (max-width: 345px) {
+  .header-search__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
 
 /* ---------- 記事一覧の絞り込み・並べ替え ---------- */
 .list-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.2rem; margin: 1rem 0; padding: 0.7rem 0.9rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
