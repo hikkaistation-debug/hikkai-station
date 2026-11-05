@@ -13,14 +13,16 @@ const synonyms = GLOSSARY.map((t) => [t.term.replace(/（.*?）/g, ''), t.yomi])
 // ・sortable：true なら「新しい順／古い順」の切り替えを出す（一覧の <section class="navi-year"> ごと並べ替え）
 // ・一覧の中の <button data-pick-field="分野"> を押すと、キーワードを消して、その分野だけにしぼりこみます
 // ・キーワードに当たった言葉は、.navi-hl の中で色がつきます
+// ・fieldGroups：分野の一覧を差しかえるとき（判例ナビなど）。省略すると法令・通達の共通の分野（navi.ts）
 interface Props {
   used: string[]; // 一覧で実際に使われている分野（使われていない分野のボタンは出さない）
   placeholder?: string;
   quick?: string[];
   sortable?: boolean;
+  fieldGroups?: readonly { title: string; fields: readonly string[] }[];
 }
-const { used, placeholder = '例）相続人申告、外気分断性', quick = [], sortable = false } = Astro.props;
-const groups = NAVI_FIELD_GROUPS.map((g) => ({ title: g.title, fields: g.fields.filter((f) => used.includes(f)) })).filter((g) => g.fields.length);
+const { used, placeholder = '例）相続人申告、外気分断性', quick = [], sortable = false, fieldGroups = NAVI_FIELD_GROUPS } = Astro.props;
+const groups = fieldGroups.map((g) => ({ title: g.title, fields: g.fields.filter((f) => used.includes(f)) })).filter((g) => g.fields.length);
 ---
 <div class="navi-filter" id="navi-filter" data-synonyms={JSON.stringify(synonyms)}>
   <div class="navi-filter__q">

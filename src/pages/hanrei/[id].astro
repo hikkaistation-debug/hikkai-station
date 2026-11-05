@@ -1,0 +1,56 @@
+---
+// 判例ナビ：1件ずつの詳しいページ
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import { HANREI, hanreiWareki, hanreiTitle, courtsUrl, type Hanrei } from '../../data/hanrei';
+
+export function getStaticPaths() {
+  return HANREI.map((h) => ({ params: { id: h.id }, props: { h } }));
+}
+const { h } = Astro.props as { h: Hanrei };
+const seireki = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${y}年${m}月${d}日`;
+};
+---
+<BaseLayout title={`${hanreiTitle(h)}（${h.caseNo}）`} description={h.point}>
+  <StationSign kicker="判例ナビ" title={hanreiTitle(h)} prev={{ label: '判例ナビ', href: '/hanrei/' }} />
+
+  <section class="article-box" aria-labelledby="p-h">
+    <h2 id="p-h">ひとことで</h2>
+    <p class="hanrei__point">{h.point}</p>
+    <p>{h.explain}</p>
+    <p class="tool__note">この欄は、このサイトがやさしく言いかえたものです（{h.level}）。</p>
+  </section>
+
+  <dl class="spec">
+    <div><dt>裁判所</dt><dd>{h.court}</dd></div>
+    <div><dt>裁判の日</dt><dd>{hanreiWareki(h.date)}（{seireki(h.date)}）　{h.kind}</dd></div>
+    <div><dt>事件番号</dt><dd>{h.caseNo}</dd></div>
+    <div><dt>事件名</dt><dd>{h.caseName}</dd></div>
+    {h.reporter && <div><dt>判例集</dt><dd>{h.reporter}</dd></div>}
+    <div><dt>分野</dt><dd>{h.fields.join('、')}</dd></div>
+    <div><dt>関係する法令</dt><dd>{h.laws.join('、')}</dd></div>
+  </dl>
+
+  <section class="article-box" aria-labelledby="o-h">
+    <h2 id="o-h">裁判所の公表した内容</h2>
+    <h3 class="hanrei__sub">判示事項</h3>
+    <blockquote class="hanrei__quote">{h.holding}</blockquote>
+    <h3 class="hanrei__sub">裁判要旨</h3>
+    <blockquote class="hanrei__quote">{h.summaryOfficial}</blockquote>
+    {h.summaryPart && <p class="tool__note">{h.summaryPart}</p>}
+    <p class="tool__note">出典：裁判所ウェブサイト「裁判例検索」（このサイトで確かめた日：{seireki(h.checkedDate)}）</p>
+  </section>
+
+  <p class="read-original">
+    <a class="cta__button" href={courtsUrl(h)} rel="noopener" target="_blank">判決文を読む（裁判所ウェブサイト）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+  </p>
+
+  <p class="tool__note">
+    このページは一般的な考え方の紹介です。ご自分の土地の件の判断や見通しは、事情によって変わります。境界の調査・測量は土地家屋調査士、争いになっている場合は弁護士にご相談ください。
+  </p>
+  <Disclaimer />
+  <p><a href="/hanrei/">← 判例ナビの一覧へ</a></p>
+</BaseLayout>

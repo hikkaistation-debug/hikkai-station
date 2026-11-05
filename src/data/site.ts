@@ -47,6 +47,7 @@ export const MENU: MenuGroup[] = [
       { href: '/yomimono/', label: '車内の読み物', ready: true },
       { href: '/hourei/', label: '法令ナビ', ready: true },
       { href: '/tsutatsu/', label: '通達ナビ', ready: true },
+      { href: '/hanrei/', label: '判例ナビ', ready: true },
       { href: '/tools/', label: '便利ツール', ready: true },
       { href: '/quiz/', label: '駅のクイズ', ready: true },
       { href: '/links/', label: 'リンク集', ready: true },

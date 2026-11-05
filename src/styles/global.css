@@ -659,3 +659,11 @@ main { padding-bottom: 1rem; }
 .tsutatsu__fields li:has(button) { border: 0; padding: 0; }
 .tsutatsu__fields button { font: inherit; font-size: 0.78rem; font-weight: 800; color: var(--navy); background: #fff; border: 2px solid var(--navy); border-radius: 999px; padding: 0 0.5rem; cursor: pointer; }
 .tsutatsu__fields button:hover { background: var(--navy); color: #fff; }
+/* 判例ナビ */
+.hanrei { border-left-color: #464c58; }
+.hanrei__level { display: inline-block; margin-left: 0.4rem; padding: 0 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; vertical-align: 1px; }
+.hanrei__level--easy { background: #e6f4ea; color: #1a7f37; }
+.hanrei__level--pro { background: #eef2f8; color: #1f2a44; }
+.hanrei__point { font-size: 1.08rem; font-weight: 800; color: #1f2a44; }
+.hanrei__sub { font-size: 0.95rem; margin: 0.8rem 0 0.3rem; }
+.hanrei__quote { margin: 0; padding: 0.5rem 0.8rem; border-left: 4px solid #464c58; background: #f4f3ee; font-size: 0.92rem; line-height: 1.8; }

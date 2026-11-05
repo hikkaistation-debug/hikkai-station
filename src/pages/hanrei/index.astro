@@ -1,0 +1,59 @@
+---
+// 駅の施設「判例ナビ」：境界・お隣の土地に関する裁判例を、分野・キーワードで探せる一覧
+// データは src/data/hanrei.ts（裁判所ウェブサイトの判例ページで確かめてから書く）
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TERMINAL } from '../../data/site';
+import NaviFilter from '../../components/NaviFilter.astro';
+import { sortedHanrei, hanreiWareki, hanreiNen, shortCourt, HANREI_FIELD_GROUPS } from '../../data/hanrei';
+
+const list = sortedHanrei();
+const used = [...new Set(list.flatMap((h) => h.fields))];
+const years = [...new Set(list.map((h) => hanreiNen(h.date)))].map((y) => ({ y, items: list.filter((h) => hanreiNen(h.date) === y) }));
+const quick = ['筆界', '境界確定訴訟', '取得時効', '筆界特定', '袋地', '境界の合意'];
+---
+<BaseLayout title="判例ナビ" description="土地の境界やお隣の土地に関する裁判例（判例）を、分野やキーワードで探せるコーナーです。やさしい説明と、裁判所ウェブサイトの判例ページへのリンク付き。">
+  <StationSign title="判例ナビ" sub="CASES" prev={TERMINAL} />
+
+  <p>
+    土地の<strong>境界</strong>やお隣の土地に関する<strong>裁判例（判例）</strong>を、分野やキーワードで探せるようにまとめています。
+    「ひとことで」はこのサイトがやさしく言いかえたものです。裁判所の公表した内容（判示事項・裁判要旨）と、裁判所ウェブサイトへのリンクも付けています。少しずつ増やしていきます。
+  </p>
+
+  <NaviFilter used={used} fieldGroups={HANREI_FIELD_GROUPS} quick={quick} sortable placeholder="例）筆界特定、時効、袋地" />
+
+  <div class="navi-years">
+    {years.map(({ y, items }) => (
+      <section class="navi-year" aria-label={y}>
+        <h2 class="navi-year__h">{y}</h2>
+        <ul class="tsutatsu-list navi-list">
+          {items.map((h) => (
+            <li class="tsutatsu hanrei" data-fields={h.fields.join('|')} data-text={[h.court, h.caseNo, h.caseName, hanreiWareki(h.date), h.date.slice(0, 4), h.reporter ?? '', h.point, h.explain, h.holding, h.summaryOfficial, ...h.laws, ...h.fields, ...h.keywords].join(' ')}>
+              <p class="tsutatsu__meta navi-hl">
+                {shortCourt(h)}　{hanreiWareki(h.date)}　{h.kind}
+                <span class={`hanrei__level hanrei__level--${h.level === '一般向け' ? 'easy' : 'pro'}`}>{h.level}</span>
+              </p>
+              <h3 class="tsutatsu__title navi-hl"><a href={`/hanrei/${h.id}/`}>{h.point}</a></h3>
+              <p class="tsutatsu__laws navi-hl"><span>事件：</span>{h.caseNo}（{h.caseName}）{h.reporter && `　${h.reporter}`}</p>
+              <p class="tsutatsu__laws navi-hl"><span>判示事項：</span>{h.holding}</p>
+              <ul class="tsutatsu__fields">{h.fields.map((f) => <li><button type="button" data-pick-field={f} title={`「${f}」の判例だけを表示`}>{f}</button></li>)}</ul>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+
+  <div class="page-body">
+    <h2>「判例」とは？</h2>
+    <p>
+      裁判所の判決のうち、同じような問題で後の裁判の手がかりになるものを、ふつう「判例」と呼びます。とくに最高裁判所の判断は重く、境界の実務でもよく参照されます。
+      地方裁判所・高等裁判所の判断（裁判例）は、事情がちがえば結論も変わりうるので、参考の一つとして見てください。
+    </p>
+    <p class="tool__note">
+      このページは、一般的な考え方の紹介です。ご自分の土地の件の判断や見通しは、事情によって変わります。境界の調査・測量は土地家屋調査士、争いになっている場合は弁護士、筆界特定の手続きは法務局にご相談ください。
+      判示事項・裁判要旨は裁判所ウェブサイトの公表文を引用しています。正確な内容は、必ずリンク先の判決文でご確認ください。
+    </p>
+    <p>条文は <a href="/hourei/">法令ナビ</a>、通達は <a href="/tsutatsu/">通達ナビ</a> で。筆界特定や境界の争いの流れは <a href="/shindan/">境界トラブル診断</a> もどうぞ。</p>
+  </div>
+</BaseLayout>
