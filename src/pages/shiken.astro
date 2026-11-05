@@ -7,9 +7,12 @@ import ArticleCard from '../components/ArticleCard.astro';
 import ListControls from '../components/ListControls.astro';
 import { getLine } from '../data/lines';
 import { getPublishedArticles } from '../data/articles';
+import { TOOLS, toolHref } from '../data/tools';
 
 const line = getLine('shiken');
 const articles = (await getPublishedArticles()).filter((a) => a.data.category === 'shiken');
+// 勉強に使える便利ツール（便利ツールの「勉強する」。増えたら自動でここにも出る）
+const studyTools = TOOLS.filter((t) => t.group === 'benkyou');
 
 // 公式の情報へのリンク（法務省）
 const officialLinks = [
@@ -64,6 +67,17 @@ const officialLinks = [
       <li><strong>多肢択一式</strong>：民法、不動産登記法、土地家屋調査士法などから出題されます。</li>
       <li><strong>記述式</strong>：土地と建物について、それぞれ登記の申請に必要な書面や図面を作る問題が出題されます。</li>
     </ul>
+
+    <h2>勉強に使える便利ツール</h2>
+    <ul>
+      {studyTools.map((t) => (
+        <li>
+          <a href={toolHref(t.id)}>{t.name}</a><br />
+          <small>{t.desc}</small>
+        </li>
+      ))}
+    </ul>
+    <p><small>ほかのツール（面積の計算・公差など）は <a href="/tools/">便利ツール</a> にまとめています。</small></p>
 
     <h2>公式の情報</h2>
     <ul>

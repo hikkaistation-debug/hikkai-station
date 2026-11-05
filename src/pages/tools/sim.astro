@@ -1,0 +1,599 @@
+---
+// 地積測量図から SIM データ（SIMA形式 .sim）を作る（OCR）
+// 流れ：PDF・画像を選ぶ → 求積表を四角で囲む → 文字読み取り（Tesseract.js）→ 表で確かめて直す → 面積の検算 → .sim で保存
+// ・ファイルはブラウザの中だけで処理し、どこにも送らない。部品（pdf.js・Tesseract.js と読み取り用データ）だけ、使うときに jsDelivr から読み込む（/privacy/ に記載）。
+// ・SIMA の書き方は、国土交通省 近畿地方整備局「登記所送付用地図（電子データ）の作成要領」の参考（SIMAデータの概要）にそろえた：
+//     座標データ  A00 → A01,点番号,点名称,X,Y,Z → A99（座標は小数点以下4けた目を四捨五入して3けた）
+//     画地データ  D00,画地番号,地番,画地種別(閉合=1) → B01,点番号,点名称 → D99
+//   ファイルの先頭の行（G00 など）は、その資料に決まりがないので入れていない。取りこむソフトで確かめること。
+// ・地積の端数の扱いは不動産登記規則100条。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="地積測量図からSIMデータを作る（OCR）" description="地積測量図のPDF・画像の座標求積表を文字読み取り（OCR）で表にし、面積を検算してからSIMA形式（.sim）で保存できるツールです。ファイルはパソコンの中だけで処理します。">
+  <StationSign kicker="便利ツール" title="地積測量図からSIMデータを作る（OCR）" sub="PDF → SIMA" prev={TOOLS_TOP} />
+
+  <aside class="notice">
+    <p class="notice__title">使う前に</p>
+    <ul>
+      <li>選んだファイルは<strong>パソコンの中だけで処理し、インターネットには送りません</strong>。読み取りの部品だけ、はじめて使うときに外部の配信サービス（jsDelivr）から読み込みます（数MB）。</li>
+      <li>文字の読み取り（OCR）は、数字を読みまちがえることがあります。<strong>必ず図面と見比べて確かめてください</strong>。下の「検算」で、図面の地積と合うかも確かめられます。</li>
+      <li>座標の書いていない古い地積測量図（三斜求積・辺長だけのもの）には使えません。</li>
+      <li>作ったデータを登記や測量の成果に使うときは、専門家が確かめたものを使ってください。</li>
+    </ul>
+  </aside>
+
+  <section class="tool" aria-labelledby="s1">
+    <h2 id="s1">1. 地積測量図のファイルを選ぶ</h2>
+    <div class="tool__row">
+      <input type="file" id="file" accept="application/pdf,image/png,image/jpeg" />
+      <label for="page">ページ</label>
+      <select id="page" disabled><option>1</option></select>
+    </div>
+    <p class="tool__note">PDF（法務局で取った図面の写しなど）か、画像（PNG・JPEG）を選べます。</p>
+  </section>
+
+  <section class="tool" aria-labelledby="s2">
+    <h2 id="s2">2. 座標求積表の部分を四角で囲む</h2>
+    <p class="tool__note">図の上をドラッグ（指でなぞる）して、<strong>点名・X・Y が並んでいる表の部分だけ</strong>を囲んでください。見出しの行は入れなくてもかまいません。</p>
+    <div class="ocr-stage" id="stage"><p class="tool__note" id="stage-msg">ファイルを選ぶと、ここに図面が出ます。</p><canvas id="canvas" hidden></canvas><div class="ocr-rect" id="rect" hidden></div></div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="ocr" disabled>囲んだ部分を読み取る</button>
+      <span class="tool__note" id="ocr-msg"></span>
+    </div>
+    <details>
+      <summary>読み取ったそのままの文字を見る</summary>
+      <pre class="ocr-raw" id="raw"></pre>
+    </details>
+  </section>
+
+  <section class="tool" aria-labelledby="s3">
+    <h2 id="s3">3. 表で確かめて直す</h2>
+    <p class="tool__note">読み取った点が下の表に入ります。<strong>図面と1行ずつ見比べて</strong>、ちがうところを直してください。手で入れることもできます（Excel から「点名・X・Y」をコピーして表に貼り付けてもかまいません）。</p>
+    <p class="guess-note" id="guess-note" hidden></p>
+    <div class="calc-wrap">
+      <table class="coord-table">
+        <thead><tr><th scope="col">No.</th><th scope="col">点名</th><th scope="col">X（m）</th><th scope="col">Y（m）</th><th scope="col"><span class="visually-hidden">削除</span></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn tool__btn--sub" id="add">＋ 点を追加</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="clear">すべて消す</button>
+    </div>
+  </section>
+
+  <section class="tool" aria-labelledby="s4">
+    <h2 id="s4">4. 検算する</h2>
+    <div class="tool__row">
+      <label for="stated">図面に書いてある地積</label>
+      <input type="number" id="stated" step="any" min="0" placeholder="例）150.12" /> ㎡
+      <label for="kind">地目</label>
+      <select id="kind"><option value="taku">宅地・鉱泉地</option><option value="other">それ以外</option></select>
+    </div>
+    <div class="tool__result" id="check" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" aria-labelledby="s5">
+    <h2 id="s5">5. SIMA形式（.sim）で保存する</h2>
+    <div class="tool__row">
+      <label for="fname">ファイル名</label>
+      <input type="text" id="fname" value="chiseki" /> .sim
+    </div>
+    <div class="tool__row">
+      <label><input type="checkbox" id="lot" checked /> 画地データ（この点を順に結んだ土地の区画）も入れる</label>
+      <label for="chiban">地番</label>
+      <input type="text" id="chiban" placeholder="例）135-1" />
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="save">.sim を保存する</button>
+      <span class="tool__note" id="save-msg"></span>
+    </div>
+    <details>
+      <summary>保存される中身を見る</summary>
+      <pre class="ocr-raw" id="preview"></pre>
+    </details>
+  </section>
+
+  <div class="page-body">
+    <h2>SIMA形式について</h2>
+    <p>SIMA形式は、測量のソフトやCADのあいだで座標などをやりとりするための共通の形式です。このツールは、国土交通省の資料にある書き方にそろえて、次の行を作ります。</p>
+    <div class="prose">
+      <table>
+        <thead><tr><th>行</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td>A00</td><td>座標データのはじまり</td></tr>
+          <tr><td>A01</td><td>A01,点番号,点名称,X,Y,Z（座標は小数点以下3けた。Z は 0.000）</td></tr>
+          <tr><td>A99</td><td>座標データのおわり</td></tr>
+          <tr><td>D00 / B01 / D99</td><td>画地（区画）のはじまり（画地番号・地番・閉合＝1）／区画を作る点／おわり</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>ファイルの先頭に入れる行（ファイル名などの見出し）は、ソフトによって必要なことがあります。取りこめないときは、お使いのソフトの説明書で確かめてください。</li>
+      <li>文字コードは Shift_JIS、改行は CRLF（Windows の形）で保存します。点名に日本語があるときも Shift_JIS にそろえます。</li>
+    </ul>
+    <p class="tool__note">出典：国土交通省 近畿地方整備局「登記所送付用地図（電子データ）の作成要領」（SIMAデータの概要）。地積の端数処理は不動産登記規則100条。</p>
+  </div>
+
+  <style>
+    .ocr-stage { position: relative; overflow: auto; max-height: 70vh; border: 2px dashed var(--line); border-radius: 8px; background: #fafaf7; margin: 0.6rem 0; touch-action: none; }
+    .ocr-stage canvas { display: block; max-width: none; cursor: crosshair; }
+    .ocr-rect { position: absolute; border: 3px solid #c4122f; background: rgba(196, 18, 47, 0.08); pointer-events: none; }
+    .ocr-raw { white-space: pre-wrap; font-size: 0.85rem; background: #f4f3ee; border-radius: 6px; padding: 0.5rem; max-height: 16em; overflow: auto; }
+    .coord-table { border-collapse: collapse; margin: 0.4rem 0; }
+    .coord-table th { background: var(--navy); color: #fff; font-size: 0.85rem; padding: 0.3rem 0.5rem; }
+    .coord-table td { padding: 0.25rem; border-bottom: 1px solid var(--line); }
+    .coord-table .no { text-align: center; font-weight: 800; color: var(--ink-soft); width: 2.5em; }
+    .coord-table input { font: inherit; font-size: 1rem; padding: 0.3rem 0.45rem; border: 2px solid var(--navy); border-radius: 6px; background: #fff; min-width: 0; font-variant-numeric: tabular-nums; }
+    .coord-table .c-name { width: 6em; }
+    .coord-table .c-name.is-guess { background: #fff3b0; border-color: #c99a00; }
+    .guess-note { margin: 0.3rem 0; padding: 0.4rem 0.7rem; background: #fff8db; border: 2px solid #c99a00; border-radius: 8px; font-weight: 700; font-size: 0.92rem; }
+    .coord-table .c-x, .coord-table .c-y { width: 10em; text-align: right; }
+    .coord-table .del { font: inherit; font-weight: 800; cursor: pointer; width: 2.2em; height: 2.2em; border: 2px solid #c4122f; color: #c4122f; background: #fff; border-radius: 6px; }
+    @media (max-width: 560px) { .coord-table .c-name { width: 4em; } .coord-table .c-x, .coord-table .c-y { width: 7em; } }
+  </style>
+
+  <script>
+    // ── 外部の部品（使うときだけ読み込む） ──
+    const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+    const PDFJS_WORKER = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+    const TESS = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+    const ENC = 'https://cdn.jsdelivr.net/npm/encoding-japanese@2.2.0/encoding.min.js';
+    const loadScript = (src: string) => new Promise<void>((ok, ng) => {
+      const s = document.createElement('script'); s.src = src; s.onload = () => ok(); s.onerror = () => ng(new Error(src)); document.head.append(s);
+    });
+    const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    // ── 1. ファイル ──
+    const canvas = $('canvas') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+    const pageSel = $('page') as HTMLSelectElement;
+    let pdfDoc: any = null;
+    async function renderPage(n: number) {
+      const page = await pdfDoc.getPage(n);
+      const vp = page.getViewport({ scale: 3 }); // 読み取りやすいよう大きめに
+      canvas.width = vp.width; canvas.height = vp.height;
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      showCanvas();
+    }
+    function showCanvas() {
+      canvas.hidden = false; $('stage-msg').hidden = true;
+      canvas.style.width = `${Math.min(canvas.width, 1800) / 2}px`; // 画面では半分の大きさで見せる
+      sel = null; $('rect').hidden = true; ($('ocr') as HTMLButtonElement).disabled = true;
+    }
+    $('file').addEventListener('change', async (e) => {
+      const f = (e.target as HTMLInputElement).files?.[0];
+      if (!f) return;
+      $('stage-msg').hidden = false; $('stage-msg').textContent = '図面を読みこんでいます…';
+      try {
+        if (f.type === 'application/pdf') {
+          const pdfjs: any = await import(/* @vite-ignore */ PDFJS);
+          pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+          pdfDoc = await pdfjs.getDocument({ data: await f.arrayBuffer() }).promise;
+          pageSel.innerHTML = Array.from({ length: pdfDoc.numPages }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+          pageSel.disabled = pdfDoc.numPages < 2;
+          await renderPage(1);
+        } else {
+          pdfDoc = null; pageSel.disabled = true;
+          const img = new Image();
+          img.src = URL.createObjectURL(f);
+          await img.decode();
+          const k = 1; // 大きさは読み取りのときに何通りか試すので、ここではそのまま
+          canvas.width = img.width * k; canvas.height = img.height * k;
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          showCanvas();
+          // 小さい（荒い）画像は読みまちがいが増えるので知らせる
+          $('ocr-msg').textContent = img.width < 1500 ? `⚠ 画像が小さめです（横${img.width}ピクセル）。読めないときは、もっと大きく（スキャンなら300dpi以上で）取りこんだ画像を使ってください。` : '';
+        }
+      } catch (err) {
+        $('stage-msg').textContent = '⚠ 図面を読みこめませんでした。インターネットにつながっているか、ファイルが壊れていないか確かめてください。';
+        console.error(err);
+      }
+    });
+    pageSel.addEventListener('change', () => renderPage(Number(pageSel.value)));
+
+    // ── 2. 四角で囲む ──
+    let sel: { x: number; y: number; w: number; h: number } | null = null;
+    let start: { x: number; y: number } | null = null;
+    const toCanvas = (ev: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      const k = canvas.width / r.width;
+      return { x: (ev.clientX - r.left) * k, y: (ev.clientY - r.top) * k, k };
+    };
+    function drawRect() {
+      const rect = $('rect');
+      if (!sel) { rect.hidden = true; return; }
+      const r = canvas.getBoundingClientRect();
+      const k = r.width / canvas.width;
+      Object.assign(rect.style, { left: `${sel.x * k}px`, top: `${sel.y * k}px`, width: `${sel.w * k}px`, height: `${sel.h * k}px` });
+      rect.hidden = false;
+    }
+    canvas.addEventListener('pointerdown', (ev) => { canvas.setPointerCapture(ev.pointerId); const p = toCanvas(ev); start = { x: p.x, y: p.y }; });
+    canvas.addEventListener('pointermove', (ev) => {
+      if (!start) return;
+      const p = toCanvas(ev);
+      sel = { x: Math.min(start.x, p.x), y: Math.min(start.y, p.y), w: Math.abs(p.x - start.x), h: Math.abs(p.y - start.y) };
+      drawRect();
+    });
+    canvas.addEventListener('pointerup', () => {
+      start = null;
+      const ok = !!sel && sel.w > 20 && sel.h > 20;
+      ($('ocr') as HTMLButtonElement).disabled = !ok;
+      $('ocr-msg').textContent = ok ? '囲めました。「囲んだ部分を読み取る」を押してください。' : '';
+    });
+
+    // ── 読み取り（OCR） ──
+    let worker: any = null;
+    async function getWorker(progress: (m: string) => void) {
+      if (worker) return worker;
+      if (!(window as any).Tesseract) { progress('読み取りの部品を読みこんでいます…'); await loadScript(TESS); }
+      worker = await (window as any).Tesseract.createWorker('eng', 1, {
+        logger: (m: any) => { if (m.status) progress(`${m.status === 'recognizing text' ? '読み取り中' : '準備中'}… ${Math.round((m.progress || 0) * 100)}%`); },
+      });
+      // 数字・小数点・マイナスと、点名によく使う英字だけにしぼる
+      await worker.setParameters({ tessedit_char_whitelist: '0123456789.-+,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ', preserve_interword_spaces: '1', tessedit_pageseg_mode: '6' }); // 6＝表のようにそろった文字のかたまり
+      return worker;
+    }
+    // 囲んだ部分を切り出して、読みやすく整える。
+    // scale：拡大の倍率（荒い画像は大きくすると読みやすい）、mode：'bw'＝白黒（しきい値は画像ごとに自動）、'gray'＝灰色のまま（ぼやけた画像向け）
+    function cropped(scale = 1, mode: 'bw' | 'gray' = 'bw', area?: { x: number; y: number; w: number; h: number }, lineFrac = { h: 0.35, v: 0.35 }) {
+      const s = area ?? sel!;
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(s.w * scale)); c.height = Math.max(1, Math.round(s.h * scale));
+      const g = c.getContext('2d')!;
+      g.imageSmoothingEnabled = true;
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(canvas, s.x, s.y, s.w, s.h, 0, 0, c.width, c.height);
+      const d = g.getImageData(0, 0, c.width, c.height);
+      const gray = new Uint8ClampedArray(d.data.length / 4);
+      const hist = new Array(256).fill(0);
+      for (let i = 0, j = 0; i < d.data.length; i += 4, j++) {
+        const v = Math.round(0.299 * d.data[i] + 0.587 * d.data[i + 1] + 0.114 * d.data[i + 2]);
+        gray[j] = v; hist[v]++;
+      }
+      // しきい値は「大津の方法」で画像ごとに決める（決め打ちだと、うすい・暗いスキャンで文字が消える）
+      let th = 165;
+      if (mode === 'bw') {
+        const total = gray.length; let sum = 0;
+        for (let t = 0; t < 256; t++) sum += t * hist[t];
+        let sumB = 0, wB = 0, best = -1;
+        for (let t = 0; t < 256; t++) {
+          wB += hist[t]; if (!wB) continue;
+          const wF = total - wB; if (!wF) break;
+          sumB += t * hist[t];
+          const mB = sumB / wB, mF = (sum - sumB) / wF;
+          const between = wB * wF * (mB - mF) ** 2;
+          if (between > best) { best = between; th = t; }
+        }
+      }
+      // 登記所の地積測量図の座標求積表には罫線（枠の線）がある。線があると数字と区別できず読めないので、
+      // 横・縦に長くつながった線を見つけて白く消す（白黒の判定はどちらのモードでも大津のしきい値で行う）
+      if (mode === 'gray') {
+        const total = gray.length; let sum = 0;
+        for (let t = 0; t < 256; t++) sum += t * hist[t];
+        let sumB = 0, wB = 0, best = -1;
+        for (let t = 0; t < 256; t++) { wB += hist[t]; if (!wB) continue; const wF = total - wB; if (!wF) break; sumB += t * hist[t]; const mB = sumB / wB, mF = (sum - sumB) / wF; const b2 = wB * wF * (mB - mF) ** 2; if (b2 > best) { best = b2; th = t; } }
+      }
+      const W = c.width, H = c.height;
+      const dark = (x: number, y: number) => gray[y * W + x] <= th;
+      const erase = new Uint8Array(W * H);
+      const minRun = (n: number, frac: number) => Math.max(20, Math.round(n * frac)); // 幅（高さ）の決まった割合以上つながった線（ふつうは35％）
+      for (let y = 0; y < H; y++) {
+        let run = 0;
+        for (let x = 0; x <= W; x++) {
+          if (x < W && dark(x, y)) { run++; continue; }
+          if (run >= minRun(W, lineFrac.h)) for (let k = x - run; k < x; k++) erase[y * W + k] = 1;
+          run = 0;
+        }
+      }
+      for (let x = 0; x < W; x++) {
+        let run = 0;
+        for (let y = 0; y <= H; y++) {
+          if (y < H && dark(x, y)) { run++; continue; }
+          if (run >= minRun(H, lineFrac.v)) for (let k = y - run; k < y; k++) erase[k * W + x] = 1;
+          run = 0;
+        }
+      }
+      for (let i = 0, j = 0; i < d.data.length; i += 4, j++) {
+        const v = erase[j] ? 255 : mode === 'bw' ? (gray[j] > th ? 255 : 0) : gray[j];
+        d.data[i] = d.data[i + 1] = d.data[i + 2] = v;
+      }
+      g.putImageData(d, 0, 0);
+      return c;
+    }
+    // 1行の文字から「点名・X・Y」を取り出す（小数点のある数を座標とみなし、最初の2つを X・Y にする）
+    function parseLines(text: string) {
+      const out: { name: string; x: string; y: string }[] = [];
+      for (const raw of text.split(/\r?\n/)) {
+        // 「12345. 678」のような、小数点まわりの空白をつめる
+        // 登記所の地積測量図の求積表は、小数点を点ではなく「すきま」で書く（例：-65825 721 ＝ -65825.721）。
+        // 数のあとに、すきまをあけてちょうど3けたの数が続くときは、小数点として読む
+        const line = raw.normalize('NFKC').replace(/,/g, '.').replace(/(\d)\s*\.\s*(\d)/g, '$1.$2')
+          .replace(/([-+]?\d+)\s+(\d{3})\.?(?!\d)/g, '$1.$2').replace(/\s+/g, ' ').trim();
+        if (!line) continue;
+        const tokens = line.split(' ');
+        // 荒い画像では小数点が消えやすい。小数点のない6けた以上の数は、下3けたを小数とみなす（表で必ず確かめてもらう）
+        for (let i = 0; i < tokens.length; i++) if (/^[-+]?\d{6,}$/.test(tokens[i])) tokens[i] = tokens[i].replace(/(\d{3})$/, '.$1');
+        const isCoord = (t: string) => /^[-+]?\d+\.\d+$/.test(t);
+        const idx = tokens.findIndex(isCoord);
+        if (idx < 0) continue;
+        const nums = tokens.slice(idx).filter(isCoord);
+        if (nums.length < 2) continue;
+        // 点名は、数の前にある英数字だけ（読みまちがいで入る記号を除く）。最後のかたまりを使う
+        let name = idx > 0 ? (tokens.slice(0, idx).map((t) => t.replace(/[^A-Za-z0-9]/g, '')).filter(Boolean).pop() ?? '') : '';
+        // 点名（K1・P12 など）の数字の部分で、よくある読みまちがい（l・I・| → 1、O・o → 0）を直す
+        // 点名は「英字1つ＋数字1〜3けた」（R1・K12 など）が多い。2文字めからは、数字によく似た英字を数字に読みかえる（a→4・S→5・T→1・B→8 など）
+        const m = name.match(/^([A-Za-z])([A-Za-z0-9|]{1,3})$/);
+        if (m) {
+          const toDigit: Record<string, string> = { a: '4', A: '4', S: '5', s: '5', T: '1', t: '1', l: '1', I: '1', i: '1', '|': '1', j: '1', J: '1', O: '0', o: '0', Q: '0', D: '0', B: '8', Z: '2', z: '2', g: '9', q: '9', G: '6', b: '6' };
+          name = m[1].toUpperCase() + [...m[2]].map((ch) => toDigit[ch] ?? ch).join('');
+        } else if (!/^([A-Za-z]{1,3})?\d{1,3}$/.test(name)) name = ''; // 長すぎる・数字の読みまちがいらしいものは点名にしない（数字だけは、点名の番号として残す）
+        out.push({ name, x: nums[0], y: nums[1] });
+      }
+      return out;
+    }
+    $('ocr').addEventListener('click', async () => {
+      if (!sel) return;
+      const msg = $('ocr-msg');
+      const btn = $('ocr') as HTMLButtonElement;
+      btn.disabled = true;
+      try {
+        const w = await getWorker((m) => (msg.textContent = m));
+        // 文字の大きさや画像のきれいさで読み取りの得意・不得意があるので、
+        // 拡大の倍率と白黒／灰色を何通りか変えて読み、座標らしい数（小数点以下3けた）がいちばん多く取れた結果を使う。
+        // 荒い画像（囲んだ幅が小さい）ほど大きく拡大する。
+        const base = Math.min(6, Math.max(1, 2400 / sel.w));
+        const tries: [number, 'bw' | 'gray'][] = [[base, 'bw'], [base, 'gray'], [Math.min(8, base * 1.6), 'bw'], [Math.min(8, base * 1.6), 'gray'], [Math.max(1, base * 0.7), 'bw'], [1, 'bw']];
+        let best = { text: '', pts: [] as Pt[], score: -1 };
+        const all: Pt[][] = [];
+        let coordLeft = Infinity; // 座標の列がはじまる位置（囲んだ部分の左はしから。図面の画素で）＝点名の列の右はし
+        let bestRows: { y0: number; y1: number }[] = []; // 座標を読めた行の上下の位置（囲んだ部分の上はしから）
+        for (const [i, [k, mode]] of tries.entries()) {
+          msg.textContent = `読み取り中…（${i + 1}/${tries.length}）`;
+          // 座標は「数字・小数点・マイナス」だけで読む（英字があると 5→S、8→B などの読みまちがいが起きる）
+          await w.setParameters({ tessedit_char_whitelist: '0123456789.- ' });
+          const { data } = await w.recognize(cropped(k, mode));
+          const got = parseLines(data.text);
+          all.push(got);
+          for (const wd of data.words ?? []) if (/^-?\d{4,}/.test(wd.text)) coordLeft = Math.min(coordLeft, wd.bbox.x0 / k);
+          const three = (v: string) => (/^[-+]?\d+\.\d{3}$/.test(v) ? 1 : 0);
+          const score = got.reduce((n, p) => n + three(p.x) + three(p.y), 0);
+          if (score > best.score) {
+            best = { text: data.text, pts: got, score };
+            bestRows = (data.lines ?? [])
+              .filter((l: any) => (l.words ?? []).filter((wd: any) => /^-?\d{4,}/.test(wd.text)).length >= 2)
+              .map((l: any) => ({ y0: l.bbox.y0 / k, y1: l.bbox.y1 / k }));
+          }
+        }
+        $('raw').textContent = best.text;
+        // 多数決：同じ行数で読めた結果どうしで、点名・X・Y を1つずつ見比べ、いちばん多く出た読み方を使う（読みまちがいを減らす）
+        const same = all.filter((r) => r.length === best.pts.length && r.length > 0);
+        const vote = (vals: string[]) => { const m = new Map<string, number>(); vals.forEach((v) => m.set(v, (m.get(v) ?? 0) + 1)); return [...m.entries()].sort((p, q) => q[1] - p[1])[0][0]; };
+        const pts = same.length >= 3
+          ? best.pts.map((p, i) => ({ name: vote(same.map((r) => r[i].name)), x: vote(same.map((r) => r[i].x)), y: vote(same.map((r) => r[i].y)) }))
+          : best.pts;
+        // 点名（R1・K2 など）：座標の列より左の「点名の列」だけを切り出し、英大文字と数字だけで何通りか読んで、
+        // 行の数が座標と同じになった結果どうしで多数決する。1文字めは英字、2文字めからは数字に読みかえる。
+        if (pts.length) {
+          // 座標を読んだとき（数字だけ）に取れた点名の番号（R1 の「1」など）。英字は次で読む
+          const nums = pts.map((p) => (p.name.match(/(\d{1,3})$/) ?? [])[1] ?? '');
+          pts.forEach((p) => (p.name = ''));
+          const fixName = (t: string) => {
+            const c = t.replace(/[^A-Za-z0-9|]/g, '').replace(/^[I1l|]+(?=[A-Z])/, ''); // 左の枠の線が「I」「1」と読まれたら除く
+            if (c.length < 2 || c.length > 4) return '';
+            const head: Record<string, string> = { '0': 'O', '1': 'I', '2': 'Z', '4': 'A', '5': 'S', '6': 'G', '8': 'B' };
+            const toDigit: Record<string, string> = { a: '4', A: '4', S: '5', s: '5', T: '1', t: '1', l: '1', I: '1', i: '1', '|': '1', j: '1', J: '1', O: '0', o: '0', Q: '0', D: '0', B: '8', Z: '2', z: '2', g: '9', q: '9', G: '6', b: '6' };
+            const first = (head[c[0]] ?? c[0]).toUpperCase();
+            const rest = [...c.slice(1)].map((ch) => toDigit[ch] ?? ch).join('');
+            return /^[A-Z]\d{1,3}$/.test(first + rest) ? first + rest : '';
+          };
+          // 行ごとに、点名のマス（座標の列より左）だけを切り出して、1行として読む。行の位置は座標を読んだときの位置を使うので、行がずれない
+          if (Number.isFinite(coordLeft) && coordLeft > 8 && sel && bestRows.length === pts.length) {
+            const nameW = Math.max(8, coordLeft - 4);
+            await w.setParameters({ tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', tessedit_pageseg_mode: '7' }); // 7＝1行
+            for (const [i, row] of bestRows.entries()) {
+              msg.textContent = `点名を読み取り中…（${i + 1}/${pts.length}）`;
+              const hgt = row.y1 - row.y0;
+              const pad = Math.max(2, hgt * 0.35);
+              let area = { x: sel.x, y: Math.max(0, sel.y + row.y0 - pad), w: nameW, h: hgt + pad * 2 };
+              // マスの中の「書いてある文字」だけの範囲にしぼる（まわりの枠の線や、となりのマスのかけらを入れない）
+              {
+                const probe = cropped(1, 'bw', area, { h: 0.6, v: 0.85 });
+                const pd = probe.getContext('2d')!.getImageData(0, 0, probe.width, probe.height).data;
+                const PW = probe.width, PH = probe.height;
+                const colDark = new Array(PW).fill(0), rowDark = new Array(PH).fill(0);
+                for (let yy = 0; yy < PH; yy++) for (let xx = 0; xx < PW; xx++) if (pd[(yy * PW + xx) * 4] < 128) { colDark[xx]++; rowDark[yy]++; }
+                // 端から見て、黒い画素が少しでもある最初と最後の列・行（細い線のかけらは無視）
+                const firstIdx = (a: number[], min: number) => a.findIndex((n) => n >= min);
+                const lastIdx = (a: number[], min: number) => a.length - 1 - [...a].reverse().findIndex((n) => n >= min);
+                const x0 = firstIdx(colDark, 2), x1 = lastIdx(colDark, 2), y0 = firstIdx(rowDark, 2), y1 = lastIdx(rowDark, 2);
+                if (x0 >= 0 && x1 > x0 + 3 && y0 >= 0 && y1 > y0 + 3) {
+                  const m = Math.max(3, (y1 - y0) * 0.25);
+                  area = { x: area.x + Math.max(0, x0 - m), y: area.y + Math.max(0, y0 - m), w: Math.min(PW, x1 - x0 + m * 2), h: Math.min(PH, y1 - y0 + m * 2) };
+                }
+              }
+              const nb = Math.min(10, Math.max(2, 120 / area.h)); // 1行の高さが120画素くらいになるように拡大
+              const v: string[] = [];
+              const letters: string[] = [];
+              for (const [k, mode] of [[nb, 'bw'], [nb, 'gray'], [nb * 1.4, 'bw'], [nb * 0.75, 'bw']] as [number, 'bw' | 'gray'][]) {
+                const { data: nd } = await w.recognize(cropped(k, mode, area, { h: 0.6, v: 0.85 })); // 小さなマスなので、文字の線を消さないよう枠の線だけ消す
+                const t = fixName(nd.text.trim());
+                if (t && !'TLCIE'.includes(t[0])) v.push(t); // 頭が T・L・C・I・E のものは、枠の線のかけらの読みまちがいが多いので使わない
+                // 英字だけ取れたとき：数字の直前か、いちばん最後の英字を、点名の頭の文字の候補にする（枠の線のかけらに見えやすい T・L・C・I・E は除く）
+                const lm = nd.text.toUpperCase().match(/([A-Z])(?=\s*\d)|([A-Z])\s*$/);
+                const ch = lm ? (lm[1] ?? lm[2]) : '';
+                if (ch && !'TLCIE'.includes(ch)) letters.push(ch);
+              }
+              const full = v.length ? vote(v) : '';
+              const letter = letters.length ? vote(letters) : '';
+              // ①英字＋数字で読めて、番号が座標のときの番号と同じ → それを使う ②英字と番号を組み合わせる ③英字＋数字で読めたもの
+              if (full && (!nums[i] || full.endsWith(nums[i]))) pts[i].name = full;
+              else if (letter && nums[i]) pts[i].name = letter + nums[i];
+              else if (full) pts[i].name = full;
+            }
+          }
+          await w.setParameters({ tessedit_pageseg_mode: '6' });
+          // 読めなかった点名は空にせず、推測した名前を入れて「推測」の印（黄色）を付ける（運営者の希望・11/6）
+          //  英字：いちばん近い（上→下の順に探す）読めた点名の英字。読めた点名が1つもなければ「P」
+          //  番号：座標を読んだときに取れた番号。なければ、その英字でまだ使っていない番号のうち小さい順
+          const named = pts.map((p) => p.name.match(/^([A-Z]+)(\d+)$/));
+          const used = new Set(pts.map((p) => p.name).filter(Boolean));
+          pts.forEach((p, i) => {
+            if (p.name) return;
+            let letter = '';
+            for (let d = 1; d < pts.length && !letter; d++) {
+              const up = named[i - d], down = named[i + d];
+              letter = (up && up[1]) || (down && down[1]) || '';
+            }
+            letter ||= 'P';
+            let no = nums[i];
+            if (!no || used.has(letter + no)) { let n = 1; while (used.has(letter + n)) n++; no = String(n); }
+            p.name = letter + no;
+            p.guess = true;
+            used.add(p.name);
+          });
+        }
+        if (!pts.length) {
+          msg.textContent = '⚠ 座標を見つけられませんでした。①表の部分だけを、少し余白をつけて囲み直す ②画像が荒いときは、スキャンなら300dpi以上、写真なら明るい所でまっすぐ撮り直す ③法務局の写しがPDFならPDFのまま選ぶ、を試してください。読めないときは、表に手で入れることもできます。';
+        } else {
+          setRows(pts);
+          const guessed = pts.filter((p) => p.guess).length;
+          msg.textContent = `${pts.length}点を読み取りました。下の表で、図面と見比べて確かめてください。`
+            + (guessed ? `点名が読めなかった ${guessed}点は、推測した名前を黄色で入れています（図面で確かめて直してください）。` : '');
+          $('s3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } catch (err) {
+        msg.textContent = '⚠ 読み取れませんでした。インターネットにつながっているか確かめてください（はじめての読み取りでは部品を読みこみます）。';
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── 3. 表 ──
+    type Pt = { name: string; x: string; y: string; guess?: boolean }; // guess＝読めなかったので推測した点名（黄色で表示）
+    const body = $('rows') as HTMLTableSectionElement;
+    const f = (tr: Element, c: string) => tr.querySelector(c) as HTMLInputElement;
+    function addRow(p: Pt = { name: '', x: '', y: '' }, focus = false) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td class="no"></td><td><input type="text" class="c-name" aria-label="点名" /></td><td><input type="text" inputmode="decimal" class="c-x" aria-label="X座標" /></td><td><input type="text" inputmode="decimal" class="c-y" aria-label="Y座標" /></td><td><button type="button" class="del" aria-label="この点を削除">×</button></td>';
+      f(tr, '.c-name').value = p.name; f(tr, '.c-x').value = p.x; f(tr, '.c-y').value = p.y;
+      if (p.guess) {
+        const nm = f(tr, '.c-name');
+        nm.classList.add('is-guess');
+        nm.title = '読み取れなかったので推測した点名です。図面で確かめて直してください（直すと黄色が消えます）';
+      }
+      body.append(tr); renumber();
+      if (focus) f(tr, '.c-x').focus();
+    }
+    function renumber() { [...body.rows].forEach((tr, i) => { tr.querySelector('.no')!.textContent = String(i + 1); f(tr, '.c-name').placeholder = String(i + 1); }); }
+    function setRows(list: Pt[]) { body.innerHTML = ''; list.forEach((p) => addRow(p)); while (body.rows.length < 4) addRow(); updateGuessNote(); update(); }
+    const num = (v: string) => (v.trim() === '' ? NaN : Number(v.normalize('NFKC').trim()));
+    function readPts() {
+      return [...body.rows].map((tr, i) => ({ no: i + 1, name: f(tr, '.c-name').value.trim() || String(i + 1), xs: f(tr, '.c-x').value, ys: f(tr, '.c-y').value }))
+        .filter((r) => r.xs.trim() || r.ys.trim())
+        .map((r) => ({ ...r, x: num(r.xs), y: num(r.ys) }));
+    }
+    body.addEventListener('input', (e) => {
+      // 推測の点名を自分で直したら、黄色の印を消す
+      const t = e.target as HTMLInputElement;
+      if (t.classList?.contains('is-guess')) { t.classList.remove('is-guess'); t.title = ''; updateGuessNote(); }
+      update();
+    });
+    // 表の上の「推測が残っています」の知らせ
+    function updateGuessNote() {
+      const n = body.querySelectorAll('.is-guess').length;
+      const el = $('guess-note');
+      el.hidden = n === 0;
+      el.textContent = `⚠ 黄色の点名（${n}点）は、読み取れなかったので推測した名前です。図面で確かめて直してください。`;
+    }
+    body.addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest('.del'); if (!b) return; b.closest('tr')!.remove(); renumber(); update(); });
+    body.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      const ins = [...body.querySelectorAll('input')]; const i = ins.indexOf(e.target);
+      if (i === ins.length - 1) addRow(undefined, true); else ins[i + 1].focus();
+    });
+    body.addEventListener('paste', (e) => {
+      const t = e.clipboardData?.getData('text') ?? '';
+      if (!/[\n\t]/.test(t.trim())) return;
+      e.preventDefault();
+      setRows(t.split(/\r?\n/).map((l) => l.normalize('NFKC').trim()).filter(Boolean).map((l) => { const p = l.split(/[\s,]+/); return p.length >= 3 ? { name: p[0], x: p[1], y: p[2] } : { name: '', x: p[0] ?? '', y: p[1] ?? '' }; }));
+    });
+    $('add').addEventListener('click', () => addRow(undefined, true));
+    $('clear').addEventListener('click', () => setRows([]));
+
+    // ── 4. 検算 ──
+    const floorTo = (v: number, unit: number) => Math.floor(Math.round((v / unit) * 1e6) / 1e6) * unit;
+    function update() {
+      const out = $('check');
+      const pts = readPts();
+      const bad = pts.filter((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y));
+      if (bad.length) { out.innerHTML = bad.map((p) => `<p class="tool__error">No.${p.no} の X・Y を数字で入れてください。</p>`).join(''); preview(); return; }
+      if (pts.length < 3) { out.innerHTML = pts.length ? '<p class="tool__note">3点以上で面積を計算します。</p>' : ''; preview(); return; }
+      let sum = 0;
+      pts.forEach((p, i) => { const prev = pts[(i - 1 + pts.length) % pts.length], next = pts[(i + 1) % pts.length]; sum += p.x * (next.y - prev.y); });
+      const area = Math.abs(sum) / 2;
+      const kind = ($('kind') as HTMLSelectElement).value;
+      const toki = kind === 'other' && area > 10 ? floorTo(area, 1) : floorTo(area, 0.01);
+      const tokiS = kind === 'other' && area > 10 ? toki.toFixed(0) : toki.toFixed(2);
+      const stated = num(($('stated') as HTMLInputElement).value);
+      let judge = '<p class="tool__note">図面に書いてある地積を入れると、合っているか確かめられます。</p>';
+      if (Number.isFinite(stated)) {
+        judge = Math.abs(toki - stated) < 1e-6
+          ? '<p class="tool__ok">✅ 図面の地積と一致しました。</p>'
+          : `<p class="tool__ng">⚠ 図面の地積（${stated}㎡）と ${Math.abs(toki - stated).toFixed(2)}㎡ ちがいます。表の数字に読みまちがいがないか、点の抜けがないか確かめてください。</p>`;
+      }
+      out.innerHTML = `<p>${pts.length}点・面積 <span class="tool__big">${area.toFixed(6)}</span> ㎡（倍面積 ${Math.abs(sum).toFixed(6)}）／登記の地積にすると <strong>${tokiS} ㎡</strong></p>${judge}`;
+      preview();
+    }
+    ['stated', 'kind'].forEach((id) => $(id).addEventListener('input', update));
+
+    // ── 5. SIMA で保存 ──
+    function simText() {
+      const pts = readPts().filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
+      const L: string[] = ['A00,'];
+      pts.forEach((p, i) => L.push(`A01,${i + 1},${p.name},${p.x.toFixed(3)},${p.y.toFixed(3)},0.000,`));
+      L.push('A99,');
+      if (($('lot') as HTMLInputElement).checked && pts.length >= 3) {
+        L.push(`D00,1,${($('chiban') as HTMLInputElement).value.trim()},1,`);
+        pts.forEach((p, i) => L.push(`B01,${i + 1},${p.name},`));
+        L.push('D99,');
+      }
+      return { text: L.join('\r\n') + '\r\n', count: pts.length };
+    }
+    function preview() { $('preview').textContent = simText().text; }
+    ['lot', 'chiban'].forEach((id) => $(id).addEventListener('input', preview));
+    $('save').addEventListener('click', async () => {
+      const msg = $('save-msg');
+      const { text, count } = simText();
+      if (count < 1) { msg.textContent = '⚠ 点がありません。'; return; }
+      // 点名・地番に日本語があるときは Shift_JIS に変える（英数字だけならそのまま同じ）
+      let blob: Blob;
+      if (/[^\x00-\x7f]/.test(text)) {
+        try {
+          if (!(window as any).Encoding) await loadScript(ENC);
+          const E = (window as any).Encoding;
+          const sjis = E.convert(E.stringToCode(text), { to: 'SJIS', from: 'UNICODE' });
+          blob = new Blob([new Uint8Array(sjis)], { type: 'text/plain' });
+        } catch {
+          msg.textContent = '⚠ 日本語を Shift_JIS に変える部品を読みこめませんでした。点名を英数字にするか、インターネットにつながっているか確かめてください。';
+          return;
+        }
+      } else {
+        blob = new Blob([text], { type: 'text/plain' });
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${(($('fname') as HTMLInputElement).value.trim() || 'chiseki').replace(/[\\/:*?"<>|]/g, '_')}.sim`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      msg.textContent = `${count}点を保存しました。`;
+    });
+
+    setRows([]);
+  </script>
+</BaseLayout>

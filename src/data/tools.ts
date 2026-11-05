@@ -59,6 +59,14 @@ export const TOOLS: Tool[] = [
     group: 'keisan',
   },
   {
+    id: 'sim',
+    name: '地積測量図からSIMデータを作る（OCR）',
+    short: '測量図→SIM',
+    desc: '地積測量図のPDF・画像の座標求積表を文字読み取り（OCR）で表にし、面積の検算をしてから、SIMA形式（.sim）で保存します。ファイルはパソコンの中だけで処理し、どこにも送りません。',
+    who: '実務者',
+    group: 'keisan',
+  },
+  {
     id: 'benkyou',
     name: '勉強プランナー（土地家屋調査士試験）',
     short: '勉強プランナー',
