@@ -1,0 +1,154 @@
+---
+// 土地家屋調査士試験の勉強プランナー（残り日数・必要な勉強時間の計算と、過去問のチェック表）
+// 入力した内容は、使っている人のブラウザの中（localStorage）にだけ保存されます。サーバーには送りません。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+
+// 過去問（法務省で公開されている年度）
+const YEARS = [
+  { label: '令和7年度', href: 'https://www.moj.go.jp/MINJI/minji05_00732.html' },
+  { label: '令和6年度', href: 'https://www.moj.go.jp/MINJI/minji05_00663.html' },
+  { label: '令和5年度', href: 'https://www.moj.go.jp/MINJI/minji05_00568.html' },
+  { label: '令和4年度', href: 'https://www.moj.go.jp/MINJI/minji05_00485.html' },
+  { label: '令和3年度', href: 'https://www.moj.go.jp/MINJI/minji05_00412.html' },
+];
+const PARTS = ['午前 択一', '午前 記述', '午後 択一', '午後 土地', '午後 建物'];
+---
+<BaseLayout title="勉強プランナー（土地家屋調査士試験）" description="土地家屋調査士試験までの残り日数と、目標の勉強時間に届くかを計算します。過去問のチェック表つき。入力はブラウザの中だけに保存されます。">
+  <StationSign kicker="計算ツール" title="勉強プランナー" sub="STUDY PLANNER" prev={TOOLS_TOP} />
+
+  <section class="tool" aria-labelledby="p-h">
+    <h2 id="p-h">試験までの計画を立てる</h2>
+    <p class="tool__note">入力した内容は、このブラウザの中にだけ保存されます（サーバーには送りません）。</p>
+    <form id="plan" onsubmit="return false">
+      <div class="tool__row"><label for="p-exam">試験日</label><input id="p-exam" name="exam" type="date" /></div>
+      <div class="tool__row"><label for="p-goal">目標の勉強時間（合計）</label><input id="p-goal" name="goal" type="number" min="0" step="10" value="1000" /> 時間</div>
+      <div class="tool__row"><label for="p-done">これまでに勉強した時間</label><input id="p-done" name="done" type="number" min="0" step="1" value="0" /> 時間</div>
+      <div class="tool__row"><label for="p-wd">平日1日の勉強時間</label><input id="p-wd" name="wd" type="number" min="0" step="0.5" value="2" /> 時間</div>
+      <div class="tool__row"><label for="p-we">休日1日の勉強時間</label><input id="p-we" name="we" type="number" min="0" step="0.5" value="5" /> 時間</div>
+    </form>
+    <div class="tool__result" id="p-result" aria-live="polite"></div>
+  </section>
+
+  <section class="tool" aria-labelledby="k-h">
+    <h2 id="k-h">過去問のチェック表</h2>
+    <p class="tool__note">解き終わったものに印を付けましょう。年度の名前を押すと、法務省の試験問題のページが開きます。</p>
+    <div class="calc-wrap">
+      <table class="calc-table" id="kakomon">
+        <thead><tr><th>年度</th>{PARTS.map((p) => <th>{p}</th>)}</tr></thead>
+        <tbody>
+          {YEARS.map((y, yi) => (
+            <tr>
+              <td><a href={y.href} target="_blank" rel="noopener">{y.label}</a></td>
+              {PARTS.map((p, pi) => (
+                <td style="text-align:center"><input type="checkbox" data-key={`${yi}-${pi}`} aria-label={`${y.label} ${p}`} /></td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="tool__note" id="k-count"></p>
+    <button type="button" class="tool__btn tool__btn--sub" id="k-reset">チェックを全部消す</button>
+  </section>
+
+  <div class="page-body">
+    <h2>計算のしかた</h2>
+    <ul>
+      <li>今日から試験日の前日までの日数を、平日（月〜金）と休日（土・日）に分けて数えます。祝日は平日として数えます。</li>
+      <li>見込みの勉強時間 ＝ これまでの時間 ＋ 平日の日数 × 平日の時間 ＋ 休日の日数 × 休日の時間</li>
+      <li>試験日の初期値は、例年の日程（10月の第3日曜日）から計算した目安です。その年の受験案内書で必ず確かめてください。</li>
+      <li>目標の勉強時間の初期値（1,000時間）は、あくまで目安です。測量や登記の経験、午前の部を免除するかどうかで大きく変わります。</li>
+    </ul>
+    <p>試験の中身は、<a href="/articles/shiken-shikumi/">土地家屋調査士試験のしくみ</a>で紹介しています。</p>
+  </div>
+
+  <script>
+    const KEY = 'hikkai-benkyou-v1';
+    type Saved = { plan?: Record<string, string>; kakomon?: Record<string, boolean> };
+    const load = (): Saved => {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch { return {}; }
+    };
+    const save = (s: Saved) => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} };
+    let saved = load();
+
+    // 10月の第3日曜日（今年がもう過ぎていれば来年）
+    const thirdSundayOfOct = (y: number) => {
+      const d = new Date(y, 9, 1);
+      const first = (7 - d.getDay()) % 7; // 最初の日曜日まで
+      return new Date(y, 9, 1 + first + 14);
+    };
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    let def = thirdSundayOfOct(today.getFullYear());
+    if (def <= today) def = thirdSundayOfOct(today.getFullYear() + 1);
+    const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    const form = document.getElementById('plan') as HTMLFormElement;
+    const result = document.getElementById('p-result')!;
+    (form.elements.namedItem('exam') as HTMLInputElement).value = iso(def);
+    for (const [k, v] of Object.entries(saved.plan ?? {})) {
+      const el = form.elements.namedItem(k) as HTMLInputElement | null;
+      if (el && v !== '') el.value = v;
+    }
+
+    const num = (name: string) => {
+      const v = Number((form.elements.namedItem(name) as HTMLInputElement).value);
+      return Number.isFinite(v) && v >= 0 ? v : 0;
+    };
+    const f1 = (v: number) => v.toLocaleString('ja-JP', { maximumFractionDigits: 1 });
+
+    const calc = () => {
+      const examStr = (form.elements.namedItem('exam') as HTMLInputElement).value;
+      const exam = examStr ? new Date(examStr + 'T00:00:00') : null;
+      saved.plan = Object.fromEntries(['exam', 'goal', 'done', 'wd', 'we'].map((n) => [n, (form.elements.namedItem(n) as HTMLInputElement).value]));
+      save(saved);
+      if (!exam || exam <= today) {
+        result.innerHTML = '<p class="tool__error">今日より後の試験日を入れてください。</p>';
+        return;
+      }
+      let weekdays = 0, holidays = 0;
+      for (const d = new Date(today); d < exam; d.setDate(d.getDate() + 1)) {
+        const w = d.getDay();
+        if (w === 0 || w === 6) holidays++; else weekdays++;
+      }
+      const days = weekdays + holidays;
+      const goal = num('goal'), done = num('done');
+      const expect = done + weekdays * num('wd') + holidays * num('we');
+      const rest = Math.max(goal - done, 0);
+      const perDay = days > 0 ? rest / days : 0;
+      const ok = expect >= goal;
+      result.innerHTML = `
+        <p>試験まで <span class="tool__big">${days.toLocaleString('ja-JP')}</span> 日（平日 ${weekdays}日・休日 ${holidays}日）</p>
+        <p>今のペースで続けると、試験日までに <strong>${f1(expect)}時間</strong>（目標 ${f1(goal)}時間）</p>
+        <p class="${ok ? 'tool__ok' : 'tool__ng'}">${ok ? '目標に届く見込みです。' : `あと ${f1(goal - expect)}時間 足りません。`}</p>
+        <p class="tool__note">目標まで残り ${f1(rest)}時間。毎日同じだけ勉強するなら、1日あたり約 ${f1(perDay)}時間です。</p>`;
+    };
+    form.addEventListener('input', calc);
+    calc();
+
+    // 過去問のチェック表
+    const boxes = [...document.querySelectorAll<HTMLInputElement>('#kakomon input[type=checkbox]')];
+    const countEl = document.getElementById('k-count')!;
+    const paint = () => {
+      const n = boxes.filter((b) => b.checked).length;
+      countEl.textContent = `${boxes.length}こ中 ${n}こ 解き終わりました。`;
+    };
+    boxes.forEach((b) => {
+      b.checked = !!saved.kakomon?.[b.dataset.key!];
+      b.addEventListener('change', () => {
+        saved.kakomon = { ...(saved.kakomon ?? {}), [b.dataset.key!]: b.checked };
+        save(saved);
+        paint();
+      });
+    });
+    document.getElementById('k-reset')!.addEventListener('click', () => {
+      if (!confirm('過去問のチェックを全部消しますか？')) return;
+      boxes.forEach((b) => (b.checked = false));
+      saved.kakomon = {};
+      save(saved);
+      paint();
+    });
+    paint();
+  </script>
+</BaseLayout>

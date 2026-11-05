@@ -2,7 +2,7 @@
 // 1件ごとに { } で囲んで並べます。説明は自分の言葉で書き、他サイトの文章は写さないこと。
 // ロゴや画像は使いません（文字のリンクだけ）。
 
-export const LINK_CATEGORIES = ['地図・GIS', '登記・資料の取得', '法令・制度', '測量・技術', '相談先'] as const;
+export const LINK_CATEGORIES = ['地図・GIS', '登記・資料の取得', '法令・制度', '測量・技術', '資格・試験', '相談先'] as const;
 export const LINK_KINDS = ['公式', 'ツール', '資料', 'ブログ'] as const;
 export const LINK_AUDIENCES = ['一般', '実務者'] as const;
 export const LINK_PRICES = ['無料', '一部有料', '有料'] as const;
@@ -178,6 +178,20 @@ export const LINKS: LinkItem[] = [
     kind: '資料',
     price: '無料',
     checked: '2026-11-04',
+  },
+
+  // ---------- 資格・試験 ----------
+  {
+    name: '法務省「土地家屋調査士試験」',
+    url: 'https://www.moj.go.jp/shikaku_saiyo_index5.html',
+    desc: '土地家屋調査士試験の公式ページです。年度ごとに、受験案内書・試験問題（過去問）・多肢択一式の正解と基準点・合格者数などが公開されています。',
+    category: '資格・試験',
+    audience: ['一般', '実務者'],
+    kind: '公式',
+    price: '無料',
+    checked: '2026-11-05',
+    note: '試験問題は年度ごとのページからPDFで見られます。記述式の正解（模範解答）は公開されていません。',
+    related: { label: '土地家屋調査士試験をくわしく', href: '/articles/shiken-kuwashiku/' },
   },
 
   // ---------- 相談先 ----------
