@@ -16,6 +16,9 @@ export async function getPublishedArticles(): Promise<Article[]> {
 
 export const isKiso = (a: Article) => getLine(a.data.category).isKiso;
 
+// 基礎知識のページで「まずはここから」として最初に出す記事（ファイル名から .md を除いた名前）
+export const KISO_FIRST = 'hikkai-to-shoyukenkai';
+
 export function formatDate(d: Date) {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
