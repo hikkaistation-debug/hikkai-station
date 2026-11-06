@@ -1,7 +1,7 @@
 ---
 // サイト内検索（ブラウザの中だけで動く、かんたんな検索）
 // ・記事はタイトル・要約・ひとこと・タグに加えて、本文の中身も探します。
-// ・キーワードがあるときは、用語・法令（法令ナビ）・通達（通達ナビ）・判例（判例ナビ）もあわせて表示します。
+// ・キーワードがあるときは、用語・法令（法令ナビ）・通達（通達ナビ）・判例（判例ナビ）・車内の読み物（小説）もあわせて表示します。
 // ・用語さくいんの言葉とよみを「関連ワード」として使います（「ぶんぴつ」→「分筆」を含む記事も出ます）。
 // ・「絞り込みパネル」で、路線・タグを組み合わせられます（対象とならび順は記事一覧の上のボタン）。
 // ・キーワードが空でも、絞り込みだけで記事をさがせます。
@@ -14,7 +14,7 @@ import { TERMINAL } from '../data/site';
 import { LINES } from '../data/lines';
 import { TAG_GROUPS } from '../data/tags';
 ---
-<BaseLayout title="サイト内検索" description="サイト内の記事・用語・法令・通達・判例を、キーワード・路線・タグでさがせます。">
+<BaseLayout title="サイト内検索" description="サイト内の記事・用語・法令・通達・判例・車内の読み物を、キーワード・路線・タグでさがせます。">
   <StationSign kicker="駅の施設" title="サイト内検索" sub="SEARCH" prev={TERMINAL} />
 
   <form class="search-box" action="/search/" method="get" role="search" id="search-form">
@@ -57,6 +57,18 @@ import { TAG_GROUPS } from '../data/tags';
   <p id="search-status" aria-live="polite"></p>
   <p id="search-related" class="search-related" hidden></p>
 
+  <!-- ならび順：記事 → 車内の読み物（小説） → 用語 → 法令 → 通達 → 判例（運営者の希望・2026-11-07） -->
+  <section id="article-section" hidden aria-labelledby="article-h">
+    <h2 id="article-h">記事</h2>
+    <ListControls />
+    <ul class="card-list" id="search-results"></ul>
+  </section>
+
+  <section id="story-section" hidden aria-labelledby="story-h">
+    <h2 id="story-h">車内の読み物（小説）</h2>
+    <ul class="card-list" id="story-results"></ul>
+  </section>
+
   <section id="term-section" hidden aria-labelledby="term-h">
     <h2 id="term-h">用語さくいん</h2>
     <ul class="card-list" id="term-results"></ul>
@@ -77,17 +89,12 @@ import { TAG_GROUPS } from '../data/tags';
     <ul class="card-list" id="case-results"></ul>
   </section>
 
-  <section id="article-section" hidden aria-labelledby="article-h">
-    <h2 id="article-h">記事</h2>
-    <ListControls />
-    <ul class="card-list" id="search-results"></ul>
-  </section>
 </BaseLayout>
 
 <script>
   type Term = { url: string; title: string; summary: string; text: string };
   type Article = Term & { category: string; level: string; line: string; tags: string[]; color: string; date: string; dateISO: string };
-  type Data = { terms: Term[]; laws: Term[]; circulars: Term[]; cases?: Term[]; articles: Article[]; synonyms: { words: string[] }[] };
+  type Data = { terms: Term[]; laws: Term[]; circulars: Term[]; cases?: Term[]; stories?: Term[]; articles: Article[]; synonyms: { words: string[] }[] };
 
   const LEVEL: Record<string, string> = { easy: 'やさしい', normal: 'ふつう', expert: '専門' };
 
@@ -103,6 +110,8 @@ import { TAG_GROUPS } from '../data/tags';
   const circularList = document.getElementById('circular-results')!;
   const caseSection = document.getElementById('case-section')!;
   const caseList = document.getElementById('case-results')!;
+  const storySection = document.getElementById('story-section')!;
+  const storyList = document.getElementById('story-results')!;
   const articleSection = document.getElementById('article-section')!;
   const articleList = document.getElementById('search-results')!;
   const facetSummary = document.getElementById('facet-summary')!;
@@ -112,7 +121,7 @@ import { TAG_GROUPS } from '../data/tags';
   const normalize = (s: string) =>
     s.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 
-  let data: Data = { terms: [], laws: [], circulars: [], cases: [], articles: [], synonyms: [] };
+  let data: Data = { terms: [], laws: [], circulars: [], cases: [], stories: [], articles: [], synonyms: [] };
   const selected = { line: new Set<string>(), tag: new Set<string>() };
 
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) {
@@ -170,6 +179,7 @@ import { TAG_GROUPS } from '../data/tags';
     lawList.replaceChildren();
     circularList.replaceChildren();
     caseList.replaceChildren();
+    storyList.replaceChildren();
     articleList.replaceChildren();
     related.hidden = true;
     const words = normalize(q).split(/\s+/).filter(Boolean);
@@ -210,6 +220,8 @@ import { TAG_GROUPS } from '../data/tags';
     const circulars = words.length > 0 ? data.circulars.filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b)) : [];
     const cases = words.length > 0 ? (data.cases ?? []).filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b)) : [];
 
+    const stories = words.length > 0 ? (data.stories ?? []).filter((t) => match(t.text)).sort((a, b) => inTitle(a) - inTitle(b)) : [];
+
     const extra = [...new Set(groups.flat())].filter((w) => !words.includes(w));
     if (extra.length > 0) {
       related.textContent = `関連ワード「${extra.join('」「')}」でもさがしました。`;
@@ -217,17 +229,19 @@ import { TAG_GROUPS } from '../data/tags';
     }
     const conds = [q && `「${q}」`, ...[...selected.line].map((v) => chips.find((c) => c.dataset.value === v)?.textContent?.replace(/\d+$/, '').trim()), ...[...selected.tag].map((t) => `#${t}`)].filter(Boolean);
     status.textContent = conds.length > 0
-      ? `${conds.join(' × ')} の検索結果：用語 ${terms.length}件・法令 ${laws.length}件・通達 ${circulars.length}件・判例 ${cases.length}件・記事 ${articles.length}件`
+      ? `${conds.join(' × ')} の検索結果：記事 ${articles.length}件・読み物 ${stories.length}件・用語 ${terms.length}件・法令 ${laws.length}件・通達 ${circulars.length}件・判例 ${cases.length}件`
       : `すべての記事：${articles.length}件（キーワードや絞り込みでさがせます）`;
     termSection.hidden = terms.length === 0;
     lawSection.hidden = laws.length === 0;
     circularSection.hidden = circulars.length === 0;
     caseSection.hidden = cases.length === 0;
+    storySection.hidden = stories.length === 0;
     articleSection.hidden = articles.length === 0;
     terms.forEach((t) => termList.append(card(t, false)));
     laws.forEach((t) => lawList.append(card(t, false)));
     circulars.forEach((t) => circularList.append(card(t, false)));
     cases.forEach((t) => caseList.append(card(t, false)));
+    stories.forEach((t) => storyList.append(card(t, false)));
     articles.forEach((a) => articleList.append(card(a, true)));
     document.dispatchEvent(new Event('cards-updated'));
   }

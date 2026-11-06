@@ -2,12 +2,14 @@
 // ・用語さくいん（言葉・よみ・説明）
 // ・記事（タイトル・要約・ひとこと・タグ・カテゴリ・本文）
 // ・法令ナビの条文、通達ナビの通達、判例ナビの判例（名称・説明・分野・キーワード）
+// ・車内の読み物（小説）：公開日が来た話だけ（タイトル・あらすじ・今日のひとこと・本文）
 import { getLine } from '../data/lines';
 import { getPublishedArticles, formatDate, isoDate } from '../data/articles';
 import { GLOSSARY } from '../data/glossary';
 import { HOUREI, LAWS, houreiTitle } from '../data/hourei';
 import { sortedTsutatsu, wareki } from '../data/tsutatsu';
 import { sortedHanrei, hanreiWareki, hanreiTitle } from '../data/hanrei';
+import { getPublishedStories, getTrain, storyHref } from '../data/trains';
 
 // Markdown の本文から、記号やHTMLを取りのぞいて文字だけにする
 function plainText(md: string | undefined) {
@@ -71,9 +73,21 @@ export async function GET() {
     text: [h.court, h.caseNo, h.caseName, hanreiWareki(h.date), h.reporter ?? '', h.point, h.explain, h.holding, h.summaryOfficial, ...h.laws, ...h.fields, ...h.keywords].join(' '),
     category: '判例',
   }));
+  // 車内の読み物（小説）：公開日が来た話だけ（公開前の話は入れない）
+  const stories = (await getPublishedStories()).map((st) => {
+    const train = getTrain(st.data.train);
+    const label = `${train.kind}「${train.title}」第${st.data.no}話`;
+    return {
+      url: storyHref(st),
+      title: `第${st.data.no}話　${st.data.title}`,
+      summary: `${label}。${st.data.summary}`,
+      text: [label, st.data.title, st.data.summary, st.data.point, plainText(st.body)].join(' '),
+      category: '車内の読み物',
+    };
+  });
   // 関連ワード：用語とそのよみ（「ぶんぴつ」で「分筆」を含む記事も見つかるようにする）
   const synonyms = GLOSSARY.map((t) => ({ words: [t.term.replace(/（.*?）/g, ''), t.yomi] }));
-  return new Response(JSON.stringify({ terms, laws, circulars, cases, articles, synonyms }), {
+  return new Response(JSON.stringify({ terms, laws, circulars, cases, stories, articles, synonyms }), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 }
