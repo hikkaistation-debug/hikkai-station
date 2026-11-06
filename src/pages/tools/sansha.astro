@@ -1,0 +1,622 @@
+---
+// 三斜求積から辺の長さを計算
+// 古い地積測量図の三斜求積（底辺×高さ÷2）の数字から、三角形をつなげて図を組み立て、周りの辺の長さを出す。
+// 調べてわかった古い図面の実態（2026-11-06）に合わせた機能：
+// - 垂線の足の位置は図面に書かれない → 「足まで（長さ）」「足まで（図上 mm・縮尺で換算）」「辺 AC」「辺 BC」「辺 AC と BC」から選ぶ
+// - 数字は図面から 5cm 単位などで読み取ったものが多い → 丸めの幅を選ぶと、辺の長さの幅（最小〜最大）を出す
+// - 昭和41年3月までは間・尺の図面もある → 単位を選べる（1間＝60/33 m、1尺＝10/33 m）、坪も表示（1坪＝400/121 ㎡）
+// - 求積表には倍面積の列がある → 入れると「底辺×高さ」と合うか確かめる（写しまちがいの発見）
+// - 結果の仮の座標を「点名 X Y」で出し、座標面積のツールに貼り付けられるようにする
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="三斜求積から辺の長さを計算" description="古い地積測量図の三斜求積（底辺・高さ）の数字から、三角形をつなげて図を組み立て、土地の周りの辺の長さ・面積を計算します。間・尺の図面、数字の丸めの幅、倍面積の検算にも対応。">
+  <StationSign kicker="便利ツール" title="三斜求積から辺の長さを計算" sub="TRIANGLE TO SIDE LENGTHS" prev={TOOLS_TOP} />
+
+  <p>
+    古い地積測量図には、土地を三角形に分けて「底辺 × 高さ ÷ 2」で面積を出す<strong>三斜求積</strong>のものが多くあります。
+    このツールは、三斜の数字から三角形をつなげて図を組み立て、<strong>土地の周りの辺の長さ</strong>を計算します。入れた数字はどこにも送りません。
+  </p>
+
+  <section class="tool" aria-labelledby="s-h1">
+    <h2 id="s-h1">1. 図面のようすを選ぶ</h2>
+    <div class="tool__row">
+      <label for="unit">数字の単位</label>
+      <select id="unit">
+        <option value="m">メートル（m）</option>
+        <option value="ken">間（けん）</option>
+        <option value="shaku">尺（しゃく）</option>
+      </select>
+    </div>
+    <p class="tool__note">昭和41年3月までの図面には、間・坪で書かれたものや、単位が書いていないものがあります。数字の大きさが土地の広さと合わないときは、間で書かれていないか確かめてください（1間 ＝ 約1.818m）。</p>
+    <div class="tool__row">
+      <label for="tol">数字の丸め</label>
+      <select id="tol">
+        <option value="0">考えない</option>
+        <option value="0.005">1cm 単位（小数第2位まで）</option>
+        <option value="0.025" selected>5cm 単位</option>
+        <option value="0.05">10cm 単位（小数第1位まで）</option>
+      </select>
+    </div>
+    <p class="tool__note">古い三斜の数字は、図面から三角スケールで 5cm 単位などに読み取ったものが多くあります。丸めを選ぶと、底辺・高さ・入れた数字がその半分（5cm 単位なら ±2.5cm）ずれたときの、辺の長さの幅も出します。</p>
+    <div class="tool__row">
+      <label for="scale">図面の縮尺　1 /</label>
+      <input type="text" inputmode="decimal" id="scale" value="250" size="6" class="sansha-in" />
+    </div>
+    <p class="tool__note">縮尺は「足まで（図上 mm）」を使うときだけ使います。古い図面は 1/200〜1/500 くらいが多いです。</p>
+  </section>
+
+  <section class="tool" aria-labelledby="s-h2">
+    <h2 id="s-h2">2. 三斜の数字を入れる</h2>
+    <p class="tool__note">
+      1行に三角形1つ。底辺の両はしの点（A・B）と、高さを下ろす頂点（C）に、図面の点名や番号を入れてください。
+      同じ点には同じ名前を付けると、三角形どうしが同じ底辺でつながります。
+    </p>
+    <div class="calc-wrap">
+      <table class="coord-table sansha-table">
+        <thead>
+          <tr>
+            <th scope="col">No.</th>
+            <th scope="col">底辺の<br />端 A</th>
+            <th scope="col">底辺の<br />端 B</th>
+            <th scope="col">頂点 C</th>
+            <th scope="col">底辺</th>
+            <th scope="col">高さ</th>
+            <th scope="col">倍面積<br /><small>（あれば）</small></th>
+            <th scope="col">形を決める数字</th>
+            <th scope="col">値</th>
+            <th scope="col">値2<br /><small>（辺 BC）</small></th>
+            <th scope="col">C の側</th>
+            <th scope="col"><span class="visually-hidden">削除</span></th>
+          </tr>
+        </thead>
+        <tbody id="tri-rows"></tbody>
+      </table>
+    </div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="add-row">＋ 三角形を追加</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="sample">例を入れる</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="clear">すべて消す</button>
+    </div>
+    <details class="sansha-box" open>
+      <summary>入れ方のくわしい説明</summary>
+      <ul class="tool__note sansha-help">
+        <li><strong>底辺と高さ</strong>：図面や三斜求積表の数字をそのまま入れます。図面では、三斜の線は一点鎖線や点線でかかれ、土地の境界線（実線）とは区別されています。</li>
+        <li><strong>1本の底辺に高さが2本</strong>あるとき（対角線を底辺にして、両側に三角形があるとき）は、三角形ごとに2行に分けて、同じ A・B を入れてください。求積表に「底辺 ×（高さ1 ＋ 高さ2）」とまとめて書かれているときも同じです。</li>
+        <li><strong>倍面積</strong>：求積表の「底辺 × 高さ」の数字です。入れると、底辺 × 高さと合うかを確かめます（写しまちがいや読みまちがいに気づけます）。</li>
+        <li><strong>形を決める数字</strong>：底辺と高さだけでは三角形の形は決まらないので、次のどれかを選びます。
+          <ul>
+            <li>辺 AC／辺 BC／辺 AC と BC … 図面に<strong>境界の辺の長さ（辺長）</strong>が書いてあるとき。いちばん確かです。「辺 AC と BC」は値に AC、値2 に BC を入れます。</li>
+            <li>足まで（長さ）… 底辺の上で、A から垂線の足（高さの線が底辺にぶつかる所）までの長さ。足が A の外側にあるときはマイナスで入れます。</li>
+            <li>足まで（図上 mm）… 足の位置も辺長も書いていないとき。図面の上で A から足までを定規で測った mm を入れると、縮尺で長さに直します。目安になります。</li>
+            <li>わからない … 面積だけ計算します。</li>
+          </ul>
+        </li>
+        <li><strong>C の側</strong>：A から B を見て、C が左か右か。「自動」なら、同じ底辺を使う三角形の反対側に置きます（1つ目の三角形は左）。図が図面と左右反対でもかまいません（裏返しになるだけで、辺の長さは同じです）。</li>
+        <li>Enter キーで次の欄へ進みます。Excel から「A・B・C・底辺・高さ・倍面積」の列をまとめて貼り付けることもできます（倍面積はなくてもかまいません）。</li>
+      </ul>
+    </details>
+
+    <div class="tool__result" id="result" aria-live="polite"></div>
+  </section>
+
+  <div class="page-body">
+    <h2>計算のしかた</h2>
+    <p>
+      三角形の面積は「底辺 × 高さ ÷ 2」なので、三斜求積の表には底辺・高さ・倍面積（底辺 × 高さ）だけが書かれていることがよくあります。
+      ただし、<strong>底辺と高さだけでは三角形の形は1つに決まりません</strong>（頂点を底辺と平行に動かしても面積は同じ）。
+      そこで、垂線の足が底辺のどこにあるか（A からの距離 a）を使って、三平方の定理で辺の長さを出します。
+    </p>
+    <div class="prose">
+      <table>
+        <thead><tr><th>項目</th><th>式</th></tr></thead>
+        <tbody>
+          <tr><td>辺 AC</td><td>√（a² ＋ 高さ²）</td></tr>
+          <tr><td>辺 BC</td><td>√（（底辺 − a）² ＋ 高さ²）</td></tr>
+          <tr><td>辺 AC がわかっているとき</td><td>a ＝ √（AC² − 高さ²）（足は A から B の向きにあるとして計算）</td></tr>
+          <tr><td>辺 BC がわかっているとき</td><td>a ＝ 底辺 − √（BC² − 高さ²）</td></tr>
+          <tr><td>辺 AC と BC がわかっているとき</td><td>a ＝（AC² − BC² ＋ 底辺²）÷（2 × 底辺）。高さはこの3辺から計算し、図面の高さとくらべます。</td></tr>
+          <tr><td>倍面積</td><td>底辺 × 高さ（面積はその半分）</td></tr>
+          <tr><td>単位</td><td>1間 ＝ 6尺 ＝ 60/33 m（約1.818m）、1坪 ＝ 400/121 ㎡（約3.306㎡）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      三角形どうしは、同じ名前の2点（共通の底辺）でつなげ、仮の座標を作って図にします。
+      2つ以上の三角形に使われている辺は土地の内側の線、1つの三角形にしか使われていない辺が<strong>土地の周りの辺</strong>です。
+      最後に、仮の座標から座標法で出した面積と、三斜の面積の合計をくらべて、組み立てが合っているかを確かめます。
+    </p>
+    <h2>古い三斜の図面を読むときの注意</h2>
+    <ul>
+      <li>昭和52年9月までの地積測量図は、境界の辺長や境界標を書くことが決まっておらず、辺長のない図面がふつうにあります。図面から三角スケールで読み取った数字や、現地を測らずに作られた図面もあります。</li>
+      <li>読み取りの誤差が積み重なるので、図面のすべての数字をぴったり満たす形がないこともあります。どの三角形から組み立てるかで、少し結果が変わることもあります。</li>
+      <li>分筆の図面で、残りの土地の面積を「もとの面積 − 分けた面積」で出している（残地求積）ものは、残りの土地の三斜が書かれていないことがあります。そのときは、このツールでは残りの土地の辺は出せません。</li>
+      <li>計算した辺の長さや仮の座標は、図面を読むための目安です。境界の確認や復元には、現地の境界標や隣の土地の図面などをあわせて調べる必要があります。境界のことは土地家屋調査士に相談してください。</li>
+    </ul>
+  </div>
+
+  <style is:global>
+    .sansha-table th { position: relative; } /* 読み上げ用の隠し文字が表の外へはみ出さないように */
+    .sansha-table th small { font-weight: 400; font-size: 0.75rem; }
+    .sansha-table .c-pt { width: 3.6em; }
+    .sansha-table .c-num { width: 5.6em; text-align: right; }
+    .sansha-table select, #unit, #tol { font: inherit; font-size: 0.92rem; padding: 0.3rem 0.2rem; border: 2px solid var(--navy); border-radius: 6px; background: #fff; }
+    .sansha-table input:disabled { background: #eceae4; border-color: #b9b5aa; }
+    .sansha-in { font: inherit; padding: 0.25rem 0.4rem; border: 2px solid var(--navy); border-radius: 6px; text-align: right; }
+    .sansha-help { padding-left: 1.2rem; }
+    .sansha-help li { margin: 0.25rem 0; }
+    .sansha-box { margin: 0.6rem 0; padding: 0.5rem 0.8rem; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .sansha-box summary { cursor: pointer; font-weight: 800; color: var(--navy); }
+    .sansha-fig { display: block; width: 100%; max-width: 560px; height: auto; margin: 0.6rem 0; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+    .sansha-warn { color: #b45309; font-weight: 700; }
+    .sansha-range { color: var(--ink-soft); font-size: 0.85em; }
+    .sansha-coords { width: 100%; max-width: 32em; font-family: ui-monospace, Consolas, monospace; font-size: 0.9rem; padding: 0.4rem; border: 1px solid var(--line); border-radius: 6px; }
+    @media (max-width: 640px) {
+      .sansha-table .c-pt { width: 3em; }
+      .sansha-table .c-num { width: 4.8em; }
+    }
+  </style>
+
+  <script>
+    type Row = { a: string; b: string; c: string; base: string; h: string; bai: string; mode: string; v: string; v2: string; side: string };
+    type P = { x: number; y: number };
+    type Geo = { foot: number; hg: number; ac: number; bc: number; err?: string };
+    const SAMPLE: Partial<Row>[] = [
+      { a: '1', b: '3', c: '2', base: '25.00', h: '12.00', bai: '300.00', mode: 'foot', v: '10.00' },
+      { a: '1', b: '3', c: '4', base: '25.00', h: '9.00', bai: '225.00', mode: 'bc', v: '15.00' },
+      { a: '3', b: '4', c: '5', base: '15.00', h: '6.00', bai: '90.00', mode: 'acbc', v: '9.60', v2: '9.60' },
+    ];
+    const MODES: [string, string][] = [
+      ['foot', '足まで（長さ）'],
+      ['mm', '足まで（図上 mm）'],
+      ['ac', '辺 AC'],
+      ['bc', '辺 BC'],
+      ['acbc', '辺 AC と BC'],
+      ['none', 'わからない'],
+    ];
+    const UNIT: Record<string, { f: number; label: string }> = {
+      m: { f: 1, label: 'm' },
+      ken: { f: 60 / 33, label: '間' },
+      shaku: { f: 10 / 33, label: '尺' },
+    };
+    const TSUBO = 400 / 121;
+    const body = document.getElementById('tri-rows') as HTMLTableSectionElement;
+    const out = document.getElementById('result')!;
+    const unitSel = document.getElementById('unit') as HTMLSelectElement;
+    const tolSel = document.getElementById('tol') as HTMLSelectElement;
+    const scaleIn = document.getElementById('scale') as HTMLInputElement;
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const f2 = (v: number) => v.toFixed(2);
+    const f3 = (v: number) => v.toFixed(3);
+    const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v.normalize('NFKC').trim()));
+    const q = <T extends Element>(tr: Element, cls: string) => tr.querySelector(cls) as unknown as T;
+    const TOL = 0.02; // 点の位置や底辺の長さの食いちがいを知らせる目安（m）
+
+    function addRow(r: Partial<Row> = {}, focus = false) {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="coord-no"></td>' +
+        '<td><input type="text" class="c-pt c-a" aria-label="底辺の端A" /></td>' +
+        '<td><input type="text" class="c-pt c-b" aria-label="底辺の端B" /></td>' +
+        '<td><input type="text" class="c-pt c-c" aria-label="頂点C" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-num c-base" aria-label="底辺" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-num c-h" aria-label="高さ" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-num c-bai" aria-label="倍面積（あれば）" /></td>' +
+        `<td><select class="c-mode" aria-label="形を決める数字">${MODES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></td>` +
+        '<td><input type="text" inputmode="decimal" class="c-num c-v" aria-label="値" /></td>' +
+        '<td><input type="text" inputmode="decimal" class="c-num c-v2" aria-label="値2（辺BC）" /></td>' +
+        '<td><select class="c-side" aria-label="Cの側"><option value="auto">自動</option><option value="L">左</option><option value="R">右</option></select></td>' +
+        '<td><button type="button" class="coord-del" aria-label="この三角形を削除">×</button></td>';
+      const set = (c: string, v = '') => (q<HTMLInputElement>(tr, c).value = v);
+      set('.c-a', r.a);
+      set('.c-b', r.b);
+      set('.c-c', r.c);
+      set('.c-base', r.base);
+      set('.c-h', r.h);
+      set('.c-bai', r.bai);
+      set('.c-v', r.v);
+      set('.c-v2', r.v2);
+      q<HTMLSelectElement>(tr, '.c-mode').value = r.mode ?? 'foot';
+      q<HTMLSelectElement>(tr, '.c-side').value = r.side ?? 'auto';
+      body.appendChild(tr);
+      syncRow(tr);
+      renumber();
+      if (focus) q<HTMLInputElement>(tr, '.c-a').focus();
+    }
+    // 形を決める数字の種類に合わせて、値・値2 の欄を使える／使えないにする
+    function syncRow(tr: Element) {
+      const mode = q<HTMLSelectElement>(tr, '.c-mode').value;
+      const v = q<HTMLInputElement>(tr, '.c-v');
+      const v2 = q<HTMLInputElement>(tr, '.c-v2');
+      v.disabled = mode === 'none';
+      v2.disabled = mode !== 'acbc';
+      v.placeholder = { foot: 'A→足', mm: 'mm', ac: 'AC', bc: 'BC', acbc: 'AC', none: '' }[mode] ?? '';
+      v2.placeholder = mode === 'acbc' ? 'BC' : '';
+    }
+    function renumber() {
+      [...body.rows].forEach((tr, i) => (tr.querySelector('.coord-no')!.textContent = String(i + 1)));
+    }
+    function setRows(list: Partial<Row>[]) {
+      body.innerHTML = '';
+      list.forEach((r) => addRow(r));
+      while (body.rows.length < Math.max(2, list.length)) addRow();
+      calc();
+    }
+
+    // 三角形の形（足の位置・形に使う高さ・2辺）を求める。数字はすべて m。
+    function geom(b: number, h: number, mode: string, v: number, v2: number): Geo {
+      const bad = (err: string) => ({ foot: NaN, hg: NaN, ac: NaN, bc: NaN, err });
+      let a = NaN;
+      let hg = h;
+      if (mode === 'foot' || mode === 'mm') a = v;
+      else if (mode === 'ac') {
+        if (v < h) return bad(`辺 AC（${f3(v)} m）が高さ（${f3(h)} m）より短いので、三角形になりません。`);
+        a = Math.sqrt(v * v - h * h);
+      } else if (mode === 'bc') {
+        if (v < h) return bad(`辺 BC（${f3(v)} m）が高さ（${f3(h)} m）より短いので、三角形になりません。`);
+        a = b - Math.sqrt(v * v - h * h);
+      } else if (mode === 'acbc') {
+        if (v + v2 <= b || v + b <= v2 || v2 + b <= v) return bad('底辺・辺 AC・辺 BC の3つの長さでは、三角形になりません。');
+        a = (v * v - v2 * v2 + b * b) / (2 * b);
+        hg = Math.sqrt(Math.max(v * v - a * a, 0));
+      }
+      return { foot: a, hg, ac: Math.hypot(a, hg), bc: Math.hypot(b - a, hg) };
+    }
+    // 丸めの幅で数字をずらしたときの、辺の長さの最小・最大
+    function ranges(b: number, h: number, mode: string, v: number, v2: number, d: number) {
+      const r = { ac: [Infinity, -Infinity], bc: [Infinity, -Infinity] };
+      const vs = mode === 'acbc' ? [-d, d] : [0];
+      for (const db of [-d, d]) for (const dh of [-d, d]) for (const dv of [-d, d]) for (const dv2 of vs) {
+        const g = geom(b + db, h + dh, mode, v + dv, v2 + dv2);
+        if (g.err) continue;
+        r.ac = [Math.min(r.ac[0], g.ac), Math.max(r.ac[1], g.ac)];
+        r.bc = [Math.min(r.bc[0], g.bc), Math.max(r.bc[1], g.bc)];
+      }
+      return r;
+    }
+
+    const key = (p: string, r: string) => (p < r ? `${p}\u0000${r}` : `${r}\u0000${p}`);
+    const dist = (p: P, r: P) => Math.hypot(r.x - p.x, r.y - p.y);
+
+    function calc() {
+      const unit = UNIT[unitSel.value] ?? UNIT.m;
+      const f = unit.f;
+      const tolIn = Number(tolSel.value) || 0;
+      const d = tolIn * f; // 丸めの幅（m）
+      const scale = toNum(scaleIn.value);
+      const errs: string[] = [];
+      const warns: string[] = [];
+
+      const rows = [...body.rows]
+        .map((tr, i) => {
+          const g = (c: string) => q<HTMLInputElement>(tr, c).value;
+          const mode = q<HTMLSelectElement>(tr, '.c-mode').value;
+          return {
+            no: i + 1,
+            a: g('.c-a').normalize('NFKC').trim(),
+            b: g('.c-b').normalize('NFKC').trim(),
+            c: g('.c-c').normalize('NFKC').trim(),
+            bIn: toNum(g('.c-base')),
+            hIn: toNum(g('.c-h')),
+            baiIn: toNum(g('.c-bai')),
+            baiS: g('.c-bai'),
+            mode,
+            vS: mode === 'none' ? '' : g('.c-v'),
+            vIn: toNum(g('.c-v')),
+            v2S: mode === 'acbc' ? g('.c-v2') : '',
+            v2In: toNum(g('.c-v2')),
+            side: q<HTMLSelectElement>(tr, '.c-side').value,
+            empty: !['.c-a', '.c-b', '.c-c', '.c-base', '.c-h', '.c-bai', '.c-v', '.c-v2'].some((c) => g(c).trim() !== ''),
+          };
+        })
+        .filter((r) => !r.empty);
+      if (!rows.length) {
+        out.innerHTML = '';
+        return;
+      }
+
+      type Tri = (typeof rows)[number] & { base: number; h: number; g: Geo | null; rg: ReturnType<typeof ranges> | null };
+      const tris: Tri[] = [];
+      for (const r of rows) {
+        const t: Tri = { ...r, base: r.bIn * f, h: r.hIn * f, g: null, rg: null };
+        tris.push(t);
+        const pre = `No.${r.no}：`;
+        if (!r.a || !r.b || !r.c) { errs.push(pre + 'A・B・C の点名を入れてください。'); continue; }
+        if (new Set([r.a, r.b, r.c]).size < 3) { errs.push(pre + 'A・B・C は別々の点名にしてください。'); continue; }
+        if (!(r.bIn > 0) || !(r.hIn > 0)) { errs.push(pre + '底辺と高さを、0より大きい数字で入れてください。'); continue; }
+        if (r.baiS.trim() !== '') {
+          if (!Number.isFinite(r.baiIn)) errs.push(pre + '倍面積を数字で入れてください。');
+          else if (Math.abs(r.bIn * r.hIn - r.baiIn) > 0.011) warns.push(`${pre}底辺 × 高さ ＝ ${(r.bIn * r.hIn).toFixed(4)} で、倍面積 ${r.baiS.trim()} と合いません。数字の写しまちがいや読みまちがいがないか確かめてください。`);
+        }
+        if (r.mode === 'none' || r.vS.trim() === '') {
+          warns.push(pre + (r.mode === 'none' ? '' : '形を決める数字が空なので、') + '面積だけ計算しました（底辺と高さだけでは辺の長さは決まりません）。');
+          continue;
+        }
+        if (!Number.isFinite(r.vIn)) { errs.push(pre + '値を数字で入れてください。'); continue; }
+        let v = r.vIn * f;
+        let v2 = NaN;
+        if (r.mode === 'mm') {
+          if (!(scale > 0)) { errs.push(pre + '「足まで（図上 mm）」を使うときは、縮尺を入れてください。'); continue; }
+          v = (r.vIn * scale) / 1000;
+        }
+        if (r.mode === 'acbc') {
+          if (!Number.isFinite(r.v2In)) { errs.push(pre + '値2 に辺 BC の長さを入れてください。'); continue; }
+          v2 = r.v2In * f;
+        }
+        const g = geom(t.base, t.h, r.mode, v, v2);
+        if (g.err) { errs.push(pre + g.err); continue; }
+        if (r.mode === 'acbc' && Math.abs(g.hg - t.h) > Math.max(TOL, d * 2)) {
+          warns.push(`${pre}3辺から計算した高さは ${f3(g.hg)} m で、図面の高さ ${f3(t.h)} m と ${f3(Math.abs(g.hg - t.h))} m ちがいます（図は3辺に合わせてかいています）。`);
+        }
+        t.g = g;
+        if (d > 0) t.rg = ranges(t.base, t.h, r.mode, v, v2, d);
+      }
+
+      // 仮の座標で三角形をつなげる（同じ名前の2点を底辺にして、置けるものから順に置く）
+      const pts = new Map<string, P>();
+      type Edge = { p: string; r: string; n: number; others: string[]; len: number; rg: number[] | null };
+      const edges = new Map<string, Edge>();
+      const placed = new Set<number>();
+      const addEdge = (p: string, r: string, other: string, len: number, rg: number[] | null) => {
+        const k = key(p, r);
+        const e = edges.get(k) ?? { p, r, n: 0, others: [], len, rg };
+        e.n++;
+        e.others.push(other);
+        edges.set(k, e);
+      };
+      const okTris = tris.filter((t) => t.g);
+      let progress = true;
+      while (progress) {
+        progress = false;
+        for (const t of okTris) {
+          if (placed.has(t.no)) continue;
+          const g = t.g!;
+          let A = pts.get(t.a);
+          let B = pts.get(t.b);
+          if (!A || !B) {
+            if (pts.size === 0) {
+              A = { x: 0, y: 0 };
+              B = { x: t.base, y: 0 };
+              pts.set(t.a, A);
+              pts.set(t.b, B);
+            } else continue;
+          }
+          const ab = dist(A, B);
+          if (Math.abs(ab - t.base) > Math.max(TOL, d * 2)) warns.push(`No.${t.no}：底辺 ${t.a}-${t.b} の長さが、前の三角形からは ${f3(ab)} m、この行では ${f3(t.base)} m で、くいちがっています。`);
+          const ux = (B.x - A.x) / ab;
+          const uy = (B.y - A.y) / ab;
+          let s = 1;
+          if (t.side === 'R') s = -1;
+          else if (t.side === 'auto') {
+            // すでにこの辺を使う三角形があれば、その三角形の残りの点の反対側に置く
+            const prev = edges.get(key(t.a, t.b));
+            if (prev && prev.others.length) s = -sideOf(A, B, pts.get(prev.others[0])!);
+          }
+          // 足の位置は、前の三角形から決まった底辺の長さに合わせて比例で置く
+          const a = g.foot * (ab / t.base);
+          const C = { x: A.x + ux * a - uy * g.hg * s, y: A.y + uy * a + ux * g.hg * s };
+          const known = pts.get(t.c);
+          if (known) {
+            if (dist(known, C) > Math.max(TOL, d * 2)) warns.push(`No.${t.no}：頂点 ${t.c} は前の三角形でも出てきますが、位置が ${f3(dist(known, C))} m ずれています（数字か「C の側」を確かめてください）。`);
+          } else pts.set(t.c, C);
+          const rb = d > 0 ? [t.base - d, t.base + d] : null;
+          addEdge(t.a, t.b, t.c, t.base, rb);
+          addEdge(t.a, t.c, t.b, g.ac, t.rg ? t.rg.ac : null);
+          addEdge(t.b, t.c, t.a, g.bc, t.rg ? t.rg.bc : null);
+          placed.add(t.no);
+          progress = true;
+        }
+      }
+      const unplaced = okTris.filter((t) => !placed.has(t.no));
+      if (unplaced.length) errs.push(`No.${unplaced.map((t) => t.no).join('・')}：底辺の2点が、ほかの三角形とつながらないので、図に置けませんでした（点名をそろえてください。形を決める数字がない三角形は、図に置けません）。`);
+
+      const lenCell = (v: number, rg: number[] | null) =>
+        Number.isFinite(v) ? `${f3(v)}${rg && Number.isFinite(rg[0]) ? `<br /><span class="sansha-range">${f2(rg[0])}〜${f2(rg[1])}</span>` : ''}` : '―';
+      const inUnit = (v: number) => (f === 1 ? '' : ` <span class="sansha-range">（${(v / f).toFixed(3)} ${unit.label}）</span>`);
+
+      // 三角形ごとの表
+      let sumBai = 0;
+      const triRows = tris.map((t) => {
+        const ok = Number.isFinite(t.base) && Number.isFinite(t.h) && t.base > 0 && t.h > 0;
+        const bai = ok ? t.base * t.h : NaN;
+        if (ok) sumBai += bai;
+        const name = t.a && t.b && t.c ? `${esc(t.a)}-${esc(t.b)}-${esc(t.c)}` : '―';
+        const num = (v: number) => (Number.isFinite(v) ? f3(v) : '―');
+        return `<tr><td>${t.no}</td><td>${name}</td><td>${num(t.base)}</td><td>${num(t.h)}</td><td>${t.g ? f3(t.g.foot) : '―'}</td><td>${lenCell(t.g?.ac ?? NaN, t.rg?.ac ?? null)}</td><td>${lenCell(t.g?.bc ?? NaN, t.rg?.bc ?? null)}</td><td>${num(bai)}</td><td>${num(bai / 2)}</td></tr>`;
+      });
+
+      // 周りの辺（1つの三角形にしか使われていない辺）を、ひと回りの順に並べる
+      const outer = [...edges.values()].filter((e) => e.n === 1);
+      const ring: string[] = [];
+      let ringOk = false;
+      if (outer.length >= 3 && !unplaced.length) {
+        const adj = new Map<string, string[]>();
+        for (const e of outer) {
+          adj.set(e.p, [...(adj.get(e.p) ?? []), e.r]);
+          adj.set(e.r, [...(adj.get(e.r) ?? []), e.p]);
+        }
+        if ([...adj.values()].every((v) => v.length === 2)) {
+          const start = outer[0].p;
+          let prev = '';
+          let cur = start;
+          do {
+            ring.push(cur);
+            const nb = adj.get(cur)!;
+            const nxt = nb[0] !== prev ? nb[0] : nb[1];
+            prev = cur;
+            cur = nxt;
+          } while (cur !== start && ring.length <= outer.length);
+          ringOk = ring.length === outer.length;
+        }
+      }
+
+      let ringHtml = '';
+      const figHtml = pts.size >= 3 ? figure(pts, edges, ringOk) : '';
+      if (ringOk) {
+        let coordBai = 0;
+        let perim = 0;
+        const lines = ring.map((p, i) => {
+          const r = ring[(i + 1) % ring.length];
+          const P1 = pts.get(p)!;
+          const P2 = pts.get(r)!;
+          coordBai += P1.x * P2.y - P2.x * P1.y;
+          const e = edges.get(key(p, r))!;
+          const len = e.len;
+          perim += len;
+          return `<tr><td>${i + 1}</td><td>${esc(p)} → ${esc(r)}</td><td>${lenCell(len, e.rg)}</td><td>${f2(len)}${inUnit(len)}</td></tr>`;
+        });
+        coordBai = Math.abs(coordBai);
+        const diff = coordBai / 2 - sumBai / 2;
+        const match = Math.abs(diff) < Math.max(0.05, (sumBai / 2) * 0.001);
+        // 座標面積のツールに貼れる形（X は図の上向き、Y は右向き。北の向きは表していない）
+        const coordText = ring.map((p) => { const P0 = pts.get(p)!; return `${p} ${P0.y.toFixed(3)} ${P0.x.toFixed(3)}`; }).join('\n');
+        ringHtml = `
+          <h3>土地の周りの辺</h3>
+          <div class="calc-wrap"><table class="calc-table">
+            <thead><tr><th>No.</th><th>辺</th><th>長さ（m）${d > 0 ? '<br /><small>丸めの幅</small>' : ''}</th><th>cm まで</th></tr></thead>
+            <tbody>${lines.join('')}</tbody>
+            <tfoot><tr><td colspan="2">周囲の長さ</td><td>${f3(perim)}</td><td>${f2(perim)}</td></tr></tfoot>
+          </table></div>
+          <p>組み立てた図の面積（座標法）は ${f3(coordBai / 2)} ㎡、三斜の合計は ${f3(sumBai / 2)} ㎡。
+          ${match ? (Math.abs(diff) < 0.005 ? '<span class="tool__ok">一致しています。</span>' : `<span class="tool__ok">ほぼ一致しています</span>（差 ${f3(Math.abs(diff))} ㎡。数字の丸めや、辺長に合わせて形をかいたことによる小さな差です）。`) :`<span class="tool__ng">${f3(Math.abs(diff))} ㎡ ちがいます。</span>三角形が重なったり、すき間があいたりしているかもしれません。「C の側」や点名を確かめてください。`}</p>
+          <h3>仮の座標（点名・X・Y）</h3>
+          <p class="tool__note">1つ目の三角形の A を原点にした仮の座標です（北の向きは表していません）。コピーして <a href="/tools/zahyo-menseki/">座標から面積を計算</a> の表に貼り付けると、求積表の形で見られます。CAD に写すときの下書きにも使えます。</p>
+          <textarea class="sansha-coords" rows="${Math.min(ring.length, 10)}" readonly>${esc(coordText)}</textarea>
+          <div class="tool__row"><button type="button" class="tool__btn tool__btn--sub" data-copy>座標をコピー</button><span class="tool__note" data-copied></span></div>`;
+      } else if (okTris.length && !unplaced.length && pts.size >= 3) {
+        ringHtml = '<p class="tool__note">周りの辺を、ひと回りの形に並べられませんでした（三角形がまだ途中か、点名のつながりがちがうかもしれません）。三角形ごとの辺の長さは上の表を見てください。</p>';
+      }
+
+      const area = sumBai / 2;
+      out.innerHTML = `
+        ${errs.map((m) => `<p class="tool__error">${esc(m)}</p>`).join('')}
+        ${warns.map((m) => `<p class="sansha-warn">${esc(m)}</p>`).join('')}
+        <p>三斜の面積の合計 <span class="tool__big">${f3(area)}</span> ㎡（倍面積 ${f3(sumBai)}）／ 約 ${(area / TSUBO).toFixed(2)} 坪</p>
+        ${f !== 1 ? `<p class="tool__note">${unit.label}で入れた数字を m に直して計算しています（1${unit.label} ＝ ${f.toFixed(5)} m）。</p>` : ''}
+        <h3>三角形ごとの辺の長さ</h3>
+        <div class="calc-wrap"><table class="calc-table">
+          <thead><tr><th>No.</th><th>三角形 A-B-C</th><th>底辺</th><th>高さ</th><th>A から足まで</th><th>辺 AC</th><th>辺 BC</th><th>倍面積</th><th>面積</th></tr></thead>
+          <tbody>${triRows.join('')}</tbody>
+          <tfoot><tr><td colspan="7">合計（長さは m、面積は ㎡）</td><td>${f3(sumBai)}</td><td>${f3(area)}</td></tr></tfoot>
+        </table></div>
+        ${d > 0 ? '<p class="tool__note">辺の長さの下の小さい数字は、数字の丸めを考えたときの幅（最小〜最大）です。</p>' : ''}
+        ${figHtml}
+        ${ringHtml}`;
+    }
+
+    // A→B から見て、点 P が左なら 1、右なら -1
+    function sideOf(A: P, B: P, Pt: P) {
+      const cr = (B.x - A.x) * (Pt.y - A.y) - (B.y - A.y) * (Pt.x - A.x);
+      return cr >= 0 ? 1 : -1;
+    }
+
+    // 組み立てた図（内側の線は点線、周りの辺は実線と長さ）
+    function figure(pts: Map<string, P>, edges: Map<string, { p: string; r: string; n: number; len: number }>, showLen: boolean) {
+      const all = [...pts.values()];
+      const minX = Math.min(...all.map((p) => p.x));
+      const maxX = Math.max(...all.map((p) => p.x));
+      const minY = Math.min(...all.map((p) => p.y));
+      const maxY = Math.max(...all.map((p) => p.y));
+      const W = 560;
+      const H = 400;
+      const pad = 48;
+      const sc = Math.min((W - pad * 2) / Math.max(maxX - minX, 1e-6), (H - pad * 2) / Math.max(maxY - minY, 1e-6));
+      const ox = (W - (maxX - minX) * sc) / 2;
+      const oy = (H - (maxY - minY) * sc) / 2;
+      const X = (p: P) => ox + (p.x - minX) * sc;
+      const Y = (p: P) => H - (oy + (p.y - minY) * sc);
+      const cx = all.reduce((s, p) => s + p.x, 0) / all.length;
+      const cy = all.reduce((s, p) => s + p.y, 0) / all.length;
+      let svg = `<svg class="sansha-fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="三斜の数字から組み立てた図（向きと位置は仮のもの）">`;
+      for (const e of edges.values()) {
+        const p1 = pts.get(e.p)!;
+        const p2 = pts.get(e.r)!;
+        const outer = e.n === 1;
+        svg += `<line x1="${X(p1).toFixed(1)}" y1="${Y(p1).toFixed(1)}" x2="${X(p2).toFixed(1)}" y2="${Y(p2).toFixed(1)}" stroke="${outer ? '#1d2b53' : '#8a94a6'}" stroke-width="${outer ? 2.5 : 1.2}" ${outer ? '' : 'stroke-dasharray="8 3 2 3"'} />`;
+        if (outer && showLen) {
+          const mx = (p1.x + p2.x) / 2;
+          const my = (p1.y + p2.y) / 2;
+          // 長さの文字は、図の中心から外へ少しずらす
+          let dx = mx - cx;
+          let dy = my - cy;
+          const dd = Math.hypot(dx, dy) || 1;
+          dx /= dd;
+          dy /= dd;
+          const tx = X({ x: mx, y: my }) + dx * 16;
+          const ty = Y({ x: mx, y: my }) - dy * 16;
+          svg += `<text x="${tx.toFixed(1)}" y="${(ty + 4).toFixed(1)}" text-anchor="middle" font-size="13" fill="#c4122f" font-weight="700">${f2(e.len)}</text>`;
+        }
+      }
+      for (const [name, p] of pts) {
+        let dx = p.x - cx;
+        let dy = p.y - cy;
+        const dd = Math.hypot(dx, dy) || 1;
+        dx /= dd;
+        dy /= dd;
+        svg += `<circle cx="${X(p).toFixed(1)}" cy="${Y(p).toFixed(1)}" r="3.5" fill="#1d2b53" />`;
+        svg += `<text x="${(X(p) + dx * 14).toFixed(1)}" y="${(Y(p) - dy * 14 + 5).toFixed(1)}" text-anchor="middle" font-size="14" font-weight="800" fill="#1d2b53">${esc(name)}</text>`;
+      }
+      svg += '</svg>';
+      return `<p class="tool__note">組み立てた図（向き・位置は仮のもので、北の向きは表していません。一点鎖線は三角形に分けた内側の線、赤い数字は周りの辺の長さ m）</p>${svg}`;
+    }
+
+    body.addEventListener('input', calc);
+    body.addEventListener('change', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.classList.contains('c-mode')) syncRow(t.closest('tr')!);
+      calc();
+    });
+    [unitSel, tolSel].forEach((el) => el.addEventListener('change', calc));
+    scaleIn.addEventListener('input', calc);
+    out.addEventListener('click', async (e) => {
+      if (!(e.target as HTMLElement).closest('[data-copy]')) return;
+      const ta = out.querySelector('.sansha-coords') as HTMLTextAreaElement;
+      const msg = out.querySelector('[data-copied]')!;
+      try {
+        await navigator.clipboard.writeText(ta.value);
+        msg.textContent = 'コピーしました';
+      } catch {
+        ta.select();
+        msg.textContent = '選んだ状態にしたので、Ctrl＋C でコピーしてください';
+      }
+    });
+    body.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.coord-del');
+      if (!btn) return;
+      btn.closest('tr')!.remove();
+      if (body.rows.length < 1) addRow();
+      renumber();
+      calc();
+    });
+    body.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !(e.target instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      const inputs = [...body.querySelectorAll('input')].filter((i) => !i.disabled);
+      const i = inputs.indexOf(e.target);
+      if (i === inputs.length - 1) addRow(undefined, true);
+      else inputs[i + 1].focus();
+    });
+    body.addEventListener('paste', (e) => {
+      const text = e.clipboardData?.getData('text') ?? '';
+      if (!/[\n\t]/.test(text.trim())) return;
+      e.preventDefault();
+      const list = text
+        .split(/\r?\n/)
+        .map((l) => l.normalize('NFKC').trim())
+        .filter(Boolean)
+        .map((l) => {
+          const p = l.split(/[\s,]+/);
+          return { a: p[0], b: p[1], c: p[2], base: p[3], h: p[4], bai: p[5] ?? '' };
+        });
+      setRows(list);
+    });
+    document.getElementById('add-row')!.addEventListener('click', () => addRow(undefined, true));
+    document.getElementById('sample')!.addEventListener('click', () => {
+      unitSel.value = 'm';
+      setRows(SAMPLE);
+    });
+    document.getElementById('clear')!.addEventListener('click', () => setRows([]));
+    setRows([]);
+  </script>
+</BaseLayout>
