@@ -65,7 +65,10 @@ export const TAG_GROUPS = [
   {
     id: 'sonota',
     title: 'その他',
-    tags: [{ id: 'jichitai', name: '自治体' }],
+    tags: [
+      { id: 'jichitai', name: '自治体' },
+      { id: 'kaigai', name: '海外' },
+    ],
   },
 ] as const;
 

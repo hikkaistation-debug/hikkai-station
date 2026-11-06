@@ -4,14 +4,20 @@
 //   2. 「―」「──」があるとき → その前が1行目、うしろが2行目（線は消す）
 //   3. 最後が「（…）」のとき → かっこの前が1行目、かっこが2行目
 // どれにも当てはまらないときは、1行のまま。ページの <title> やSNSでは元のタイトルをそのまま使う。
+// 「」の中の「？」「―」では分けない（例：「登記を信じて買えば守られる？」から見る → 」が2行目の頭に来てしまう）
+function insideQuote(title: string, i: number): boolean {
+  const before = title.slice(0, i);
+  return (before.match(/「/g) || []).length > (before.match(/」/g) || []).length;
+}
+
 export function splitTitle(title: string): [string] | [string, string] {
   const q = title.indexOf('？');
-  if (q !== -1 && q < title.length - 1) {
+  if (q !== -1 && q < title.length - 1 && !insideQuote(title, q)) {
     const rest = title.slice(q + 1).trim();
     if (rest) return [title.slice(0, q + 1), rest];
   }
   const dash = title.match(/\s*(?:──|―)\s*/);
-  if (dash && dash.index && dash.index > 0) {
+  if (dash && dash.index && dash.index > 0 && !insideQuote(title, dash.index)) {
     const rest = title.slice(dash.index + dash[0].length).trim();
     if (rest) return [title.slice(0, dash.index).trim(), rest];
   }
