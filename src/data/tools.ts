@@ -1,6 +1,6 @@
 // 便利ツールの一覧（駅の施設「便利ツール」。2026-11-05 に「計算ツール」から名前を変えた）
 // ツールを増やしたら、ここに1行足してください。トップの一覧と、各ツールの駅名標に使います。
-export type ToolGroupId = 'keisan' | 'shiraberu' | 'benkyou';
+export type ToolGroupId = 'keisan' | 'shiraberu' | 'seiri' | 'benkyou';
 
 export type Tool = {
   id: string; // アドレス（/tools/○○/）
@@ -8,7 +8,7 @@ export type Tool = {
   short: string; // 駅名標の「となりの駅」などに使う短い名前
   desc: string;
   who: string; // だれ向けか
-  group: ToolGroupId; // 一覧での分け方（計算する／調べる・診断する／勉強する）
+  group: ToolGroupId; // 一覧での分け方（計算する／調べる・診断する／写真・ファイルを整える／勉強する）
 };
 
 // 一覧ページの分け方。/tools/ の外にあるページ（境界トラブル診断など）は extra に書く。
@@ -30,6 +30,7 @@ export const TOOL_GROUPS: {
       },
     ],
   },
+  { id: 'seiri', label: '写真・ファイルを整える' },
   { id: 'benkyou', label: '勉強する' },
 ];
 
@@ -75,6 +76,14 @@ export const TOOLS: Tool[] = [
     group: 'keisan',
   },
   {
+    id: 'shashin',
+    name: '写真の圧縮（サイズを小さくする）',
+    short: '写真の圧縮',
+    desc: '写真（JPEG・PNG・WebP）を、大きさと画質を選んで小さくします。何枚でもまとめて縮めて、ZIPで保存できます。写真はパソコン・スマホの中だけで処理し、どこにも送りません。撮影日時・位置情報も消えます。',
+    who: 'どなたでも',
+    group: 'seiri',
+  },
+  {
     id: 'benkyou',
     name: '勉強プランナー（土地家屋調査士試験）',
     short: '勉強プランナー',
@@ -103,4 +112,4 @@ export const TOOLS: Tool[] = [
 export const toolHref = (id: string) => `/tools/${id}/`;
 export const TOOLS_TOP = { label: '便利ツール', href: '/tools/' };
 // 一覧ページの名前の下に出す短い説明
-export const TOOLS_LEAD = '面積の計算・公差・境界トラブルの診断・勉強の計画など';
+export const TOOLS_LEAD = '面積の計算・公差・境界トラブルの診断・写真の圧縮・勉強の計画など';

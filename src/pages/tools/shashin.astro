@@ -1,0 +1,340 @@
+---
+// 写真の圧縮（ファイルのサイズを小さくする）
+// ・写真はブラウザの中（canvas）で縮めて保存しなおすだけ。どこにも送らない。外部の部品も使わない。
+// ・まとめて保存の ZIP は、圧縮なし（store）の ZIP をこのページの中で組み立てる（JPEG などはもう圧縮されているので、ZIP で縮める意味がほとんどない）。
+// ・保存しなおすと、撮影日時・位置情報（GPS）などの撮影情報（Exif）は入らない。向き（縦・横）は、読みこむときに写真の情報どおりに直してから描く。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import { TOOLS_TOP } from '../../data/tools';
+---
+<BaseLayout title="写真の圧縮（サイズを小さくする）" description="写真（JPEG・PNG・WebP）のファイルサイズを小さくするツールです。写真はパソコン・スマホの中だけで処理し、どこにも送りません。何枚でもまとめて縮めて、ZIPで保存できます。">
+  <StationSign kicker="便利ツール" title="写真の圧縮（サイズを小さくする）" sub="PHOTO COMPRESS" prev={TOOLS_TOP} />
+
+  <aside class="notice">
+    <p class="notice__title">使う前に</p>
+    <ul>
+      <li>写真は<strong>パソコン・スマホの中だけで処理し、インターネットには送りません</strong>（このページを開いたあとは、通信を切っても使えます）。</li>
+      <li>縮めた写真には、<strong>撮影日時・位置情報（GPS）などの撮影情報が入りません</strong>。メールやSNSで送るときは安心ですが、撮影日時を残す必要がある写真は、<strong>元の写真も消さずにとっておいてください</strong>。</li>
+      <li>画質を下げるほど小さくなりますが、文字や細かい線（図面・書類の写真など）はつぶれやすくなります。保存する前に、下の見本で確かめてください。</li>
+    </ul>
+  </aside>
+
+  <section class="tool" aria-labelledby="s1">
+    <h2 id="s1">1. 写真を選ぶ</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="image/jpeg,image/png,image/webp" multiple />
+      <span class="drop__big">ここに写真をドラッグ</span>
+      <span class="drop__sub">または押して選ぶ（何枚でも）</span>
+    </label>
+    <p class="ph-count" id="count" aria-live="polite">まだ写真を選んでいません</p>
+    <p class="tool__note">何枚でも選べます（あとから足すこともできます）。決まった上限はありませんが、パソコンなら100枚くらい、スマホなら30枚くらいずつに分けると、止まらず安心です。</p>
+    <p class="tool__note">JPEG・PNG・WebP が使えます。iPhone の HEIC 形式の写真は、ブラウザによっては読みこめません（iPhone の「設定」→「カメラ」→「フォーマット」で「互換性優先」にすると JPEG で撮れます）。</p>
+  </section>
+
+  <section class="tool" aria-labelledby="s2">
+    <h2 id="s2">2. 縮め方を決める</h2>
+    <div class="tool__row">
+      <label for="size">大きさ（長いほうの辺）</label>
+      <select id="size">
+        <option value="0">そのまま</option>
+        <option value="3000">3000ピクセルまで</option>
+        <option value="2048">2048ピクセルまで</option>
+        <option value="1600" selected>1600ピクセルまで（ふつう）</option>
+        <option value="1280">1280ピクセルまで</option>
+        <option value="1024">1024ピクセルまで</option>
+        <option value="800">800ピクセルまで</option>
+      </select>
+    </div>
+    <div class="tool__row">
+      <label for="quality">画質</label>
+      <input type="range" id="quality" min="30" max="95" step="5" value="80" />
+      <output id="q-out" for="quality">80</output>
+      <span class="tool__note">（数字が小さいほど小さく、粗くなります。ふつうは 70〜85）</span>
+    </div>
+    <div class="tool__row">
+      <label for="fmt">保存の形式</label>
+      <select id="fmt">
+        <option value="image/jpeg" selected>JPEG（.jpg・いちばん広く使える）</option>
+        <option value="image/webp">WebP（.webp・より小さいが、古いソフトでは開けないことも）</option>
+        <option value="keep">元の形式のまま</option>
+      </select>
+    </div>
+    <div class="tool__row">
+      <label><input type="checkbox" id="limit-on" /> 1枚あたり</label>
+      <input type="number" id="limit" min="20" step="10" value="500" aria-label="1枚あたりの上限（KB）" disabled /> KB 以下になるよう、画質を自動で下げる
+    </div>
+    <p class="tool__note">設定を変えると、選んだ写真をすべて縮めなおします。PNG（透明な部分がある画像）を JPEG にすると、透明な部分は白になります。</p>
+  </section>
+
+  <section class="tool" aria-labelledby="s3">
+    <h2 id="s3">3. 結果を見て保存する</h2>
+    <div class="tool__result" id="total" aria-live="polite"></div>
+    <div class="tool__row">
+      <button type="button" class="tool__btn" id="zip" disabled>まとめて保存（ZIP）</button>
+      <button type="button" class="tool__btn tool__btn--sub" id="clear" disabled>すべて消す</button>
+      <span class="tool__note" id="msg"></span>
+    </div>
+    <ul class="ph-list" id="list"></ul>
+    <p class="tool__note" id="empty">写真を選ぶと、ここに縮めた結果が出ます。</p>
+  </section>
+
+  <div class="page-body">
+    <h2>こんなときに</h2>
+    <ul>
+      <li>メールやチャットに写真を付けたいのに、大きすぎて送れないとき。</li>
+      <li>スマホの写真をまとめて人に渡したいとき（1枚 3〜5MB の写真が、ふつう数百KBになります）。</li>
+      <li>ホームページや資料に写真を入れたいとき。</li>
+    </ul>
+    <h2>しくみ</h2>
+    <p>ブラウザの中で写真をいったん描きなおし、えらんだ大きさと画質で保存しなおしています。写真のデータはこのページの外に出ません。縮めた結果が元より大きくなったときは、元の写真をそのまま使います。</p>
+    <h2>安心してお使いいただくために</h2>
+    <ul>
+      <li><strong>写真は送信されません。</strong>縮める作業は、お使いのパソコン・スマホのブラウザの中だけで行います。筆界ステーションには、写真を受け取るしくみがありません。</li>
+      <li><strong>写真は残りません。</strong>ブラウザにも保存しないので、ページを閉じると消えます。</li>
+      <li><strong>ほかのサービスを使っていません。</strong>縮める部品も、ZIP にまとめる部品も、このページの中にあります。</li>
+      <li><strong>確かめ方：</strong>ページを開いたあとにインターネットを切っても（機内モードなど）、そのまま使えます。通信をしていない証拠になります。</li>
+    </ul>
+    <p class="tool__note">このサイトでは、ページが見られた回数を数えるため Google アナリティクスを使っています（<a href="/privacy/">プライバシーポリシー</a>）。写真やファイル名は送っていません。</p>
+    <p class="tool__note">提出先（役所・会社など）にファイルの大きさや形式の決まりがあるときは、その決まりを先に確かめてください。</p>
+  </div>
+
+  <style is:global>
+    .drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-height: 9rem; border: 3px dashed var(--navy); border-radius: 10px; background: #f6f8fc; cursor: pointer; text-align: center; padding: 1rem; font-weight: 400; }
+    .drop.is-over { background: #e3ebf8; }
+    .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .drop:focus-within { outline: 3px solid #c99a00; outline-offset: 2px; }
+    .drop__big { font-weight: 900; font-size: 1.15rem; color: var(--navy); }
+    .ph-count { margin: 0.5rem 0 0; font-weight: 800; color: var(--navy); }
+    .ph-count strong { font-size: 1.3rem; }
+    .drop__sub { font-size: 0.9rem; color: var(--ink-soft); }
+    #quality { width: 12em; }
+    #q-out { font-weight: 900; min-width: 2em; }
+    #limit { width: 6em !important; }
+    .ph-list { list-style: none; margin: 0.6rem 0 0; padding: 0; display: grid; gap: 0.6rem; }
+    .ph { display: grid; grid-template-columns: 96px 1fr auto; gap: 0.4rem 0.8rem; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 0.5rem; background: #fff; }
+    .ph img { width: 96px; height: 72px; object-fit: cover; border-radius: 4px; background: #eee; cursor: zoom-in; }
+    .ph__name { font-weight: 700; word-break: break-all; font-size: 0.92rem; }
+    .ph__info { font-size: 0.86rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+    .ph__down { font-weight: 900; color: #0f766e; }
+    .ph__same { font-weight: 800; color: var(--ink-soft); }
+    .ph__err { color: #c4122f; font-weight: 700; font-size: 0.88rem; }
+    .ph a.tool__btn { text-decoration: none; display: inline-block; white-space: nowrap; }
+    @media (max-width: 560px) {
+      .ph { grid-template-columns: 72px 1fr; }
+      .ph img { width: 72px; height: 54px; }
+      .ph__act { grid-column: 1 / -1; }
+    }
+    .ph-view { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 100; cursor: zoom-out; padding: 1rem; }
+    .ph-view img { max-width: 100%; max-height: 100%; }
+  </style>
+
+  <script>
+    type Item = { file: File; blob: Blob | null; name: string; w: number; h: number; url: string; err: string; kept: boolean; lastQ: number };
+    const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+    const fileIn = $<HTMLInputElement>('file');
+    const drop = $('drop');
+    const sizeSel = $<HTMLSelectElement>('size');
+    const qIn = $<HTMLInputElement>('quality');
+    const fmtSel = $<HTMLSelectElement>('fmt');
+    const limitOn = $<HTMLInputElement>('limit-on');
+    const limitIn = $<HTMLInputElement>('limit');
+    const list = $('list');
+    const items: Item[] = [];
+    let runId = 0;
+
+    const kb = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(2)}MB` : `${Math.max(1, Math.round(n / 1024))}KB`);
+    const EXT: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+
+    // ── 写真を選ぶ ──
+    function addFiles(files: FileList | File[]) {
+      const ok = [...files].filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
+      const ng = [...files].length - ok.length;
+      $('msg').textContent = ng ? `⚠ 読みこめない形式のファイルが ${ng} 件ありました（HEIC など）。` : '';
+      ok.forEach((f) => items.push({ file: f, blob: null, name: '', w: 0, h: 0, url: '', err: '', kept: false, lastQ: 0 }));
+      if (ok.length) processAll();
+    }
+    fileIn.addEventListener('change', () => { if (fileIn.files) addFiles(fileIn.files); fileIn.value = ''; });
+    ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('is-over'); }));
+    ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('is-over')));
+    drop.addEventListener('drop', (e) => { e.preventDefault(); if (e.dataTransfer?.files) addFiles(e.dataTransfer.files); });
+    // ページのほかの場所に落としても、写真が開いてしまわないように
+    window.addEventListener('dragover', (e) => e.preventDefault());
+    window.addEventListener('drop', (e) => e.preventDefault());
+
+    // ── 設定 ──
+    qIn.addEventListener('input', () => { $('q-out').textContent = qIn.value; });
+    limitOn.addEventListener('change', () => { limitIn.disabled = !limitOn.checked; processAll(); });
+    [sizeSel, qIn, fmtSel, limitIn].forEach((el) => el.addEventListener('change', processAll));
+
+    // ── 縮める ──
+    const toBlob = (c: HTMLCanvasElement, type: string, q: number) =>
+      new Promise<Blob | null>((ok) => c.toBlob(ok, type, q));
+
+    async function compress(item: Item) {
+      const f = item.file;
+      const bmp = await createImageBitmap(f, { imageOrientation: 'from-image' });
+      const max = Number(sizeSel.value);
+      const k = max && Math.max(bmp.width, bmp.height) > max ? max / Math.max(bmp.width, bmp.height) : 1;
+      const w = Math.round(bmp.width * k), h = Math.round(bmp.height * k);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d')!;
+      let type = fmtSel.value === 'keep' ? f.type : fmtSel.value;
+      if (type === 'image/jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); } // 透明な部分は白に
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(bmp, 0, 0, w, h);
+      bmp.close();
+      let q = Number(qIn.value) / 100;
+      let blob = await toBlob(c, type, q);
+      // WebP で保存できないブラウザ（古い Safari）は PNG になってしまうので JPEG に
+      if (blob && blob.type !== type) { type = 'image/jpeg'; blob = await toBlob(c, type, q); }
+      // 上限（KB）があれば、画質を下げてためす（PNG は画質の指定がきかない）
+      if (limitOn.checked && type !== 'image/png') {
+        const lim = Number(limitIn.value) * 1024;
+        while (blob && blob.size > lim && q > 0.15) { q = Math.round((q - 0.05) * 100) / 100; blob = await toBlob(c, type, q); }
+      }
+      if (!blob) throw new Error('toBlob');
+      const base = f.name.replace(/\.[^.]+$/, '');
+      // 元より大きくなって、形式も大きさも変わらないなら、元の写真を使う
+      item.kept = blob.size >= f.size && type === f.type && k === 1;
+      item.blob = item.kept ? f : blob;
+      item.name = item.kept ? f.name : `${base}_small.${EXT[type]}`;
+      item.w = w; item.h = h;
+      item.lastQ = q;
+    }
+
+    async function processAll() {
+      const id = ++runId;
+      render();
+      for (const it of items) {
+        if (id !== runId) return; // 途中で設定が変わったら、やりなおし
+        it.blob = null; it.err = '';
+        render();
+        try { await compress(it); } catch (e) { it.err = 'この写真は読みこめませんでした。'; console.error(e); }
+        if (id !== runId) return;
+        if (it.url) URL.revokeObjectURL(it.url);
+        it.url = it.blob ? URL.createObjectURL(it.blob) : '';
+        render();
+      }
+    }
+
+    // ── 表示 ──
+    function render() {
+      $('empty').hidden = items.length > 0;
+      const left = items.filter((i) => !i.blob && !i.err).length;
+      $('count').innerHTML = items.length
+        ? `選んだ写真：<strong>${items.length}</strong>枚${left ? `（縮めています…あと${left}枚）` : '（すべて縮めました）'}`
+        : 'まだ写真を選んでいません';
+      $<HTMLButtonElement>('clear').disabled = items.length === 0;
+      const done = items.filter((i) => i.blob);
+      $<HTMLButtonElement>('zip').disabled = done.length === 0 || done.length < items.filter((i) => !i.err).length;
+      list.replaceChildren(...items.map((it, idx) => {
+        const li = document.createElement('li');
+        li.className = 'ph';
+        const img = document.createElement('img');
+        img.alt = `${it.file.name} の縮めた見本`;
+        if (it.url) { img.src = it.url; img.addEventListener('click', () => view(it.url)); }
+        const mid = document.createElement('div');
+        const name = document.createElement('div');
+        name.className = 'ph__name'; name.textContent = it.file.name;
+        const info = document.createElement('div');
+        info.className = 'ph__info';
+        if (it.err) info.innerHTML = `<span class="ph__err">⚠ ${it.err}</span>`;
+        else if (!it.blob) info.textContent = `${kb(it.file.size)} → 縮めています…`;
+        else if (it.kept) info.innerHTML = `${kb(it.file.size)} → <span class="ph__same">これ以上小さくならないので、元のまま</span>`;
+        else {
+          const pct = Math.round((1 - it.blob.size / it.file.size) * 100);
+          info.innerHTML = `${kb(it.file.size)} → <strong>${kb(it.blob.size)}</strong> <span class="ph__down">${pct > 0 ? `${pct}% 小さく` : '小さくなりません'}</span><br>${it.w}×${it.h}ピクセル${limitOn.checked && it.blob.type !== 'image/png' ? `・画質 ${Math.round(it.lastQ * 100)}` : ''}`;
+        }
+        mid.append(name, info);
+        const act = document.createElement('div');
+        act.className = 'ph__act';
+        if (it.blob) {
+          const a = document.createElement('a');
+          a.className = 'tool__btn tool__btn--sub'; a.href = it.url; a.download = it.name; a.textContent = '保存';
+          act.append(a);
+        }
+        const del = document.createElement('button');
+        del.type = 'button'; del.className = 'tool__btn tool__btn--sub'; del.textContent = '×';
+        del.setAttribute('aria-label', `${it.file.name} を消す`);
+        del.style.marginLeft = '0.4rem';
+        del.addEventListener('click', () => { if (it.url) URL.revokeObjectURL(it.url); items.splice(idx, 1); render(); });
+        act.append(del);
+        li.append(img, mid, act);
+        return li;
+      }));
+      const before = done.reduce((s, i) => s + i.file.size, 0);
+      const after = done.reduce((s, i) => s + i.blob!.size, 0);
+      $('total').innerHTML = done.length
+        ? `${done.length}枚：<span class="tool__big">${kb(before)} → ${kb(after)}</span>（${Math.round((1 - after / before) * 100)}% 小さく）`
+        : '';
+    }
+
+    function view(url: string) {
+      const d = document.createElement('div');
+      d.className = 'ph-view'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', '縮めた写真を大きく見る（押すと閉じます）');
+      const img = document.createElement('img'); img.src = url; img.alt = '';
+      d.append(img);
+      const close = () => { d.remove(); document.removeEventListener('keydown', esc); };
+      const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+      d.addEventListener('click', close); document.addEventListener('keydown', esc);
+      document.body.append(d);
+    }
+
+    $('clear').addEventListener('click', () => {
+      runId++;
+      items.forEach((i) => i.url && URL.revokeObjectURL(i.url));
+      items.length = 0; $('msg').textContent = ''; render();
+    });
+
+    // ── まとめて保存（圧縮なしの ZIP を組み立てる） ──
+    const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+    const crc32 = (b: Uint8Array) => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+    async function makeZip(files: { name: string; blob: Blob }[]) {
+      const enc = new TextEncoder();
+      const parts: BlobPart[] = [], cen: Uint8Array[] = [];
+      let off = 0;
+      const d = new Date();
+      const time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+      const date = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+      const used = new Set<string>();
+      for (const f of files) {
+        let n = f.name, i = 2;
+        while (used.has(n)) n = f.name.replace(/(\.[^.]+)$/, `(${i++})$1`);
+        used.add(n);
+        const name = enc.encode(n);
+        const data = new Uint8Array(await f.blob.arrayBuffer());
+        const crc = crc32(data);
+        const loc = new DataView(new ArrayBuffer(30));
+        loc.setUint32(0, 0x04034b50, true); loc.setUint16(4, 20, true); loc.setUint16(6, 0x0800, true); // 0x0800＝名前は UTF-8
+        loc.setUint16(10, time, true); loc.setUint16(12, date, true);
+        loc.setUint32(14, crc, true); loc.setUint32(18, data.length, true); loc.setUint32(22, data.length, true);
+        loc.setUint16(26, name.length, true);
+        parts.push(loc.buffer, name, data);
+        const c = new DataView(new ArrayBuffer(46));
+        c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true);
+        c.setUint16(12, time, true); c.setUint16(14, date, true);
+        c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true);
+        c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+        const ce = new Uint8Array(46 + name.length); ce.set(new Uint8Array(c.buffer)); ce.set(name, 46);
+        cen.push(ce);
+        off += 30 + name.length + data.length;
+      }
+      const cenSize = cen.reduce((s, x) => s + x.length, 0);
+      const end = new DataView(new ArrayBuffer(22));
+      end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+      end.setUint32(12, cenSize, true); end.setUint32(16, off, true);
+      return new Blob([...parts, ...cen, end.buffer], { type: 'application/zip' });
+    }
+    $('zip').addEventListener('click', async () => {
+      const files = items.filter((i) => i.blob).map((i) => ({ name: i.name, blob: i.blob! }));
+      $('msg').textContent = 'ZIP を作っています…';
+      const zip = await makeZip(files);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zip); a.download = 'shashin_small.zip';
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+      $('msg').textContent = `${files.length}枚を ZIP で保存しました（${kb(zip.size)}）。`;
+    });
+  </script>
+</BaseLayout>
