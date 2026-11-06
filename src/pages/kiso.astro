@@ -7,10 +7,11 @@ import ListControls from '../components/ListControls.astro';
 import { getPublishedArticles, isKiso, KISO_FIRST } from '../data/articles';
 
 const all = (await getPublishedArticles()).filter(isKiso);
-// 最初に読んでほしい記事（筆界の話）は、一覧の上に別に出し、下の一覧からは外す
+// 最初に読んでほしい記事（筆界の話・土地家屋調査士の話）は、一覧の上に別に出し、下の一覧からは外す
 // （下の一覧は「ならび順」で並べ替わるので、その外に置いて、いつも最初に見えるようにする）
-const first = all.find((a) => a.id === KISO_FIRST);
-const kiso = all.filter((a) => a !== first);
+const firsts = KISO_FIRST.map((id) => all.find((a) => a.id === id)).filter((a) => a !== undefined);
+const first = firsts.length > 0;
+const kiso = all.filter((a) => !firsts.includes(a));
 ---
 <BaseLayout title="基礎知識について" description="境界や登記の基本を、はじめての方向けにやさしく解説します。">
   <StationSign kicker="1番のりば｜はじめての方" title="基礎知識について" sub="BASICS" color="#6d28a8" prev={TERMINAL} />
@@ -20,9 +21,9 @@ const kiso = all.filter((a) => a !== first);
   {first && (
     <section class="first-pick" aria-labelledby="first-pick-title">
       <h2 id="first-pick-title">まずはここから</h2>
-      <p class="first-pick__lead">土地の境目の話は、「筆界」という言葉を知ると、ぐっとわかりやすくなります。はじめての方は、この記事から読んでみてください。</p>
+      <p class="first-pick__lead">土地の境目の話は、「筆界」という言葉と、境目を調べる専門家「土地家屋調査士」を知ると、ぐっとわかりやすくなります。はじめての方は、ここから読んでみてください。</p>
       <ul class="first-pick__list">
-        <ArticleCard article={first} />
+        {firsts.map((a) => <ArticleCard article={a} />)}
       </ul>
     </section>
   )}
@@ -44,6 +45,6 @@ const kiso = all.filter((a) => a !== first);
   .first-pick { margin: 1.5rem 0 0.5rem; padding: 0.9rem 1rem 1rem; border: 2px solid #6d28a8; border-radius: 10px; }
   .first-pick h2 { margin: 0 0 0.3rem; font-size: 1.15rem; color: #6d28a8; }
   .first-pick__lead { margin: 0 0 0.8rem; font-size: 0.95rem; }
-  .first-pick__list { list-style: none; margin: 0; padding: 0; }
+  .first-pick__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
   .rest-title { font-size: 1.15rem; }
 </style>
