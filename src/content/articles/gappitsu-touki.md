@@ -11,6 +11,9 @@ tags:
   - 合筆
   - 筆界
   - 不動産登記法
+station: 合筆登記
+branchFrom: hyoudaibu-touki
+branchOrder: 2
 ---
 
 ## 合筆とは

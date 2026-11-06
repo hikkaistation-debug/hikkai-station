@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getLine } from './lines';
 
@@ -50,8 +51,15 @@ export type Tracks = {
 export function buildTracks(all: Article[]): Tracks {
   const byId = new Map(all.map((a) => [a.id, a]));
   const branches = new Map<string, Article[]>();
-  for (const a of all) {
+  // 分かれ元がまだ下書き（本番に出ない）なら、その支線の記事は本線にもどして表示する
+  const fromOf = (a: Article) => {
     const from = a.data.branchFrom;
+    if (!from || byId.has(from)) return from;
+    if (existsSync(`src/content/articles/${from}.md`)) return undefined;
+    return from;
+  };
+  for (const a of all) {
+    const from = fromOf(a);
     if (!from) continue;
     if (!byId.has(from)) {
       throw new Error(`記事「${a.id}」の branchFrom「${from}」という記事が見つかりません（ファイル名から .md を除いた名前を書いてください）`);
@@ -67,8 +75,11 @@ export function buildTracks(all: Article[]): Tracks {
     );
   }
   return {
-    main: (lineId) => all.filter((a) => a.data.category === lineId && !a.data.branchFrom),
+    main: (lineId) => all.filter((a) => a.data.category === lineId && !fromOf(a)),
     branchOf: (parentId) => branches.get(parentId) ?? [],
-    parentOf: (a) => (a.data.branchFrom ? byId.get(a.data.branchFrom) : undefined),
+    parentOf: (a) => {
+      const from = fromOf(a);
+      return from ? byId.get(from) : undefined;
+    },
   };
 }

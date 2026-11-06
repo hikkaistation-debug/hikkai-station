@@ -10,6 +10,9 @@ comment: 畑を宅地にするときは、登記の前に農地法の許可や�
 tags:
   - 入門
   - 不動産登記法
+station: 地目変更登記
+branchFrom: hyoudaibu-touki
+branchOrder: 3
 ---
 
 ## 地目は23種類（不動産登記規則第99条）

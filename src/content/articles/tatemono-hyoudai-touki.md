@@ -10,6 +10,9 @@ comment: 登記の床面積と、建築確認の床面積がちがうのはよ�
 tags:
   - 入門
   - 不動産登記法
+station: 建物表題登記
+branchFrom: hyoudaibu-touki
+branchOrder: 4
 ---
 
 ## どんな登記？

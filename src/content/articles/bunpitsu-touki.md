@@ -12,6 +12,9 @@ tags:
   - 筆界
   - 地積測量図
   - 入門
+station: 分筆登記
+branchFrom: hyoudaibu-touki
+branchOrder: 1
 ---
 
 ## どんなときに分筆する？
