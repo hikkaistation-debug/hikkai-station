@@ -24,7 +24,7 @@ import { TAG_GROUPS } from '../data/tags';
   </form>
 
   <details class="facets" id="facets" open>
-    <summary>絞り込みパネル（路線・タグ）<span id="facet-summary"></span></summary>
+    <summary>路線・タグでしぼりこむ<span id="facet-summary"></span></summary>
     <div class="facets__row">
       <p class="facets__label">路線</p>
       <ul class="facet-chips">
@@ -51,7 +51,7 @@ import { TAG_GROUPS } from '../data/tags';
         </ul>
       </div>
     ))}
-    <p class="facets__foot"><button type="button" id="facet-clear" class="facets__clear">絞り込みをすべて外す</button></p>
+    <p class="facets__foot"><button type="button" id="facet-clear" class="facets__clear">しぼりこみを外す</button></p>
   </details>
 
   <p id="search-status" aria-live="polite"></p>
@@ -230,7 +230,7 @@ import { TAG_GROUPS } from '../data/tags';
     const conds = [q && `「${q}」`, ...[...selected.line].map((v) => chips.find((c) => c.dataset.value === v)?.textContent?.replace(/\d+$/, '').trim()), ...[...selected.tag].map((t) => `#${t}`)].filter(Boolean);
     status.textContent = conds.length > 0
       ? `${conds.join(' × ')} の検索結果：記事 ${articles.length}件・読み物 ${stories.length}件・用語 ${terms.length}件・法令 ${laws.length}件・通達 ${circulars.length}件・判例 ${cases.length}件`
-      : `すべての記事：${articles.length}件（キーワードや絞り込みでさがせます）`;
+      : `すべての記事：${articles.length}件（キーワードやしぼりこみでさがせます）`;
     termSection.hidden = terms.length === 0;
     lawSection.hidden = laws.length === 0;
     circularSection.hidden = circulars.length === 0;

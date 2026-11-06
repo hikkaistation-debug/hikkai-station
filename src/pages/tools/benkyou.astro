@@ -40,7 +40,7 @@ const PARTS = ['午前 択一', '午前 記述', '午後 択一', '午後 土地
         <tbody>
           {YEARS.map((y, yi) => (
             <tr>
-              <td><a href={y.href} target="_blank" rel="noopener">{y.label}</a></td>
+              <td><a href={y.href} target="_blank" rel="noopener">{y.label}<span class="visually-hidden">（新しいタブで開きます）</span></a></td>
               {PARTS.map((p, pi) => (
                 <td style="text-align:center"><input type="checkbox" data-key={`${yi}-${pi}`} aria-label={`${y.label} ${p}`} /></td>
               ))}

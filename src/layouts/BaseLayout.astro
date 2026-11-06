@@ -122,6 +122,22 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
         btn.textContent = open ? 'メニュー' : 'とじる';
         if (nav) nav.hidden = open;
       });
+
+      // カード（記事・小説・用語・通達・判例など）は、枠のどこを押してもタイトルのリンク先を開く。
+      // 文字を選んでいるとき・カードの中のボタンや別のリンクを押したときは開かない（コピーしやすいように）。
+      // 検索結果のようにあとから増えるカードにも効くよう、document で受ける。
+      const CARD = '.article-card, .tsutatsu';
+      const CARD_LINK = '.article-card__title a, .tsutatsu__title a';
+      document.addEventListener('click', (e) => {
+        const t = e.target as Element | null;
+        const card = t?.closest?.(CARD);
+        if (!card || t!.closest('a, button, input, select, textarea, label, summary')) return;
+        if ((window.getSelection()?.toString() ?? '') !== '') return;
+        const link = card.querySelector<HTMLAnchorElement>(CARD_LINK);
+        if (!link) return;
+        if (e.ctrlKey || e.metaKey || e.shiftKey) window.open(link.href, '_blank', 'noopener');
+        else link.click();
+      });
     </script>
   </body>
 </html>

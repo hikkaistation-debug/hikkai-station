@@ -33,6 +33,9 @@ body {
 
 a { color: #0a55a0; text-underline-offset: 0.2em; }
 a:hover { color: #073c72; }
+/* 新しいタブで開くリンクには、サイト全体で同じ「↗」を自動で付ける（手で ↗ を書かない）。
+   読み上げ用の「（新しいタブで開きます）」は、リンクの中に visually-hidden で書く。図の拡大リンクと、手元の通達チェック（もとから ↗ あり）には付けない */
+a[target='_blank']:not(:has(img)):not(.tc-item__links a)::after { content: ' ↗'; content: ' ↗' / ''; white-space: nowrap; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 
 img, svg { max-width: 100%; }
@@ -157,10 +160,17 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 .article-card {
   background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--c);
   border-radius: var(--radius); padding: 0.9rem 1rem;
+  transition: box-shadow 0.1s, border-color 0.1s;
 }
 .article-card__title { margin: 0.45rem 0 0.25rem; font-size: 1.1rem; }
 .article-card__title a { color: var(--ink); text-decoration: none; }
-.article-card__title a:hover { text-decoration: underline; }
+/* 押せるカード（サイト全体で同じ）：左の色帯は8px・枠は1px、のせると枠に色と下の影。
+   枠のどこを押してもタイトルのリンク先が開く（しくみは BaseLayout の script）。
+   記事・検索結果（.article-card）と通達・判例（.tsutatsu）で見え方をそろえる */
+.article-card:has(.article-card__title a), .tsutatsu:has(.tsutatsu__title a) { cursor: pointer; }
+.article-card:has(.article-card__title a):hover { border-color: var(--c); box-shadow: 0 3px 0 var(--c); }
+.tsutatsu:has(.tsutatsu__title a):hover { border-color: var(--tc-card, var(--navy)); box-shadow: 0 3px 0 var(--tc-card, var(--navy)); }
+.article-card:hover .article-card__title a, .tsutatsu:hover .tsutatsu__title a { text-decoration: underline; }
 
 /* 下書きの印（手元の確認用画面だけに出る） */
 .draft-badge { display: inline-block; background: #c4122f; color: #fff; font-weight: 800; font-size: 0.8rem; border-radius: 6px; padding: 0.05rem 0.5rem; }
@@ -178,9 +188,9 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 .platform {
   display: flex; flex-direction: column; background: var(--card); color: var(--ink);
   border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; text-decoration: none;
-  border: 3px solid var(--pc, var(--navy)); border-top-width: 12px; transition: transform 0.1s;
+  border: 3px solid var(--pc, var(--navy)); border-top-width: 12px; transition: box-shadow 0.1s;
 }
-.platform:hover { color: var(--ink); transform: translateY(-2px); box-shadow: 0 4px 0 var(--pc, var(--navy)); }
+.platform:hover { color: var(--ink); box-shadow: 0 3px 0 var(--pc, var(--navy)); }
 .platform__head { display: flex; align-items: center; gap: 0.6rem; }
 .platform__num {
   display: grid; place-items: center; width: 2.6rem; height: 2.6rem; flex: none;
@@ -208,7 +218,7 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
   padding: 0.55rem 0.8rem; background: var(--card); border: 1px solid var(--line);
   border-radius: var(--radius); text-decoration: none; color: var(--ink); font-weight: 700;
 }
-.route-map a:hover { border-color: var(--navy); }
+.route-map a:hover { border-color: var(--navy); box-shadow: 0 3px 0 var(--navy); }
 .route-map small { font-weight: 500; color: var(--ink-soft); }
 .route-map .is-soon span.stop { color: var(--ink-soft); background: #efeee9; }
 .route-map .is-soon::before { border-style: dashed; }
@@ -218,10 +228,10 @@ a.line-badge:hover { background: #f1f1ee; color: var(--ink); }
 @media (min-width: 760px) { .line-list { grid-template-columns: repeat(2, 1fr); } }
 .line-list a {
   display: flex; align-items: center; gap: 0.6rem; background: var(--card);
-  border: 1px solid var(--line); border-left: 10px solid var(--c);
+  border: 1px solid var(--line); border-left: 8px solid var(--c);
   border-radius: var(--radius); padding: 0.6rem 0.8rem; color: var(--ink); text-decoration: none; font-weight: 700;
 }
-.line-list a:hover { border-color: var(--c); }
+.line-list a:hover { border-color: var(--c); box-shadow: 0 3px 0 var(--c); }
 .line-list .count { margin-left: auto; color: var(--ink-soft); font-size: 0.85rem; font-weight: 500; }
 
 /* ---------- 検索ボックス ---------- */
@@ -470,13 +480,14 @@ main { padding-bottom: 1rem; }
 .rosen-track--branch .rosen-stop::before { width: 0.7rem; height: 0.7rem; left: -1.33rem; border-width: 2.5px; }
 
 /* ---------- タグ ---------- */
+/* 丸いボタン（チップ）はサイト全体で同じ：のせると薄い青、えらんでいるときは紺 */
 .tag-group h2 { font-size: 1.1rem; margin: 1.4rem 0 0.5rem; }
 .tag-chips { list-style: none; padding: 0; margin: 0.5rem 0 1rem; display: flex; flex-wrap: wrap; gap: 0.45rem; }
 .tag-chip {
   display: inline-flex; align-items: center; gap: 0.4rem; background: #fff; color: var(--ink); text-decoration: none;
   border: 2px solid var(--navy); border-radius: 999px; padding: 0.15rem 0.75rem; font-weight: 700; font-size: 0.92rem;
 }
-.tag-chip:hover { background: var(--sign-yellow); color: var(--navy); }
+.tag-chip:hover { background: #eef2f8; color: var(--ink); }
 .tag-chip.is-empty { opacity: 0.5; border-style: dashed; }
 .tag-chip__count { font-size: 0.75rem; background: var(--navy); color: #fff; border-radius: 999px; padding: 0 0.45rem; }
 .tag-term { border-left: 8px solid var(--sign-yellow); }
@@ -502,6 +513,7 @@ main { padding-bottom: 1rem; }
 .facet-chip[aria-pressed='true'] { background: var(--c, var(--navy)); color: #fff; }
 .facet-chip[aria-pressed='true'] .line-mark { color: #fff; }
 .facet-chip:disabled { opacity: 0.4; cursor: default; }
+.facet-chip:hover:not(:disabled):not([aria-pressed='true']), .list-controls button:hover:not([aria-pressed='true']) { background: #eef2f8; }
 .facet-chip__count { font-size: 0.72rem; background: #ebeae4; color: var(--ink); border-radius: 999px; padding: 0 0.4rem; }
 .facets__foot { margin: 0.7rem 0 0; text-align: right; }
 .facets__clear { font: inherit; font-size: 0.85rem; background: none; border: 0; color: #0a55a0; text-decoration: underline; cursor: pointer; }
@@ -526,7 +538,7 @@ main { padding-bottom: 1rem; }
 .story-stops li { position: relative; padding-left: 2.4rem; margin: 0.35rem 0; }
 .story-stops li::before { content: ''; position: absolute; left: 0.35rem; top: 1.05rem; width: 0.95rem; height: 0.95rem; background: #fff; border: 4px solid var(--tc); border-radius: 50%; }
 .story-stops a, .story-stops span.stop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.6rem; padding: 0.5rem 0.8rem; border: 1px solid var(--line); border-radius: var(--radius); text-decoration: none; color: var(--ink); background: #fff; }
-.story-stops a:hover { border-color: var(--tc); background: #fafaf7; }
+.story-stops a:hover { border-color: var(--tc); box-shadow: 0 3px 0 var(--tc); }
 .story-stops small { flex-basis: 100%; color: var(--ink-soft); font-size: 0.86rem; line-height: 1.6; }
 .story-stops__no { font-size: 0.8rem; font-weight: 800; color: #fff; background: var(--tc); border-radius: 4px; padding: 0 0.4rem; }
 .story-stops__title { font-weight: 800; }
@@ -552,8 +564,8 @@ main { padding-bottom: 1rem; }
 .story-share small { color: var(--ink-soft); }
 .story-latest { list-style: none; margin: 0.8rem 0; padding: 0; display: grid; gap: 0.7rem; }
 @media (min-width: 760px) { .story-latest { grid-template-columns: repeat(2, 1fr); } }
-.story-latest a { display: flex; align-items: center; gap: 0.8rem; background: var(--card); border: 2px solid var(--tc); border-radius: var(--radius); padding: 0.7rem 0.9rem; color: var(--ink); text-decoration: none; height: 100%; }
-.story-latest a:hover { box-shadow: 0 3px 0 var(--tc); }
+.story-latest a { display: flex; align-items: center; gap: 0.8rem; background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--tc); border-radius: var(--radius); padding: 0.7rem 0.9rem; color: var(--ink); text-decoration: none; height: 100%; }
+.story-latest a:hover { border-color: var(--tc); box-shadow: 0 3px 0 var(--tc); }
 .story-latest .train__kind { flex: none; font-size: 0.85rem; }
 .story-latest__train { display: block; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); }
 .story-latest__title { display: block; font-weight: 800; }
@@ -561,8 +573,8 @@ main { padding-bottom: 1rem; }
 /* ---------- 計算ツール ---------- */
 .tool-list { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: 0.8rem; }
 @media (min-width: 760px) { .tool-list { grid-template-columns: repeat(2, 1fr); } }
-.tool-card { display: flex; flex-direction: column; height: 100%; background: var(--card); color: var(--ink); text-decoration: none; border: 2px solid var(--navy); border-left-width: 10px; border-radius: var(--radius); padding: 0.8rem 1rem; }
-.tool-card:hover { color: var(--ink); box-shadow: 0 3px 0 var(--navy); }
+.tool-card { display: flex; flex-direction: column; height: 100%; background: var(--card); color: var(--ink); text-decoration: none; border: 1px solid var(--line); border-left: 8px solid var(--navy); border-radius: var(--radius); padding: 0.8rem 1rem; }
+.tool-card:hover { color: var(--ink); border-color: var(--navy); box-shadow: 0 3px 0 var(--navy); }
 .tool-card__name { font-weight: 800; font-size: 1.1rem; }
 .tool-card__who { display: inline-block; margin-top: 0.2rem; font-size: 0.78rem; font-weight: 800; color: #fff; background: var(--navy); border-radius: 4px; padding: 0 0.45rem; align-self: flex-start; }
 .tool-card__desc { margin: 0.4rem 0 0; font-size: 0.93rem; color: var(--ink-soft); line-height: 1.7; }
@@ -644,8 +656,8 @@ main { padding-bottom: 1rem; }
 .navi-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; margin: 0 0 0.7rem; }
 .navi-quick__label { font-size: 0.88rem; font-weight: 800; color: var(--ink-soft); }
 .navi-quick ul { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
-.navi-quick button { font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; padding: 0.15rem 0.7rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--navy); }
-.navi-quick button:hover { border-color: var(--navy); background: #eef2f8; }
+.navi-quick button { font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; padding: 0.15rem 0.7rem; border: 2px solid var(--navy); border-radius: 999px; background: #fff; color: var(--navy); }
+.navi-quick button:hover { background: #eef2f8; }
 .navi-quick button[aria-pressed='true'] { background: var(--navy); border-color: var(--navy); color: #fff; }
 .navi-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.6rem; }
 .navi-bar #navi-count { margin: 0; font-weight: 800; }
@@ -658,9 +670,9 @@ main { padding-bottom: 1rem; }
 .tsutatsu__laws span { font-weight: 800; }
 .tsutatsu__fields li:has(button) { border: 0; padding: 0; }
 .tsutatsu__fields button { font: inherit; font-size: 0.78rem; font-weight: 800; color: var(--navy); background: #fff; border: 2px solid var(--navy); border-radius: 999px; padding: 0 0.5rem; cursor: pointer; }
-.tsutatsu__fields button:hover { background: var(--navy); color: #fff; }
+.tsutatsu__fields button:hover { background: #eef2f8; }
 /* 判例ナビ */
-.hanrei { border-left-color: #464c58; }
+.hanrei { border-left-color: #464c58; --tc-card: #464c58; }
 .hanrei__level { display: inline-block; margin-left: 0.4rem; padding: 0 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; vertical-align: 1px; }
 .hanrei__level--easy { background: #e6f4ea; color: #1a7f37; }
 .hanrei__level--pro { background: #eef2f8; color: #1f2a44; }

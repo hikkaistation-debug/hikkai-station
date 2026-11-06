@@ -52,7 +52,7 @@ const blanks = ANAUME.reduce((n, a) => n + splitAnaume(a.text).filter((p) => p.t
         <p class="anaume__foot">
           <label><input type="checkbox" class="anaume__done" /> 覚えた</label>
           <button type="button" class="anaume__row-open">この条の答え</button>
-          <a href={anaumeUrl(a)} target="_blank" rel="noopener">e-Gov で原文を見る ↗</a>
+          <a href={anaumeUrl(a)} target="_blank" rel="noopener">e-Gov で原文を見る<span class="visually-hidden">（新しいタブで開きます）</span></a>
         </p>
       </li>
     ))}

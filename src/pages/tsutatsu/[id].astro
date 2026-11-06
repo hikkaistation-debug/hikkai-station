@@ -30,7 +30,7 @@ const { t } = Astro.props as { t: Tsutatsu };
   </section>
 
   <p class="read-original">
-    <a class="cta__button" href={t.url} rel="noopener" target="_blank">本文を読む（公式）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+    <a class="cta__button" href={t.url} rel="noopener" target="_blank">本文を読む（公式）<span class="visually-hidden">（新しいタブで開きます）</span></a>
   </p>
   {t.sourcePage && (
     <p>掲載ページ：<a href={t.sourcePage.href} rel="noopener" target="_blank">{t.sourcePage.label}<span class="visually-hidden">（新しいタブで開きます）</span></a></p>

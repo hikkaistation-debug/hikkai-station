@@ -32,7 +32,7 @@ const lawKeys = Object.keys(LAWS) as LawKey[];
               <h3 class="tsutatsu__title navi-hl">{h.article}（{h.heading}）</h3>
               <p class="tsutatsu__summary navi-hl">{h.summary}</p>
               <p class="tsutatsu__links">
-                <a href={lawUrl(h)} rel="noopener" target="_blank">原文を読む（e-Gov）<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
+                <a href={lawUrl(h)} rel="noopener" target="_blank">原文を読む（e-Gov）<span class="visually-hidden">（新しいタブで開きます）</span></a>
                 {h.links?.map((l) => <a href={l.href}>{l.label}</a>)}
               </p>
               <ul class="tsutatsu__fields">{h.fields.map((f) => <li><button type="button" data-pick-field={f} title={`「${f}」の条文だけを表示`}>{f}</button></li>)}</ul>

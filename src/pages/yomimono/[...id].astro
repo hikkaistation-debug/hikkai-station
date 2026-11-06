@@ -72,8 +72,8 @@ const shareHref = `https://x.com/intent/post?text=${encodeURIComponent(shareText
   </nav>
 
   <p class="story-share">
-    <a href={shareHref} rel="noopener" target="_blank">この話を X でシェアする<span class="visually-hidden">（新しいタブで開きます）</span> ↗</a>
-    {SITE.xUser && <small>毎日の更新は <a href={`https://x.com/${SITE.xUser}`} rel="noopener" target="_blank">@{SITE.xUser}</a> でもお知らせします。</small>}
+    <a href={shareHref} rel="noopener" target="_blank">この話を X でシェアする<span class="visually-hidden">（新しいタブで開きます）</span></a>
+    {SITE.xUser && <small>毎日の更新は <a href={`https://x.com/${SITE.xUser}`} rel="noopener" target="_blank">@{SITE.xUser}<span class="visually-hidden">（新しいタブで開きます）</span></a> でもお知らせします。</small>}
   </p>
 
   <p><a href="/yomimono/">← 車内の読み物の一覧へ</a></p>

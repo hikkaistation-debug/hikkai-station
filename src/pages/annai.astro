@@ -94,9 +94,10 @@ const cases = [
 
   <section id="glossary" aria-labelledby="glossary-h">
     <h2 id="glossary-h">用語さくいん</h2>
-    <div class="search-box">
-      <label for="g-filter" class="visually-hidden">言葉をしぼりこむ</label>
-      <input id="g-filter" type="search" placeholder="言葉やよみで、しぼりこみ（例：ぶんぴつ）" autocomplete="off" />
+    <!-- 法令・通達・判例ナビ（NaviFilter）と同じ見た目の「キーワード」欄 -->
+    <div class="navi-filter__q">
+      <label for="g-filter">キーワード</label>
+      <input id="g-filter" type="search" placeholder="例）ぶんぴつ、筆界" autocomplete="off" />
     </div>
     <p id="g-status" aria-live="polite" class="visually-hidden"></p>
     <dl class="glossary">
