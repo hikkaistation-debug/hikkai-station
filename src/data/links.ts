@@ -133,6 +133,19 @@ export const LINKS: LinkItem[] = [
     checked: '2026-11-04',
   },
 
+  {
+    name: '法務局ホームページ「管轄のご案内」',
+    url: 'https://houmukyoku.moj.go.jp/homu/static/kankatsu_index.html',
+    desc: '土地や建物の場所から、登記を受け持つ法務局（登記所）を調べられるページです。各法務局の住所や、登記の手続きの案内（相談）の予約方法もここからたどれます。',
+    category: '登記・資料の取得',
+    audience: ['一般', '実務者'],
+    kind: '公式',
+    price: '無料',
+    checked: '2026-11-06',
+    note: '法務局の登記手続案内は、申請書の書き方などを聞ける窓口で、予約制のところが多いです。境界がどこかを決めてもらう場ではありません。',
+    related: { label: '法務局で取れる土地の資料まとめ', href: '/articles/houmukyoku-shiryou/' },
+  },
+
   // ---------- 法令・制度 ----------
   {
     name: 'e-Gov法令検索',
@@ -213,6 +226,19 @@ export const LINKS: LinkItem[] = [
     checked: '2026-11-04',
   },
 
+  {
+    name: '国土地理院',
+    url: 'https://www.gsi.go.jp/',
+    desc: '日本の測量と地図づくりを受け持つ国の機関（国土交通省）のサイトです。基準点（測量の目じるしになる点）の成果や、測量のきまり・地殻変動の情報などを調べられます。',
+    category: '測量・技術',
+    audience: ['一般', '実務者'],
+    kind: '公式',
+    price: '無料',
+    checked: '2026-11-06',
+    note: '地図を見るだけなら「地理院地図」が便利です。基準点の位置や成果は、サイト内の「基準点成果等閲覧サービス」から探せます。',
+    related: { label: 'GNSSとは？', href: '/articles/gnss-towa/' },
+  },
+
   // ---------- 資格・試験 ----------
   {
     name: '法務省「土地家屋調査士試験」',
@@ -238,5 +264,17 @@ export const LINKS: LinkItem[] = [
     price: '無料',
     checked: '2026-11-04',
     related: { label: '土地家屋調査士ってどんな人？', href: '/articles/chousashi-towa/' },
+  },
+  {
+    name: '日本司法書士会連合会',
+    url: 'https://www.shiho-shoshi.or.jp/',
+    desc: '司法書士の全国団体のサイトです。相続や売買による名義の変更（権利の登記）など、司法書士に頼める仕事の紹介や、各地の司法書士会・相談窓口を探せます。',
+    category: '相談先',
+    audience: ['一般'],
+    kind: '公式',
+    price: '無料',
+    checked: '2026-11-06',
+    note: '土地の境界や、表題部の登記（分筆・建物の新築など）は土地家屋調査士、名義（権利）の登記は司法書士、と分かれています。',
+    related: { label: '相続登記の申請が義務になりました（2024年4月から）', href: '/articles/souzoku-touki-gimuka/' },
   },
 ];
