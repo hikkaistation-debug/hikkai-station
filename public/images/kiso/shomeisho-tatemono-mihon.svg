@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">建物の登記事項証明書の表題部の見本。架空の例。所在は土地の地番まで書き、家屋番号、種類は居宅、構造は木造かわらぶき2階建、床面積は階ごと</title>
+  <style>
+    .c { font-size: 13px; fill: #1a1d24; }
+    .h { font-size: 13px; fill: #1a1d24; font-weight: 700; }
+    .g { fill: none; stroke: #1a1d24; stroke-width: 1; }
+    .n circle { fill: #c4122f; }
+    .n text { font-size: 13px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  </style>
+  <rect width="760" height="330" fill="#ffffff"/>
+  <rect x="0" y="0" width="760" height="34" fill="#c4122f"/>
+  <text x="380" y="23" font-size="15" font-weight="700" text-anchor="middle" fill="#fff">見本（架空の例）― 建物の表題部</text>
+
+  <g transform="translate(16,0)">
+    <text x="40" y="62" class="c">見本市中央町一丁目12番地3</text>
+    <text x="720" y="62" class="h" text-anchor="end">全部事項証明書　　（建物）</text>
+
+    <rect x="40" y="72" width="680" height="196" class="g" stroke-width="1.6"/>
+    <rect x="40" y="72" width="400" height="28" fill="#eef1f8"/>
+    <line x1="40" y1="100" x2="720" y2="100" class="g"/>
+    <line x1="40" y1="128" x2="720" y2="128" class="g"/>
+    <line x1="40" y1="156" x2="720" y2="156" class="g"/>
+    <line x1="40" y1="184" x2="720" y2="184" class="g"/>
+    <line x1="40" y1="212" x2="720" y2="212" class="g"/>
+    <!-- 1行目 -->
+    <line x1="440" y1="72" x2="440" y2="100" class="g"/>
+    <line x1="485" y1="72" x2="485" y2="100" class="g"/>
+    <line x1="535" y1="72" x2="535" y2="100" class="g"/>
+    <line x1="612" y1="72" x2="612" y2="100" class="g"/>
+    <text x="240" y="91" class="h" text-anchor="middle">表　題　部　（主である建物の表示）</text>
+    <text x="462" y="91" class="c" text-anchor="middle">調製</text>
+    <text x="510" y="91" class="c" text-anchor="middle">余白</text>
+    <text x="573" y="91" class="c" text-anchor="middle">不動産番号</text>
+    <text x="666" y="91" class="c" text-anchor="middle">2345678901234</text>
+    <!-- 所在図番号・所在・家屋番号 -->
+    <line x1="130" y1="100" x2="130" y2="184" class="g"/>
+    <line x1="560" y1="128" x2="560" y2="184" class="g"/>
+    <text x="85" y="119" class="c" text-anchor="middle">所在図番号</text>
+    <text x="142" y="119" class="c">余白</text>
+    <text x="85" y="147" class="c" text-anchor="middle">所　在</text>
+    <text x="142" y="147" class="c">見本市中央町一丁目　12番地3</text>
+    <text x="640" y="147" class="c" text-anchor="middle">余白</text>
+    <text x="85" y="175" class="c" text-anchor="middle">家屋番号</text>
+    <text x="142" y="175" class="c">12番3</text>
+    <text x="640" y="175" class="c" text-anchor="middle">余白</text>
+    <!-- 見出し -->
+    <line x1="140" y1="184" x2="140" y2="268" class="g"/>
+    <line x1="300" y1="184" x2="300" y2="268" class="g"/>
+    <line x1="450" y1="184" x2="450" y2="268" class="g"/>
+    <text x="90" y="203" class="c" text-anchor="middle">①　種　類</text>
+    <text x="220" y="203" class="c" text-anchor="middle">②　構　造</text>
+    <text x="375" y="203" class="c" text-anchor="middle">③　床　面　積　㎡</text>
+    <text x="585" y="203" class="c" text-anchor="middle">原因及びその日付〔登記の日付〕</text>
+    <!-- 記録 -->
+    <text x="60" y="232" class="c">居宅</text>
+    <text x="152" y="232" class="c">木造かわらぶき</text>
+    <text x="152" y="250" class="c">2階建</text>
+    <text x="312" y="232" class="c">1階</text>
+    <text x="438" y="232" class="c" text-anchor="end">68：50</text>
+    <text x="312" y="250" class="c">2階</text>
+    <text x="438" y="250" class="c" text-anchor="end">52：17</text>
+    <text x="462" y="232" class="c">令和元年7月1日新築</text>
+    <text x="462" y="250" class="c">〔令和元年7月20日〕</text>
+  </g>
+
+  <g class="n">
+    <circle cx="26" cy="142" r="11"/><text x="26" y="147">A</text>
+    <circle cx="26" cy="170" r="11"/><text x="26" y="175">B</text>
+    <circle cx="26" cy="236" r="11"/><text x="26" y="241">C</text>
+  </g>
+  <text x="380" y="300" font-size="12" text-anchor="middle" fill="#464c58">建物の「所在」には、建物が建っている土地の地番（12番地3）まで書きます。</text>
+  <text x="380" y="318" font-size="12" text-anchor="middle" fill="#464c58">地名・番号はすべて架空です。</text>
+</svg>

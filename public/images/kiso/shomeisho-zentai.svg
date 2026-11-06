@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">登記事項証明書の3つの部分。上から表題部は不動産の姿で土地家屋調査士、権利部甲区は持ち主で司法書士、権利部乙区はローンなど所有権以外の権利で司法書士。乙区はないこともある</title>
+  <rect width="640" height="360" fill="#ffffff"/>
+  <text x="320" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">登記事項証明書は3つの部分でできている</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+
+  <!-- 用紙 -->
+  <rect x="40" y="52" width="330" height="290" fill="#fafbfd" stroke="#464c58" stroke-width="2"/>
+  <text x="205" y="74" font-size="13" text-anchor="middle" fill="#464c58">全部事項証明書（土地）</text>
+
+  <!-- 表題部 -->
+  <rect x="56" y="86" width="298" height="76" fill="#eef1f8" stroke="#1f2a44" stroke-width="2.5"/>
+  <text x="72" y="114" font-size="18" font-weight="700" fill="#1f2a44">表題部</text>
+  <text x="72" y="138" font-size="13" fill="#1f2a44">所在・地番・地目・地積</text>
+  <text x="72" y="155" font-size="12" fill="#464c58">（建物は 家屋番号・種類・構造・床面積）</text>
+
+  <!-- 甲区 -->
+  <rect x="56" y="174" width="298" height="70" fill="#fff3f4" stroke="#c4122f" stroke-width="2.5"/>
+  <text x="72" y="202" font-size="18" font-weight="700" fill="#c4122f">権利部（甲区）</text>
+  <text x="72" y="226" font-size="13" fill="#1a1d24">所有権：だれが・いつ・なぜ持ち主に</text>
+
+  <!-- 乙区 -->
+  <rect x="56" y="256" width="298" height="70" fill="#f4f4f6" stroke="#464c58" stroke-width="2.5" stroke-dasharray="7 4"/>
+  <text x="72" y="284" font-size="18" font-weight="700" fill="#464c58">権利部（乙区）</text>
+  <text x="72" y="308" font-size="13" fill="#1a1d24">抵当権（ローン）・地上権・賃借権など</text>
+
+  <!-- 右側の説明 -->
+  <line x1="362" y1="124" x2="400" y2="124" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+  <text x="410" y="118" font-size="16" font-weight="700" fill="#1f2a44">不動産の「姿」</text>
+  <text x="410" y="140" font-size="13" fill="#464c58">登記：土地家屋調査士</text>
+
+  <line x1="362" y1="209" x2="400" y2="209" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+  <text x="410" y="203" font-size="16" font-weight="700" fill="#c4122f">「持ち主」</text>
+  <text x="410" y="225" font-size="13" fill="#464c58">登記：司法書士</text>
+
+  <line x1="362" y1="291" x2="400" y2="291" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+  <text x="410" y="285" font-size="16" font-weight="700" fill="#464c58">「ほかの権利」</text>
+  <text x="410" y="307" font-size="13" fill="#464c58">登記：司法書士</text>
+  <text x="410" y="327" font-size="12" fill="#464c58">一度も登記がなければ、ない</text>
+</svg>

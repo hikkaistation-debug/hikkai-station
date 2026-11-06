@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 900" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">土地の登記事項証明書（全部事項証明書）の見本。架空の例。表題部に所在・地番・地目・地積、甲区に所有権移転が2つ、乙区に抵当権設定とその抹消。番号1から8で読みどころを示す</title>
+  <style>
+    .c { font-size: 13px; fill: #1a1d24; }
+    .h { font-size: 13px; fill: #1a1d24; font-weight: 700; }
+    .u { text-decoration: underline; }
+    .g { fill: none; stroke: #1a1d24; stroke-width: 1; }
+    .n circle { fill: #c4122f; }
+    .n text { font-size: 13px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  </style>
+  <rect width="760" height="900" fill="#ffffff"/>
+
+  <!-- 見本の帯 -->
+  <rect x="0" y="0" width="760" height="34" fill="#c4122f"/>
+  <text x="380" y="23" font-size="15" font-weight="700" text-anchor="middle" fill="#fff">見本（架空の例）― 実在の土地・人物・会社ではありません</text>
+
+  <!-- すかし -->
+  <text x="380" y="520" font-size="190" font-weight="700" text-anchor="middle" fill="#c4122f" opacity="0.07" transform="rotate(-25 380 520)">見本</text>
+
+  <g transform="translate(16,0)">
+    <text x="40" y="62" class="c">見本市中央町一丁目12番3</text>
+    <text x="720" y="62" class="h" text-anchor="end">全部事項証明書　　（土地）</text>
+
+    <!-- ===== 表題部 ===== -->
+    <rect x="40" y="72" width="680" height="208" class="g" stroke-width="1.6"/>
+    <rect x="40" y="72" width="380" height="28" fill="#eef1f8"/>
+    <line x1="40" y1="100" x2="720" y2="100" class="g"/>
+    <line x1="40" y1="128" x2="720" y2="128" class="g"/>
+    <line x1="40" y1="156" x2="720" y2="156" class="g"/>
+    <line x1="40" y1="184" x2="720" y2="184" class="g"/>
+    <line x1="40" y1="232" x2="720" y2="232" class="g"/>
+    <!-- 1行目 -->
+    <line x1="420" y1="72" x2="420" y2="100" class="g"/>
+    <line x1="470" y1="72" x2="470" y2="100" class="g"/>
+    <line x1="530" y1="72" x2="530" y2="100" class="g"/>
+    <line x1="612" y1="72" x2="612" y2="100" class="g"/>
+    <text x="230" y="91" class="h" text-anchor="middle">表　題　部　（土地の表示）</text>
+    <text x="445" y="91" class="c" text-anchor="middle">調製</text>
+    <text x="500" y="91" class="c" text-anchor="middle">余白</text>
+    <text x="571" y="91" class="c" text-anchor="middle">不動産番号</text>
+    <text x="666" y="91" class="c" text-anchor="middle">1234567890123</text>
+    <!-- 2行目 -->
+    <line x1="130" y1="100" x2="130" y2="156" class="g"/>
+    <line x1="300" y1="100" x2="300" y2="128" class="g"/>
+    <line x1="390" y1="100" x2="390" y2="128" class="g"/>
+    <text x="85" y="119" class="c" text-anchor="middle">地図番号</text>
+    <text x="215" y="119" class="c" text-anchor="middle">余白</text>
+    <text x="345" y="119" class="c" text-anchor="middle">筆界特定</text>
+    <text x="555" y="119" class="c" text-anchor="middle">余白</text>
+    <!-- 3行目 -->
+    <line x1="560" y1="128" x2="560" y2="156" class="g"/>
+    <text x="85" y="147" class="c" text-anchor="middle">所　在</text>
+    <text x="142" y="147" class="c">見本市中央町一丁目</text>
+    <text x="640" y="147" class="c" text-anchor="middle">余白</text>
+    <!-- 見出し -->
+    <line x1="150" y1="156" x2="150" y2="280" class="g"/>
+    <line x1="250" y1="156" x2="250" y2="280" class="g"/>
+    <line x1="400" y1="156" x2="400" y2="280" class="g"/>
+    <text x="95" y="175" class="c" text-anchor="middle">①　地　番</text>
+    <text x="200" y="175" class="c" text-anchor="middle">②　地　目</text>
+    <text x="325" y="175" class="c" text-anchor="middle">③　地　積　㎡</text>
+    <text x="560" y="175" class="c" text-anchor="middle">原因及びその日付〔登記の日付〕</text>
+    <!-- 1つ目の記録 -->
+    <text x="60" y="204" class="c">12番3</text>
+    <text x="165" y="204" class="c">宅地</text>
+    <text x="388" y="204" class="c u" text-anchor="end">170：00</text>
+    <text x="412" y="204" class="c">12番から分筆</text>
+    <text x="412" y="222" class="c">〔平成10年5月12日〕</text>
+    <!-- 2つ目の記録 -->
+    <text x="60" y="252" class="c">余白</text>
+    <text x="165" y="252" class="c">余白</text>
+    <text x="388" y="252" class="c" text-anchor="end">165：42</text>
+    <text x="412" y="252" class="c">③錯誤</text>
+    <text x="412" y="270" class="c">〔令和2年9月15日〕</text>
+
+    <!-- ===== 甲区 ===== -->
+    <rect x="40" y="300" width="680" height="196" class="g" stroke-width="1.6"/>
+    <rect x="40" y="300" width="680" height="28" fill="#fff3f4"/>
+    <line x1="40" y1="328" x2="720" y2="328" class="g"/>
+    <line x1="40" y1="356" x2="720" y2="356" class="g"/>
+    <line x1="40" y1="426" x2="720" y2="426" class="g"/>
+    <line x1="110" y1="328" x2="110" y2="496" class="g"/>
+    <line x1="250" y1="328" x2="250" y2="496" class="g"/>
+    <line x1="400" y1="328" x2="400" y2="496" class="g"/>
+    <text x="380" y="319" class="h" text-anchor="middle">権　利　部　（甲　区）　　（所　有　権　に　関　す　る　事　項）</text>
+    <text x="75" y="347" class="c" text-anchor="middle">順位番号</text>
+    <text x="180" y="347" class="c" text-anchor="middle">登 記 の 目 的</text>
+    <text x="325" y="347" class="c" text-anchor="middle">受付年月日・受付番号</text>
+    <text x="560" y="347" class="c" text-anchor="middle">権 利 者 そ の 他 の 事 項</text>
+    <!-- 1 -->
+    <text x="75" y="376" class="c" text-anchor="middle">1</text>
+    <text x="122" y="376" class="c">所有権移転</text>
+    <text x="262" y="376" class="c">平成10年6月1日</text>
+    <text x="262" y="394" class="c">第1234号</text>
+    <text x="412" y="376" class="c">原因　平成10年6月1日売買</text>
+    <text x="412" y="394" class="c">所有者　見本市中央町一丁目12番3号</text>
+    <text x="440" y="412" class="c">見　本　一　郎</text>
+    <!-- 2 -->
+    <text x="75" y="446" class="c" text-anchor="middle">2</text>
+    <text x="122" y="446" class="c">所有権移転</text>
+    <text x="262" y="446" class="c">令和5年3月10日</text>
+    <text x="262" y="464" class="c">第567号</text>
+    <text x="412" y="446" class="c">原因　令和4年11月2日相続</text>
+    <text x="412" y="464" class="c">所有者　見本市中央町一丁目12番3号</text>
+    <text x="440" y="482" class="c">見　本　花　子</text>
+
+    <!-- ===== 乙区 ===== -->
+    <rect x="40" y="516" width="680" height="244" class="g" stroke-width="1.6"/>
+    <rect x="40" y="516" width="680" height="28" fill="#f4f4f6"/>
+    <line x1="40" y1="544" x2="720" y2="544" class="g"/>
+    <line x1="40" y1="572" x2="720" y2="572" class="g"/>
+    <line x1="40" y1="708" x2="720" y2="708" class="g"/>
+    <line x1="110" y1="544" x2="110" y2="760" class="g"/>
+    <line x1="250" y1="544" x2="250" y2="760" class="g"/>
+    <line x1="400" y1="544" x2="400" y2="760" class="g"/>
+    <text x="380" y="535" class="h" text-anchor="middle">権　利　部　（乙　区）　　（所 有 権 以 外 の 権 利 に 関 す る 事 項）</text>
+    <text x="75" y="563" class="c" text-anchor="middle">順位番号</text>
+    <text x="180" y="563" class="c" text-anchor="middle">登 記 の 目 的</text>
+    <text x="325" y="563" class="c" text-anchor="middle">受付年月日・受付番号</text>
+    <text x="560" y="563" class="c" text-anchor="middle">権 利 者 そ の 他 の 事 項</text>
+    <!-- 1（抹消済み：下線） -->
+    <text x="75" y="592" class="c u" text-anchor="middle">1</text>
+    <text x="122" y="592" class="c u">抵当権設定</text>
+    <text x="262" y="592" class="c u">平成10年6月1日</text>
+    <text x="262" y="610" class="c u">第1235号</text>
+    <text x="412" y="592" class="c u">原因　平成10年6月1日金銭消費貸借</text>
+    <text x="412" y="610" class="c u">同日設定</text>
+    <text x="412" y="628" class="c u">債権額　金2,000万円</text>
+    <text x="412" y="646" class="c u">利息　年2・5％</text>
+    <text x="412" y="664" class="c u">債務者　見本市中央町一丁目12番3号　見本一郎</text>
+    <text x="412" y="682" class="c u">抵当権者　見本市本町二丁目1番1号</text>
+    <text x="440" y="700" class="c u">株式会社見本銀行</text>
+    <!-- 2 -->
+    <text x="75" y="728" class="c" text-anchor="middle">2</text>
+    <text x="122" y="728" class="c">1番抵当権抹消</text>
+    <text x="262" y="728" class="c">令和3年8月20日</text>
+    <text x="262" y="746" class="c">第890号</text>
+    <text x="412" y="728" class="c">原因　令和3年8月20日弁済</text>
+
+    <!-- ===== 末尾 ===== -->
+    <text x="40" y="790" class="c">これは登記記録に記録されている事項の全部を証明した書面である。</text>
+    <text x="40" y="812" class="c">令和8年11月6日　　○○地方法務局　　登記官　（ここに登記官の氏名と公印が入ります）</text>
+    <line x1="40" y1="828" x2="720" y2="828" stroke="#1a1d24" stroke-width="1"/>
+    <text x="40" y="848" class="c">＊　下線のあるものは抹消事項であることを示す。</text>
+    <text x="720" y="848" class="c" text-anchor="end">整理番号　D00000　（1/1）　1/1</text>
+  </g>
+
+  <!-- 読みどころの番号（左の余白） -->
+  <g class="n">
+    <circle cx="26" cy="142" r="11"/><text x="26" y="147">1</text>
+    <circle cx="26" cy="200" r="11"/><text x="26" y="205">2</text>
+    <circle cx="26" cy="248" r="11"/><text x="26" y="253">3</text>
+    <circle cx="26" cy="314" r="11"/><text x="26" y="319">4</text>
+    <circle cx="26" cy="446" r="11"/><text x="26" y="451">5</text>
+    <circle cx="26" cy="530" r="11"/><text x="26" y="535">6</text>
+    <circle cx="26" cy="724" r="11"/><text x="26" y="729">7</text>
+    <circle cx="26" cy="844" r="11"/><text x="26" y="849">8</text>
+  </g>
+  <!-- 下線の地積を赤い枠で強調 -->
+  <rect x="342" y="190" width="68" height="20" fill="none" stroke="#c4122f" stroke-width="2" rx="3"/>
+  <text x="380" y="886" font-size="12" text-anchor="middle" fill="#464c58">本物の証明書の形をもとにした説明用の見本です（地名・人名・番号はすべて架空）。</text>
+</svg>
