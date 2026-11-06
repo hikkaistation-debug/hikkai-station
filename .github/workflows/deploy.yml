@@ -6,8 +6,9 @@ on:
     branches: [main]
   workflow_dispatch: # GitHubの画面から手動でも実行できるようにする
   schedule:
-    # 毎日0時5分（日本時間）にも組み立てなおす（日付が変わったらすぐ出るように）。
-    # 「車内の読み物」で、公開日が今日になった話を自動で出すため。
+    # 毎日0時5分（日本時間）すぎに、公開日が今日になった「車内の読み物」の話を自動で出す。
+    # GitHub Pages は、前と同じコミットをもう一度送ってもサイトを置きかえない（2026-11-07 に判明）。
+    # そこで夜中は、下の daily で「中身のない印のコミット」を作ってから、組み立てなおしを頼む。
     - cron: '5 15 * * *'
 
 permissions:
@@ -20,7 +21,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 夜中（schedule）のときだけ動く：今日が公開日の話があれば、印のコミットを作って
+  # このワークフローを手動実行（workflow_dispatch）で呼び直す（新しいコミットで組み立てて公開される）。
+  daily:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: 今日が公開日の話があれば、印のコミットを作って公開を頼む
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          today=$(TZ=Asia/Tokyo date +%F)
+          if ! grep -lq "^pubDate: $today" src/content/stories/*/*.md; then
+            echo "今日（$today）が公開日の話はありません"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "自動公開：$today の車内の読み物"
+          git push
+          gh workflow run deploy.yml --ref main
+
   build:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
