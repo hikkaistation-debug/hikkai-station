@@ -8,6 +8,7 @@
 // Microsoft Edge を使って画像にします。
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { parse } from 'yaml';
 
@@ -93,8 +94,11 @@ ${isLast ? `<div class="point"><b>📍 今日のひとこと</b>${esc(data.point
   const htmlPath = path.join(outDir, `_tmp-${i}.html`);
   fs.writeFileSync(htmlPath, html);
   const png = path.join(outDir, `${train}-${no}-${i + 1}.png`);
-  execFileSync(edge, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1080,1350', `--screenshot=${png}`, 'file:///' + htmlPath.replace(/\\/g, '/')], { stdio: 'ignore' });
+  // ふだん使いの Edge が開いていると、画像ができないことがある（11/7）。そのため、作業用の別のプロフィールで動かす。
+  const profile = path.join(os.tmpdir(), 'hikkai-story-images-edge');
+  execFileSync(edge, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1080,1350', `--user-data-dir=${profile}`, `--screenshot=${png}`, 'file:///' + htmlPath.replace(/\\/g, '/')], { stdio: 'ignore' });
   fs.unlinkSync(htmlPath);
+  if (!fs.existsSync(png)) throw new Error(`画像ができませんでした：${png}`);
   files.push(png);
 });
 
