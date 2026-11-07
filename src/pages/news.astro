@@ -25,8 +25,10 @@ const MARK_NOTE: Record<string, string> = {
 };
 const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.id) > 0) - Number(count(a.id) > 0));
 ---
-<BaseLayout title="ニュース" description="筆界・境界・登記まわりのニュースを、カテゴリ別にまとめています。">
-  <StationSign kicker="3番のりば｜実務者の方" title="ニュース" sub="NEWS" color="#0b62b4" prev={TERMINAL} />
+<BaseLayout title="実務" description="制度の動き・通達・技術のニュースなど、筆界・境界・登記の実務に役立つ情報を、カテゴリ別にまとめています。">
+  <StationSign kicker="3番のりば｜実務者の方" title="実務" sub="PRACTICE" color="#0b62b4" prev={TERMINAL} />
+
+  <p>法改正・通達・裁決・技術の動きなど、筆界・境界・登記の実務に関わるニュースを、出典リンク付きでまとめています。法令・通達・判例は、<a href="/hourei/">法令ナビ</a>・<a href="/tsutatsu/">通達ナビ</a>・<a href="/hanrei/">判例ナビ</a>からもさがせます。</p>
 
   <h2>路線（カテゴリ）からさがす</h2>
   <ul class="line-list">
