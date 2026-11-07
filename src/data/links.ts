@@ -205,6 +205,18 @@ export const LINKS: LinkItem[] = [
     related: { label: 'エーサーベイ（A-Survey）とは？', href: '/articles/a-survey/' },
   },
   {
+    name: '【非公式】A-Survey wiki【土地家屋調査士業務】',
+    url: 'https://asurvey.wiki.fc2.com/',
+    desc: '測量計算アプリ「エーサーベイ（A-Survey）」を土地家屋調査士の仕事で使うための、有志による非公式のwikiです。機器との初めての接続、観測・杭打ち・面積計算などの使い方がまとめられています。',
+    category: '測量・技術',
+    audience: ['実務者'],
+    kind: '資料',
+    price: '無料',
+    checked: '2026-11-07',
+    note: 'アプリの作成元とは関係のない、利用者どうしのwikiです。対応する機種や料金などは、公式サイトで最新の情報を確かめてください。',
+    related: { label: 'A-Surveyを調査士の仕事で使うための非公式wiki', href: '/articles/a-survey-wiki/' },
+  },
+  {
     name: '桜町測量ウェブサイト',
     url: 'https://sakura.3ku.jp/',
     desc: '土地家屋調査士事務所のサイトです。ブログで、GNSS測量・3次元測量・GISの使い方など、測量の技術情報を発信しています。',
@@ -251,6 +263,18 @@ export const LINKS: LinkItem[] = [
     checked: '2026-11-05',
     note: '試験問題は年度ごとのページからPDFで見られます。記述式の正解（模範解答）は公開されていません。',
     related: { label: '土地家屋調査士試験をくわしく', href: '/articles/shiken-kuwashiku/' },
+  },
+  {
+    name: 'アガルートアカデミー「解答用紙・様式・ツール 無料ダウンロードページ」',
+    url: 'https://www.agaroot.jp/chousashi/column/answer-sheet-download/',
+    desc: '予備校のアガルートアカデミーが配っている、土地家屋調査士試験の勉強用の用紙です。択一式のマークシート、記述式の申請書枠・図面枠、過去問用の答案用紙などをPDFでダウンロードできます。',
+    category: '資格・試験',
+    audience: ['一般', '実務者'],
+    kind: '資料',
+    price: '無料',
+    checked: '2026-11-07',
+    note: '予備校が作った練習用の用紙で、本番の答案用紙と同じとは限りません。ページには講座の案内もあります。特定の予備校をおすすめするものではありません。',
+    related: { label: '解答用紙・申請書枠・図面枠を無料でダウンロードできるページ', href: '/articles/shiken-kaitouyoushi-download/' },
   },
 
   // ---------- 相談先 ----------
