@@ -28,7 +28,7 @@ export const PLATFORMS = [
     title: '法改正・通達・裁決・技術の情報',
     desc: '制度の動き・通達・技術のニュースなど、実務に役立つ情報を出典リンク付きでまとめます。',
     dest: '実務',
-    href: '/news/',
+    href: '/jitsumu/',
     color: '#0b62b4', // 青（制度の路線と同じ）
   },
   {

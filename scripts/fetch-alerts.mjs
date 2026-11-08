@@ -82,6 +82,7 @@ function draftMarkdown(item) {
   return `---
 # ▼ Googleアラートから自動で作った下書きです（サイトには出ません）
 # 使うときは、要約・ひとこと・カテゴリ・対象を書き、元記事を確認してから draft: false にします。
+# 発車標（ニュース）に見出しとリンクだけを出すときは、category と level を合わせて feed: true にします（draft: true のままでOK。30日で自動で消えます）。
 # 使わないときは、このファイルを削除してください。
 title: ${yamlStr(item.title || '（タイトルを書く）')}
 pubDate: ${date}
@@ -92,6 +93,7 @@ sourceUrl: ${yamlStr(item.url)}
 summary: "（1〜2文・100字くらいで、何の話かを自分の言葉で書く）"
 comment: "（ひとことを書く）"
 tags: []
+feed: false
 draft: true
 ---
 

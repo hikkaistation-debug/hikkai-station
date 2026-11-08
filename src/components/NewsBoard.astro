@@ -1,0 +1,92 @@
+---
+// 発車標（ニュース）… 駅の電光掲示板の見た目で、新着ニュースを見出し・出典・日付だけで並べる
+// 中身は src/data/news.ts の getNews() で取り出して、items に渡します。
+import type { NewsItem } from '../data/news';
+import LineMark from './LineMark.astro';
+
+interface Props {
+  items: NewsItem[];
+  title?: string; // 掲示板の上の段の文字
+  more?: boolean; // 「ニュースをもっと見る」のリンクを出すか
+  headingLevel?: 'h2' | 'h3';
+  id?: string;
+}
+const { items, title = '発車標｜新着ニュース', more = true, headingLevel = 'h2', id = 'news-board' } = Astro.props;
+const H = headingLevel;
+const md = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
+---
+<section class="news-board" aria-labelledby={`${id}-heading`}>
+  <div class="news-board__head">
+    <H id={`${id}-heading`} class="news-board__title">{title}</H>
+    <span class="news-board__en" aria-hidden="true">NEWS</span>
+  </div>
+  {items.length > 0 ? (
+    <ol class="news-board__list">
+      {items.map((n) => (
+        <li class="news-board__row" style={`--c:${n.line.color}`}>
+          <span class="news-board__line" title={n.line.name}>
+            <span aria-hidden="true">{n.line.code}</span>
+            <span class="news-board__mark" aria-hidden="true"><LineMark mark={n.line.mark} /></span>
+            <span class="visually-hidden">{n.line.short}</span>
+          </span>
+          <time class="news-board__date" datetime={n.date.toISOString().slice(0, 10)}>{md(n.date)}</time>
+          <a class="news-board__link" href={n.url} target="_blank" rel="noopener">
+            {n.title}<span class="visually-hidden">（{n.source}・新しいタブで開きます）</span>
+          </a>
+          <span class="news-board__src" aria-hidden="true">{n.source}</span>
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <p class="news-board__empty">ただいま表示できるニュースはありません。</p>
+  )}
+  {more && <p class="news-board__more"><a href="/news/">ニュースをもっと見る →</a></p>}
+</section>
+
+<style>
+  .news-board {
+    background: #14171f;
+    color: #f2f2ee;
+    border-radius: var(--radius);
+    border: 3px solid #2c3242;
+    margin: 1.5rem 0;
+    overflow: hidden;
+  }
+  .news-board__head {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem;
+    background: var(--navy); padding: 0.45rem 0.9rem; border-bottom: 2px solid #2c3242;
+  }
+  .news-board__title { margin: 0; font-size: 1.05rem; color: #fff; }
+  .news-board__en { color: var(--sign-yellow); font-weight: 700; letter-spacing: 0.15em; font-size: 0.85rem; }
+  .news-board__list { list-style: none; margin: 0; padding: 0; }
+  .news-board__row {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 0.1rem 0.7rem;
+    align-items: baseline;
+    padding: 0.55rem 0.9rem;
+    border-top: 1px dashed #343a4a;
+  }
+  .news-board__row:first-child { border-top: 0; }
+  .news-board__line {
+    display: inline-flex; align-items: center; gap: 0.15rem;
+    background: var(--c); color: #fff; font-weight: 700; font-size: 0.8rem;
+    padding: 0 0.4rem; border-radius: 4px; line-height: 1.6; align-self: start; margin-top: 0.2rem;
+  }
+  .news-board__mark { display: inline-flex; }
+  /* 日付と出典は、電光掲示板のだいだい色 */
+  .news-board__date { color: #ffb648; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.9rem; }
+  .news-board__link { color: #fff; font-weight: 700; }
+  .news-board__link:hover { color: var(--sign-yellow); }
+  .news-board__link:focus-visible { outline-color: var(--sign-yellow); }
+  .news-board__src { grid-column: 3; color: #ffb648; font-size: 0.8rem; }
+  /* スマホ：印と日付を1行目に、見出しと出典はその下に広く */
+  @media (max-width: 560px) {
+    .news-board__row { grid-template-columns: auto 1fr; }
+    .news-board__line { margin-top: 0; align-self: center; }
+    .news-board__link, .news-board__src { grid-column: 1 / -1; }
+  }
+  .news-board__empty { margin: 0; padding: 0.8rem 0.9rem; color: #c9cbd3; }
+  .news-board__more { margin: 0; padding: 0.4rem 0.9rem 0.6rem; text-align: right; font-size: 0.9rem; border-top: 1px dashed #343a4a; }
+  .news-board__more a { color: var(--sign-yellow); }
+</style>

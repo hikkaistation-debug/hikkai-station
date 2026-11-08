@@ -63,7 +63,7 @@ const { data } = article;
 const line = getLine(data.category);
 const { Content } = await render(article);
 const hasBody = Boolean(article.body?.trim());
-const back = isKiso(article) ? { href: '/kiso/', label: '基礎知識' } : { href: '/news/', label: '実務' };
+const back = isKiso(article) ? { href: '/kiso/', label: '基礎知識' } : { href: '/jitsumu/', label: '実務' };
 const isKiki = data.category === 'kiki' && data.product;
 // 関連する駅：この記事の路線＋relatedLines（重複なし）
 const relatedLines = [...new Set([data.category, ...data.relatedLines])];

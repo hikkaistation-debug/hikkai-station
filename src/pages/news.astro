@@ -1,62 +1,29 @@
 ---
+// 発車標（ニュース）のページ … 新着ニュースを見出し・出典・日付だけで並べる（30日たったものは自動で消える）
+// ニュースの出し方は src/data/news.ts を見てください。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
+import NewsBoard from '../components/NewsBoard.astro';
 import { TERMINAL } from '../data/site';
-import ArticleCard from '../components/ArticleCard.astro';
-import ListControls from '../components/ListControls.astro';
-import LineBadge from '../components/LineBadge.astro';
-import LineMark from '../components/LineMark.astro';
-import { LINES } from '../data/lines';
-import { getPublishedArticles, isKiso } from '../data/articles';
+import { getNews, NEWS_DAYS } from '../data/news';
 
-const all = await getPublishedArticles();
-const news = all.filter((a) => !isKiso(a));
-// 記事のある路線を先に、0件の路線は「準備中」として後ろに薄く表示する
-const count = (id: string) => all.filter((a) => a.data.category === id).length;
-// 記号の説明（境界標がモチーフ）
-const MARK_NOTE: Record<string, string> = {
-  stake: 'コンクリート杭の頭（四角に十字）',
-  plate: '金属プレート（矢印）',
-  sankaku: '三角点（三角に点）',
-  byo: '金属鋲（丸に十字）',
-  yajirushi: '矢印杭（矢印）',
-  shinchu: '真鍮鋲（二重丸に点）',
-  kokuin: '刻印（十字）',
-};
-const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.id) > 0) - Number(count(a.id) > 0));
+const items = await getNews();
 ---
-<BaseLayout title="実務" description="制度の動き・通達・技術のニュースなど、筆界・境界・登記の実務に役立つ情報を、カテゴリ別にまとめています。">
-  <StationSign kicker="3番のりば｜実務者の方" title="実務" sub="PRACTICE" color="#0b62b4" prev={TERMINAL} />
+<BaseLayout title="ニュース（発車標）" description="筆界・境界・登記・土地家屋調査士に関する新着ニュースを、出典へのリンクで紹介しています。">
+  <StationSign kicker="駅の施設" title="発車標" sub="NEWS" color="#1f2a44" prev={TERMINAL} />
 
-  <p>法改正・通達・裁決・技術の動きなど、筆界・境界・登記の実務に関わるニュースを、出典リンク付きでまとめています。法令・通達・判例は、<a href="/hourei/">法令ナビ</a>・<a href="/tsutatsu/">通達ナビ</a>・<a href="/hanrei/">判例ナビ</a>からもさがせます。</p>
+  <p>筆界・境界・登記・土地家屋調査士に関する新しいニュースを、見出しと出典だけで紹介しています。内容は、それぞれのリンク先（元の記事）でご確認ください。{NEWS_DAYS}日たったニュースは、ここから消えます。</p>
 
-  <h2>路線（カテゴリ）からさがす</h2>
-  <ul class="line-list">
-    {newsLines.map((l) => (
-      <li>
-        <a href={`/category/${l.id}/`} style={`--c:${l.color}`} class={count(l.id) === 0 ? 'is-soon' : undefined}>
-          <LineBadge id={l.id} />
-          <span class="count">{count(l.id) > 0 ? `${count(l.id)}件` : '準備中'}</span>
-        </a>
-      </li>
-    ))}
-  </ul>
-  <details class="mark-legend">
-    <summary>路線の記号について（境界標がモチーフです）</summary>
-    <ul>
-      {LINES.map((l) => (
-        <li style={`--c:${l.color}`}><LineMark mark={l.mark} /><span><strong>{l.name}</strong>：{MARK_NOTE[l.mark]}</span></li>
-      ))}
-    </ul>
-  </details>
+  <NewsBoard items={items} title="新着ニュース" more={false} />
 
-  <h2>記事</h2>
-  <ListControls />
-  {news.length > 0 ? (
-    <ul class="card-list">
-      {news.map((a) => <ArticleCard article={a} />)}
-    </ul>
-  ) : (
-    <p class="empty">まだ記事はありません。</p>
-  )}
+  <aside class="notice">
+    <p class="notice__title">見出しの左の印について</p>
+    <p>ニュースが関係する路線（カテゴリ）の色と記号です。くわしく解説した記事は、<a href="/jitsumu/">実務（3番のりば）</a>や<a href="/rosenzu/">路線図</a>からさがせます。</p>
+  </aside>
+
+  <p class="moved-note">※ 以前このアドレスにあった「実務」のページは、<a href="/jitsumu/">/jitsumu/</a> に移りました。</p>
 </BaseLayout>
+
+<style>
+  .moved-note { font-size: 0.9rem; color: var(--ink-soft); }
+</style>

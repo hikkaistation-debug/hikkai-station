@@ -20,6 +20,7 @@ export const SITE = {
 //   筆界ステーション（トップ）＝ ターミナル駅
 //   のりば   … 読者別の入口（src/data/platforms.ts）
 //   路線     … 記事の分類。ターミナル → 路線のページ → 新しい記事 → … → 古い記事（終点）
+//   発車標   … 新着ニュースの見出し（src/data/news.ts）。駅の施設の1つ
 //   駅の施設 … 調べものの道具
 //   ご案内   … サイトについて
 // メニューとトップの「サイトの案内図」は、この MENU を使います。
@@ -40,6 +41,7 @@ export const MENU: MenuGroup[] = [
     id: 'facilities',
     title: '駅の施設',
     items: [
+      { href: '/news/', label: '発車標（ニュース）', ready: true },
       { href: '/rosenzu/', label: '路線図', ready: true },
       { href: '/tags/', label: 'テーマ一覧', ready: true },
       { href: '/annai/', label: '逆引き案内所', ready: true },

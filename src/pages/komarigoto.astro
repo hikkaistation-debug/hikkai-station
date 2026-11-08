@@ -8,6 +8,11 @@ import { TERMINAL } from '../data/site';
 import ArticleCard from '../components/ArticleCard.astro';
 import ListControls from '../components/ListControls.astro';
 import { getPublishedArticles, type Article } from '../data/articles';
+import NewsBoard from '../components/NewsBoard.astro';
+import { getNews } from '../data/news';
+
+// 一般の方に関係するニュース（「専門」は出さない）
+const komariNews = await getNews({ lines: ['kyokai', 'toki', 'seido', 'kiso'], excludeLevel: 'expert', limit: 3 });
 
 const all = (await getPublishedArticles()).filter((a) => a.data.level !== 'expert');
 const easyFirst = (list: Article[]) =>
@@ -47,6 +52,8 @@ const sections = [
     <a class="cta__button" href="/shindan/">どこに相談すればいい？ 境界トラブル診断 →</a>
     <small>質問に答えると、相談先と次にやることがわかります</small>
   </p>
+
+  {komariNews.length > 0 && <NewsBoard items={komariNews} title="発車標｜くらしと土地のニュース" id="komari-news" />}
 
   <ListControls />
 

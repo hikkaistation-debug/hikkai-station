@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StationSign from '../components/StationSign.astro';
+import { TERMINAL } from '../data/site';
+import ArticleCard from '../components/ArticleCard.astro';
+import ListControls from '../components/ListControls.astro';
+import LineBadge from '../components/LineBadge.astro';
+import LineMark from '../components/LineMark.astro';
+import { LINES } from '../data/lines';
+import { getPublishedArticles, isKiso } from '../data/articles';
+import NewsBoard from '../components/NewsBoard.astro';
+import { getNews } from '../data/news';
+
+// 実務に関係するニュース（試験のニュースは4番のりばへ）
+const jitsumuNews = await getNews({ lines: ['kyokai', 'toki', 'sokuryo', 'kiki', 'seido'], limit: 5 });
+
+const all = await getPublishedArticles();
+const news = all.filter((a) => !isKiso(a));
+// 記事のある路線を先に、0件の路線は「準備中」として後ろに薄く表示する
+const count = (id: string) => all.filter((a) => a.data.category === id).length;
+// 記号の説明（境界標がモチーフ）
+const MARK_NOTE: Record<string, string> = {
+  stake: 'コンクリート杭の頭（四角に十字）',
+  plate: '金属プレート（矢印）',
+  sankaku: '三角点（三角に点）',
+  byo: '金属鋲（丸に十字）',
+  yajirushi: '矢印杭（矢印）',
+  shinchu: '真鍮鋲（二重丸に点）',
+  kokuin: '刻印（十字）',
+};
+const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.id) > 0) - Number(count(a.id) > 0));
+---
+<BaseLayout title="実務" description="制度の動き・通達・技術のニュースなど、筆界・境界・登記の実務に役立つ情報を、カテゴリ別にまとめています。">
+  <StationSign kicker="3番のりば｜実務者の方" title="実務" sub="PRACTICE" color="#0b62b4" prev={TERMINAL} />
+
+  <p>法改正・通達・裁決・技術の動きなど、筆界・境界・登記の実務に関わる話題を、要約とひとこと・出典リンク付きの記事でまとめています。新しいニュースの見出しは<a href="/news/">発車標</a>に並べています。法令・通達・判例は、<a href="/hourei/">法令ナビ</a>・<a href="/tsutatsu/">通達ナビ</a>・<a href="/hanrei/">判例ナビ</a>からもさがせます。</p>
+
+  {jitsumuNews.length > 0 && <NewsBoard items={jitsumuNews} title="発車標｜実務のニュース" id="jitsumu-news" />}
+
+  <h2>路線（カテゴリ）からさがす</h2>
+  <ul class="line-list">
+    {newsLines.map((l) => (
+      <li>
+        <a href={`/category/${l.id}/`} style={`--c:${l.color}`} class={count(l.id) === 0 ? 'is-soon' : undefined}>
+          <LineBadge id={l.id} />
+          <span class="count">{count(l.id) > 0 ? `${count(l.id)}件` : '準備中'}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <details class="mark-legend">
+    <summary>路線の記号について（境界標がモチーフです）</summary>
+    <ul>
+      {LINES.map((l) => (
+        <li style={`--c:${l.color}`}><LineMark mark={l.mark} /><span><strong>{l.name}</strong>：{MARK_NOTE[l.mark]}</span></li>
+      ))}
+    </ul>
+  </details>
+
+  <h2>記事</h2>
+  <ListControls />
+  {news.length > 0 ? (
+    <ul class="card-list">
+      {news.map((a) => <ArticleCard article={a} />)}
+    </ul>
+  ) : (
+    <p class="empty">まだ記事はありません。</p>
+  )}
+</BaseLayout>

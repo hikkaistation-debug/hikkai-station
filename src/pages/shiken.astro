@@ -8,6 +8,10 @@ import ListControls from '../components/ListControls.astro';
 import { getLine } from '../data/lines';
 import { getPublishedArticles } from '../data/articles';
 import { TOOLS, toolHref } from '../data/tools';
+import NewsBoard from '../components/NewsBoard.astro';
+import { getNews } from '../data/news';
+
+const shikenNews = await getNews({ lines: ['shiken'], limit: 5 });
 
 const line = getLine('shiken');
 const articles = (await getPublishedArticles()).filter((a) => a.data.category === 'shiken');
@@ -45,6 +49,8 @@ const officialLinks = [
     <p class="notice__title">試験の日程・科目は、必ず公式の情報で確認してください</p>
     <p>このページの説明は、例年の流れをもとにした概要です。年度によって変わることがあります。試験日・試験地・申請方法などは、必ず法務省の受験案内書で確認してください。</p>
   </aside>
+
+  {shikenNews.length > 0 && <NewsBoard items={shikenNews} title="発車標｜試験のニュース" id="shiken-news" />}
 
   <div class="page-body">
     <h2>試験のしくみ（例年の流れ）</h2>
