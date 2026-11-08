@@ -41,7 +41,7 @@ export const MENU: MenuGroup[] = [
     id: 'facilities',
     title: '駅の施設',
     items: [
-      { href: '/news/', label: '発車標（ニュース）', ready: true },
+      { href: '/news/', label: '発車標（新着ニュース）', ready: true },
       { href: '/rosenzu/', label: '路線図', ready: true },
       { href: '/tags/', label: 'テーマ一覧', ready: true },
       { href: '/annai/', label: '逆引き案内所', ready: true },

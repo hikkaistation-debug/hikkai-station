@@ -33,7 +33,7 @@ const newsLines = LINES.filter((l) => !l.isKiso).sort((a, b) => Number(count(b.i
 <BaseLayout title="実務" description="制度の動き・通達・技術のニュースなど、筆界・境界・登記の実務に役立つ情報を、カテゴリ別にまとめています。">
   <StationSign kicker="3番のりば｜実務者の方" title="実務" sub="PRACTICE" color="#0b62b4" prev={TERMINAL} />
 
-  <p>法改正・通達・裁決・技術の動きなど、筆界・境界・登記の実務に関わる話題を、要約とひとこと・出典リンク付きの記事でまとめています。新しいニュースの見出しは<a href="/news/">発車標</a>に並べています。法令・通達・判例は、<a href="/hourei/">法令ナビ</a>・<a href="/tsutatsu/">通達ナビ</a>・<a href="/hanrei/">判例ナビ</a>からもさがせます。</p>
+  <p>法改正・通達・裁決・技術の動きなど、筆界・境界・登記の実務に関わる話題を、要約とひとこと・出典リンク付きの記事でまとめています。新しいニュースの見出しは<a href="/news/">発車標（新着ニュース）</a>に並べています。法令・通達・判例は、<a href="/hourei/">法令ナビ</a>・<a href="/tsutatsu/">通達ナビ</a>・<a href="/hanrei/">判例ナビ</a>からもさがせます。</p>
 
   {jitsumuNews.length > 0 && <NewsBoard items={jitsumuNews} title="発車標｜実務のニュース" id="jitsumu-news" />}
 
