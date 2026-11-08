@@ -3,13 +3,15 @@ title: 久留米市、官民境界確定図のダウンロードと無人の情�
 pubDate: 2026-11-04
 category: toki
 level: normal
-sourceName: 久留米市「官民境界確定図ダウンロード・無人情報交付機の設置について」
+sourceName: 久留米市
 sourceUrl: https://www.city.kurume.fukuoka.jp/1500soshiki/9106rosei/3010oshirase/2026-0611-2110-100.html
 summary: 福岡県久留米市が、官民境界確定図の一部をWebでダウンロードできるようにし、市役所に無人の情報交付機も置きました。
 comment: 官民境界の資料を、窓口に行かなくても確認できるのは、調査の下準備がぐっと楽になる取り組みです。ほかの自治体にも広がってほしいですね。
 tags:
   - 官民境界
   - 自治体
+feed: true # 発車標（ニュース）だけに出す。記事のページは作らない（2026-11-08 に記事から移動。draft: false にもどすと記事にもどる）
+draft: true
 ---
 
 ## ポイント

@@ -13,7 +13,7 @@ export function getStaticPaths() {
   return import.meta.env.DEV ? [{ params: { check: 'shitagaki-check' } }] : [];
 }
 
-const drafts = (await getCollection('articles', ({ id, data }) => data.draft && !id.startsWith('inbox/'))).sort(
+const drafts = (await getCollection('articles', ({ id, data }) => data.draft && !data.feed && !id.startsWith('inbox/'))).sort(
   (a, b) => (a.data.draftNo ?? 9999) - (b.data.draftNo ?? 9999),
 );
 ---

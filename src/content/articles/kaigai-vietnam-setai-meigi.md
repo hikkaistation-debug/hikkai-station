@@ -13,6 +13,8 @@ tags:
 branchFrom: kaigai-touki-seido
 branchOrder: 1
 station: ベトナム：世帯の名義
+feed: true # 発車標（ニュース）だけに出す。記事のページは作らない（2026-11-08 に記事から移動。draft: false にもどすと記事にもどる）
+draft: true
 ---
 
 > 日本と海外の登記のしくみのちがいは、[海外と日本の登記制度のちがい](/articles/kaigai-touki-seido/) にまとめています。
