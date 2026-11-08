@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "alerts": "node scripts/fetch-alerts.mjs"
+    "alerts": "node scripts/fetch-alerts.mjs",
+    "news-check": "node scripts/check-news-links.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

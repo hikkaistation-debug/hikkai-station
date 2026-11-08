@@ -3,12 +3,11 @@
 // ・記事（src/content/articles/ のMarkdown）に feed: true と書くと、発車標に出ます。
 //   Googleアラートの下書き（inbox）は draft: true のままでかまいません（記事のページは作られず、元の記事へのリンクだけが出ます）。
 // ・要約やひとことは出しません（他サイトの文章をなぞらないため）。
-// ・公開日（pubDate）から NEWS_DAYS 日たったものは、自動で出なくなります（サイトを組み立てなおしたときに消えます）。
+// ・古いニュースも消しません。トップや各のりばの発車標には新しい順に数件だけ、/news/ には月ごとにすべて並べます（バックナンバー）。
+//   元の記事が消えてリンクが切れたものは、見つけしだいファイルを削除するか feed: false にします。
 // ・路線の色の印は category で決まります。下書きの category を合わせてから feed: true にしてください。
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getLine } from './lines';
-
-export const NEWS_DAYS = 30;
 
 export type NewsItem = {
   id: string;
@@ -68,12 +67,21 @@ function toItem(a: CollectionEntry<'articles'>): NewsItem {
 //   level：この対象（やさしい・ふつう・専門）を除く
 //   limit：いちばん多くて何件
 export async function getNews(opts: { lines?: string[]; excludeLevel?: string; limit?: number } = {}): Promise<NewsItem[]> {
-  const cutoff = Date.now() - NEWS_DAYS * 86400 * 1000;
-  const list = await getCollection('articles', ({ data }) => data.feed && data.pubDate.getTime() >= cutoff);
+  const list = await getCollection('articles', ({ data }) => data.feed);
   return list
     .filter((a) => !opts.lines || opts.lines.includes(a.data.category))
     .filter((a) => !opts.excludeLevel || a.data.level !== opts.excludeLevel)
     .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime() || a.id.localeCompare(b.id))
     .slice(0, opts.limit ?? Infinity)
     .map(toItem);
+}
+
+// 月ごとに分ける（新しい月から）… /news/ のバックナンバー用
+export function groupByMonth(items: NewsItem[]): { key: string; label: string; items: NewsItem[] }[] {
+  const groups = new Map<string, NewsItem[]>();
+  for (const n of items) {
+    const key = `${n.date.getFullYear()}-${String(n.date.getMonth() + 1).padStart(2, '0')}`;
+    groups.set(key, [...(groups.get(key) ?? []), n]);
+  }
+  return [...groups].map(([key, list]) => ({ key, label: `${Number(key.slice(0, 4))}年${Number(key.slice(5))}月`, items: list }));
 }

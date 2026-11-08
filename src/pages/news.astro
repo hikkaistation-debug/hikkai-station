@@ -1,20 +1,36 @@
 ---
-// 発車標（ニュース）のページ … 新着ニュースを見出し・出典・日付だけで並べる（30日たったものは自動で消える）
+// 発車標（ニュース）のページ … ニュースを見出し・出典・日付だけで、月ごとに並べる（古いものも消さないバックナンバー）
 // ニュースの出し方は src/data/news.ts を見てください。
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StationSign from '../components/StationSign.astro';
 import NewsBoard from '../components/NewsBoard.astro';
 import { TERMINAL } from '../data/site';
-import { getNews, NEWS_DAYS } from '../data/news';
+import { getNews, groupByMonth } from '../data/news';
 
-const items = await getNews();
+const months = groupByMonth(await getNews());
 ---
 <BaseLayout title="ニュース（発車標）" description="筆界・境界・登記・土地家屋調査士に関する新着ニュースを、出典へのリンクで紹介しています。">
   <StationSign kicker="駅の施設" title="発車標" sub="NEWS" color="#1f2a44" prev={TERMINAL} />
 
-  <p>筆界・境界・登記・土地家屋調査士に関する新しいニュースを、見出しと出典だけで紹介しています。内容は、それぞれのリンク先（元の記事）でご確認ください。{NEWS_DAYS}日たったニュースは、ここから消えます。</p>
+  <p>筆界・境界・登記・土地家屋調査士に関する新しいニュースを、見出しと出典だけで紹介しています。内容は、それぞれのリンク先（元の記事）でご確認ください。過去のニュースも、月ごとに残しています（元の記事が見られなくなったものは、のぞいています）。</p>
 
-  <NewsBoard items={items} title="新着ニュース" more={false} />
+  {months.length > 1 && (
+    <nav aria-label="月ごとのニュース">
+      <ul class="month-nav">
+        {months.map((m) => <li><a href={`#m-${m.key}`}>{m.label}<small>{m.items.length}件</small></a></li>)}
+      </ul>
+    </nav>
+  )}
+
+  {months.length > 0 ? (
+    months.map((m, i) => (
+      <div id={`m-${m.key}`} class="month">
+        <NewsBoard items={m.items} title={i === 0 ? `${m.label}｜新着ニュース` : m.label} more={false} id={`news-${m.key}`} />
+      </div>
+    ))
+  ) : (
+    <NewsBoard items={[]} title="新着ニュース" more={false} />
+  )}
 
   <aside class="notice">
     <p class="notice__title">見出しの左の印について</p>
@@ -25,5 +41,13 @@ const items = await getNews();
 </BaseLayout>
 
 <style>
+  .month { scroll-margin-top: 1rem; }
+  .month-nav { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .month-nav a {
+    display: inline-flex; gap: 0.4rem; align-items: baseline;
+    padding: 0.2rem 0.75rem; border: 1px solid var(--line); border-radius: 999px; background: var(--card);
+    text-decoration: none; font-weight: 700;
+  }
+  .month-nav small { color: var(--ink-soft); font-weight: 400; }
   .moved-note { font-size: 0.9rem; color: var(--ink-soft); }
 </style>
