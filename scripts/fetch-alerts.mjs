@@ -5,21 +5,30 @@
 // ・作った下書きは src/content/articles/inbox/ に入ります。
 //   draft: true なので、サイトには表示されません。
 // ・一度下書きにしたリンクは src/data/alerts-seen.json に記録し、二度は作りません。
+// ・同じニュースがいくつものサイトに載っていても、下書きは1つだけ作ります。
+//   タイトルの「 - Yahoo!ニュース」のような媒体名や日付をのぞいて、ほぼ同じタイトルなら同じニュースとみなし、
+//   2つめからは、先に作った下書きの最後に「同じニュースの別の掲載先」として書き足します。
+//   下書きを消したあとも同じニュースが別のサイトから届かないように、タイトルは
+//   src/data/alerts-seen-titles.json に記録します（90日分）。
+// ・関係ないサイトや言葉は src/data/alerts-filter.json に書いておくと、下書きを作りません。
 //
 // 手元で試すとき： ALERT_FEEDS="https://..." npm run alerts
 // ファイルで試すとき： node scripts/fetch-alerts.mjs --file テスト用.xml
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const INBOX = path.join(ROOT, 'src', 'content', 'articles', 'inbox');
 const SEEN_FILE = path.join(ROOT, 'src', 'data', 'alerts-seen.json');
 const MAX_PER_RUN = 30; // 1回に作る下書きの上限（作りすぎ防止）
 const SEEN_LIMIT = 2000; // 記録しておくリンクの上限
+const TITLES_FILE = path.join(ROOT, 'src', 'data', 'alerts-seen-titles.json');
+const TITLE_DAYS = 90; // タイトルを覚えておく日数
+const FILTER_FILE = path.join(ROOT, 'src', 'data', 'alerts-filter.json');
 
 // --- 文字の整形 ---
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
@@ -90,6 +99,73 @@ draft: true
 `;
 }
 
+// --- 同じニュースかどうかを見分ける ---
+// タイトルから媒体名・日付・記号などをのぞいた「くらべる用の文字」を作る
+export function titleKey(title) {
+  let s = (title ?? '').normalize('NFKC');
+  s = s.replace(/^【(画像|写真|動画)】/, '');
+  // 最後の「 - 媒体名」「 | 媒体名」を2回までのぞく（例：… - ｄメニューニュース - NTTドコモ）
+  for (let i = 0; i < 2; i++) s = s.replace(/\s+[-|｜–—]\s+[^-|｜–—]{1,40}$/, '');
+  // 「：山陽新聞デジタル」のように、コロンのあとが媒体名のとき
+  s = s.replace(/[:：]\s*[^:：]{0,20}(新聞|ニュース|NEWS|News|デジタル|TIMES|Times|ONLINE|Online)[^:：]{0,10}$/, '');
+  s = s.replace(/\(\d{2}\/\d{1,2}\/\d{1,2}\)/g, ''); // (26/11/06) のような日付
+  s = s.replace(/(\.{2,}|…)+/g, ''); // 途中で切れたしるし
+  s = s.replace(/[\s\p{P}\p{S}]/gu, ''); // 空白・記号
+  return s.toLowerCase();
+}
+
+function bigrams(s) {
+  const set = new Set();
+  for (let i = 0; i < s.length - 1; i++) set.add(s.slice(i, i + 2));
+  return set;
+}
+
+// ほぼ同じタイトルなら true。片方が途中で切れていても（長い方に短い方がほぼ入っていれば）同じとみなす
+export function sameNews(a, b) {
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  if (short.length < 10) return false;
+  if (long.startsWith(short)) return true;
+  const A = bigrams(short);
+  const B = bigrams(long);
+  let both = 0;
+  for (const g of A) if (B.has(g)) both++;
+  const dice = (2 * both) / (A.size + B.size);
+  const inLong = both / A.size;
+  return dice >= 0.75 || (short.length >= 15 && inLong >= 0.9);
+}
+
+async function loadJson(file, fallback) {
+  if (!existsSync(file)) return fallback;
+  return JSON.parse(await readFile(file, 'utf8'));
+}
+
+// いまある下書きのタイトルを読む
+async function loadInbox() {
+  if (!existsSync(INBOX)) return [];
+  const list = [];
+  for (const name of await readdir(INBOX)) {
+    if (!name.endsWith('.md')) continue;
+    const file = path.join(INBOX, name);
+    const line = (await readFile(file, 'utf8')).match(/^title:\s*(.+)$/m)?.[1] ?? '';
+    let title = line.trim();
+    try {
+      title = JSON.parse(title);
+    } catch {
+      title = title.replace(/^["']|["']$/g, '');
+    }
+    list.push({ file, key: titleKey(title) });
+  }
+  return list;
+}
+
+function isFiltered(item, filter) {
+  const host = hostOf(item.url);
+  if ((filter.hosts ?? []).some((h) => host === h || host.endsWith('.' + h))) return true;
+  return (filter.words ?? []).some((w) => w && item.title.includes(w));
+}
+
 async function loadSeen() {
   if (!existsSync(SEEN_FILE)) return [];
   return JSON.parse(await readFile(SEEN_FILE, 'utf8'));
@@ -120,29 +196,61 @@ async function main() {
 
   const seen = await loadSeen();
   const seenSet = new Set(seen);
+  const filter = await loadJson(FILTER_FILE, {});
+  const cutoff = new Date(Date.now() - TITLE_DAYS * 86400 * 1000).toISOString().slice(0, 10);
+  const titles = (await loadJson(TITLES_FILE, [])).filter((t) => t.date >= cutoff);
+  const inbox = await loadInbox();
   await mkdir(INBOX, { recursive: true });
 
   let created = 0;
+  let merged = 0;
+  let skipped = 0;
   for (const src of sources) {
     for (const item of parseFeed(src.xml)) {
       if (created >= MAX_PER_RUN) break;
       if (seenSet.has(item.url)) continue;
       seenSet.add(item.url);
       seen.push(item.url);
+      if (isFiltered(item, filter)) {
+        skipped++;
+        console.log(`関係ないので作らない：${item.title}`);
+        continue;
+      }
+      const key = titleKey(item.title);
+      // いまある下書きと同じニュースなら、その下書きに掲載先を書き足す
+      const draft = inbox.find((d) => sameNews(d.key, key));
+      if (draft) {
+        await appendFile(draft.file, `<!-- 同じニュースの別の掲載先：${item.url} -->\n`, 'utf8');
+        merged++;
+        console.log(`同じニュースなので下書きにまとめる：${item.title}`);
+        continue;
+      }
+      // 前に届いたニュース（下書きを消した・公開したもの）と同じなら作らない
+      if (titles.some((t) => sameNews(t.key, key))) {
+        skipped++;
+        console.log(`前に届いたニュースと同じなので作らない：${item.title}`);
+        continue;
+      }
       const id = createHash('sha1').update(item.url).digest('hex').slice(0, 8);
       const file = path.join(INBOX, `${today()}-${id}.md`);
       if (existsSync(file)) continue;
       await writeFile(file, draftMarkdown(item), 'utf8');
+      inbox.push({ file, key });
+      titles.push({ key, date: today() });
       created++;
       console.log(`下書きを作成：${item.title}`);
     }
   }
 
   await writeFile(SEEN_FILE, JSON.stringify(seen.slice(-SEEN_LIMIT), null, 2) + '\n', 'utf8');
-  console.log(`新しい下書き：${created}件`);
+  await writeFile(TITLES_FILE, JSON.stringify(titles, null, 2) + '\n', 'utf8');
+  console.log(`新しい下書き：${created}件／同じニュースでまとめた：${merged}件／作らなかった：${skipped}件`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// ほかのファイルから読み込んだとき（テストなど）は動かさない
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

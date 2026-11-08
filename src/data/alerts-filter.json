@@ -1,0 +1,14 @@
+{
+  "_説明": "Googleアラートで下書きを作らないサイト（hosts）と、タイトルにふくまれていたら作らない言葉（words）。サイトは www. をのぞいた名前で書く（例：sponichi.co.jp）。",
+  "hosts": [
+    "sponichi.co.jp",
+    "go2senkyo.com",
+    "mk.co.kr",
+    "indexbox.io",
+    "sakhaparliament.ru"
+  ],
+  "words": [
+    "投手成績",
+    "クマ出没"
+  ]
+}
