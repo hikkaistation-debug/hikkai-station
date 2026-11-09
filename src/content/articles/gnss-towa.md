@@ -52,6 +52,11 @@ GNSSは「Global Navigation Satellite System（全球測位衛星システム）
 | RTK測位 | 位置のわかっている基準局と、測る点の受信機を通信でつなぎ、その場で位置を出す | 測量、工事、農業機械 |
 | ネットワーク型RTK | 国土地理院の電子基準点などのデータから作った補正情報を使って、その場で位置を出す | 測量 |
 
+<figure class="figure">
+  <a href="/images/kiso/gnss-sokui.svg" target="_blank" rel="noopener"><img src="/images/kiso/gnss-sokui.svg" alt="左は受信機1台で衛星の電波を受ける単独測位、右は基準局と測る点の受信機を通信でつなぐRTK測位を、衛星からの点線とともに比べた図" width="640" height="360" loading="lazy" /></a>
+  <figcaption>RTK測位は、位置のわかっている基準局とつないで、その場で位置を出します。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 精度は、測り方だけでは決まらない
 
 どのくらい正確に測れるかは、測り方の名前だけでなく、次のようなことでも大きく変わります。

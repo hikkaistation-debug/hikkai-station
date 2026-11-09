@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 401" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">相続土地国庫帰属制度の申請から国が引き取るまでの流れと費用を示す図</title>
+  <rect width="640" height="401" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">相続した土地を国に引き取ってもらう流れ</text>
+  <line x1="50" y1="79" x2="50" y2="310" stroke="#0b62b4" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="50" cy="79" r="13" fill="#fff" stroke="#0b62b4" stroke-width="4"/>
+  <text x="50" y="84" font-size="14" font-weight="700" text-anchor="middle" fill="#0b62b4">1</text>
+  <text x="76" y="85" font-size="17" font-weight="700" fill="#1a1d24">申請する</text>
+  <text x="76" y="109" font-size="14.5" fill="#464c58">相続や遺贈で土地を取得した相続人が申請します。<tspan font-weight="700">審査手数料</tspan>：土地1筆あたり</text>
+  <text x="76" y="130" font-size="14.5" fill="#464c58">14,000円</text>
+  <circle cx="50" cy="163" r="13" fill="#fff" stroke="#0b62b4" stroke-width="4"/>
+  <text x="50" y="168" font-size="14" font-weight="700" text-anchor="middle" fill="#0b62b4">2</text>
+  <text x="76" y="169" font-size="17" font-weight="700" fill="#1a1d24">審査</text>
+  <text x="76" y="193" font-size="14.5" fill="#464c58">建物がある・境界がはっきりしないなど、申請できない土地や、認められないこ</text>
+  <text x="76" y="214" font-size="14.5" fill="#464c58">とがある土地が決められています</text>
+  <circle cx="50" cy="247" r="13" fill="#fff" stroke="#0b62b4" stroke-width="4"/>
+  <text x="50" y="252" font-size="14" font-weight="700" text-anchor="middle" fill="#0b62b4">3</text>
+  <text x="76" y="253" font-size="17" font-weight="700" fill="#1a1d24">引き取りが認められたら、負担金を納める</text>
+  <text x="76" y="277" font-size="14.5" fill="#464c58"><tspan font-weight="700">負担金</tspan>：原則20万円（一部の宅地・農地・森林は面積に応じて計算）</text>
+  <circle cx="50" cy="310" r="13" fill="#fff" stroke="#0b62b4" stroke-width="4"/>
+  <text x="50" y="315" font-size="14" font-weight="700" text-anchor="middle" fill="#0b62b4">4</text>
+  <text x="76" y="316" font-size="17" font-weight="700" fill="#0b62b4">国が引き取る</text>
+  <text x="30" y="347" font-size="14" fill="#464c58">境界がはっきりしない土地は申請できないので、事前に土地家屋調査士に境目を確かめても</text>
+  <text x="30" y="367" font-size="14" fill="#464c58">らうこともあります。</text>
+</svg>

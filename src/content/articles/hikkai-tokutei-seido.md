@@ -19,6 +19,11 @@ tags:
 2. 筆界調査委員（外部の専門家）が、法務局の職員と一緒に現地調査や測量などを行い、意見を出します。
 3. 筆界特定登記官が、その意見をふまえて筆界の位置を特定します。
 
+<figure class="figure">
+  <a href="/images/kiso/hikkai-tokutei-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/hikkai-tokutei-nagare.svg" alt="申請・筆界調査委員の調査と意見・筆界特定登記官の特定という3つの段階と、結果が1本の線で示される場合と範囲で示される場合を並べた図" width="640" height="430" loading="lazy" /></a>
+  <figcaption>筆界特定は「申請 → 調査・意見 → 特定」の順に進みます。結果は1本の線のほか、範囲で示されることもあります。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 知っておきたいこと
 
 - 申請があると、お隣の土地の所有者などにも知らせが届きます。

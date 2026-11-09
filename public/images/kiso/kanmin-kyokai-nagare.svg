@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 378" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">官民境界の協議の流れを4つの段階で示す図</title>
+  <rect width="640" height="378" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">官民境界の協議の流れ</text>
+  <line x1="50" y1="79" x2="50" y2="289" stroke="#c4122f" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="50" cy="79" r="13" fill="#fff" stroke="#c4122f" stroke-width="4"/>
+  <text x="50" y="84" font-size="14" font-weight="700" text-anchor="middle" fill="#c4122f">1</text>
+  <text x="76" y="85" font-size="17" font-weight="700" fill="#1a1d24">窓口で資料を調べる</text>
+  <text x="76" y="109" font-size="14.5" fill="#464c58">道路や水路の管理者の窓口で、道路台帳や過去の境界確定図を調べます</text>
+  <circle cx="50" cy="142" r="13" fill="#fff" stroke="#c4122f" stroke-width="4"/>
+  <text x="50" y="147" font-size="14" font-weight="700" text-anchor="middle" fill="#c4122f">2</text>
+  <text x="76" y="148" font-size="17" font-weight="700" fill="#1a1d24">境界確定（境界協議）を申請する</text>
+  <text x="76" y="172" font-size="14.5" fill="#464c58">土地家屋調査士に代理で頼むのが一般的です</text>
+  <circle cx="50" cy="205" r="13" fill="#fff" stroke="#c4122f" stroke-width="4"/>
+  <text x="50" y="210" font-size="14" font-weight="700" text-anchor="middle" fill="#c4122f">3</text>
+  <text x="76" y="211" font-size="17" font-weight="700" fill="#1a1d24">現地で立ち会う</text>
+  <text x="76" y="235" font-size="14.5" fill="#464c58">管理者の担当者と立ち会います（向かいの土地の持ち主などにも声をかけること</text>
+  <text x="76" y="256" font-size="14.5" fill="#464c58">があります）</text>
+  <circle cx="50" cy="289" r="13" fill="#fff" stroke="#c4122f" stroke-width="4"/>
+  <text x="50" y="294" font-size="14" font-weight="700" text-anchor="middle" fill="#c4122f">4</text>
+  <text x="76" y="295" font-size="17" font-weight="700" fill="#1a1d24">境界確定図・確定書を受け取る</text>
+  <text x="76" y="319" font-size="14.5" fill="#464c58">協議がまとまると受け取れます。申請から確定まで、数か月かかることがよくあ</text>
+  <text x="76" y="340" font-size="14.5" fill="#464c58">ります</text>
+</svg>

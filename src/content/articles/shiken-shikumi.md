@@ -26,6 +26,11 @@ tags:
 | 冬（例年1月ごろ） | 口述試験（筆記試験の合格者が受けます） |
 | 口述試験のあと | 最終合格の発表 |
 
+<figure class="figure">
+  <a href="/images/kiso/shiken-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/shiken-nagare.svg" alt="夏の受験の申請、秋の筆記試験、冬の口述試験、最終合格の発表を、時期とともに縦に並べた図" width="640" height="361" loading="lazy" /></a>
+  <figcaption>例年の流れ。日程は必ず最新の受験案内書で確かめてください。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 筆記試験の中身
 
 | | 午前の部 | 午後の部 |

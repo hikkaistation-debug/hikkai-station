@@ -33,6 +33,11 @@ branchOrder: 3
 
 地目は、土地の今の使い方（現況）で判断されます。たとえば、登記簿は「畑」でも、家が建っていれば実際は「宅地」です。こうしたずれがあるときは、地目変更の登記をします。
 
+<figure class="figure">
+  <a href="/images/kiso/chimoku-henko-zu.svg" target="_blank" rel="noopener"><img src="/images/kiso/chimoku-henko-zu.svg" alt="登記簿では畑の土地に家が建ち、地目変更登記で登記簿を宅地に直すまでを、左から右へ3つの枠で示した図" width="640" height="330" loading="lazy" /></a>
+  <figcaption>登記簿の地目と今の使い方がずれたら、1か月以内に地目変更登記をします。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 地目変更登記
 
 | 項目 | 内容 |

@@ -32,6 +32,11 @@ tags:
 3. 管理者の担当者と現地で立ち会う（向かいの土地の持ち主などにも声をかけることがある）
 4. 協議がまとまると、境界確定図や確定書を受け取る
 
+<figure class="figure">
+  <a href="/images/kiso/kanmin-kyokai-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/kanmin-kyokai-nagare.svg" alt="窓口で資料を調べる・申請する・現地で立ち会う・境界確定図や確定書を受け取るという4つの段階を、縦に並べた図" width="640" height="378" loading="lazy" /></a>
+  <figcaption>官民境界の協議の4つの段階。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 申請は持ち主本人もできますが、測量や図面が必要になるので、土地家屋調査士に代理で頼むのが一般的です。
 
 ## 期間の目安

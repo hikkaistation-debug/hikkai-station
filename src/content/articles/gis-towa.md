@@ -36,6 +36,11 @@ GISは「Geographic Information System（地理情報システム）」の頭文
 | まちの計画 | 用途地域などの都市計画 |
 | 災害の情報 | ハザードマップ（浸水・土砂災害） |
 
+<figure class="figure">
+  <a href="/images/kiso/gis-layer.svg" target="_blank" rel="noopener"><img src="/images/kiso/gis-layer.svg" alt="地図の土台・写真・土地の区画・まちの計画・災害の情報の5枚の層が、上下に重なっている様子を示した図" width="640" height="420" loading="lazy" /></a>
+  <figcaption>GISでは、位置をもつデータを層（レイヤー）のように重ねて見ます。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 たとえば、公図のデータと航空写真を重ねると、「この土地は今、どんな使われ方をしているか」がひと目でわかります。
 
 ## 無料（または基本無料）で使えるGISの例

@@ -26,6 +26,11 @@ tags:
 | 平成17年（2005年） | 新しい不動産登記法で、14条4項の「地図に準ずる図面」になる |
 | 現在 | 地籍調査などで作られた**14条1項地図**への置き換えが進んでいる |
 
+<figure class="figure">
+  <a href="/images/kiso/kouzu-nenpyo.svg" target="_blank" rel="noopener"><img src="/images/kiso/kouzu-nenpyo.svg" alt="明治6年の地租改正から、土地台帳附属地図、一元化で公図と呼ばれるようになり、現在の14条1項地図への置き換えまでを並べた年表の図" width="640" height="546" loading="lazy" /></a>
+  <figcaption>税のための図面が、いまの「公図」になるまで。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 公図が現地と合わない理由
 
 - もともと税を決めるための図で、境目の位置を正確に示す目的ではなかった

@@ -35,6 +35,11 @@ tags:
 | 表示するもの | 各土地の区画・地番（2項） | 土地の位置・形状・地番（5項）。ただし形や長さはおおよそのことが多い |
 | 現地に境目を復元できるか | できる可能性が高い（座標などから。ただし絶対ではない） | 原則としてむずかしい |
 
+<figure class="figure">
+  <a href="/images/kiso/14jou-chizu-chigai.svg" target="_blank" rel="noopener"><img src="/images/kiso/14jou-chizu-chigai.svg" alt="左に直線と座標のある整った14条1項地図、右に線がゆがんだ地図に準ずる図面（公図など）を並べて比べた図" width="640" height="380" loading="lazy" /></a>
+  <figcaption>同じ4つの土地でも、図面の種類で精度の考え方が変わります。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 実務でのポイント
 
 - まず、取得した図面が上の表のどちらかを確かめます。登記事項証明書や図面の欄外の記載でわかります。

@@ -33,6 +33,11 @@ tags:
 3. 調査の結果（地籍図・地籍簿の案）を確認する（閲覧期間がある）
 4. 結果が法務局に送られ、登記が直される
 
+<figure class="figure">
+  <a href="/images/kiso/chiseki-chousa-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/chiseki-chousa-nagare.svg" alt="お知らせが届く・現地で立ち会う・調査の結果を確認する・法務局で登記が直されるという4つの段階を、縦に並べた図" width="640" height="339" loading="lazy" /></a>
+  <figcaption>地籍調査で持ち主がすることは4つです。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 持ち主の費用負担はありません。
 
 ## 進み具合

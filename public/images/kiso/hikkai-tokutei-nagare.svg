@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">筆界特定制度の流れ（申請・調査・特定）と、結果が1本の線または範囲で示されることを示す図</title>
+  <rect width="640" height="430" fill="#ffffff"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c4122f"/></marker></defs>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">筆界特定の流れと、結果の示し方</text>
+  <rect x="20" y="62" width="180" height="86" rx="10" fill="#eef2f8" stroke="#8a93a3" stroke-width="2"/>
+  <text x="110" y="92" font-size="17" font-weight="700" text-anchor="middle" fill="#1a1d24">① 申請</text>
+  <text x="110" y="116" font-size="13.5" text-anchor="middle" fill="#464c58">土地のある場所を</text>
+  <text x="110" y="134" font-size="13.5" text-anchor="middle" fill="#464c58">担当する法務局へ</text>
+  <rect x="230" y="62" width="180" height="86" rx="10" fill="#eef2f8" stroke="#8a93a3" stroke-width="2"/>
+  <text x="320" y="92" font-size="17" font-weight="700" text-anchor="middle" fill="#1a1d24">② 調査・意見</text>
+  <text x="320" y="116" font-size="13.5" text-anchor="middle" fill="#464c58">筆界調査委員が</text>
+  <text x="320" y="134" font-size="13.5" text-anchor="middle" fill="#464c58">現地調査・測量など</text>
+  <rect x="440" y="62" width="180" height="86" rx="10" fill="#fdecef" stroke="#c4122f" stroke-width="2"/>
+  <text x="530" y="92" font-size="17" font-weight="700" text-anchor="middle" fill="#c4122f">③ 特定</text>
+  <text x="530" y="116" font-size="13.5" text-anchor="middle" fill="#464c58">筆界特定登記官が</text>
+  <text x="530" y="134" font-size="13.5" text-anchor="middle" fill="#464c58">意見をふまえて特定</text>
+  <line x1="202" y1="105" x2="226" y2="105" stroke="#c4122f" stroke-width="3" marker-end="url(#a)"/>
+  <line x1="412" y1="105" x2="436" y2="105" stroke="#c4122f" stroke-width="3" marker-end="url(#a)"/>
+  <text x="320" y="186" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">結果の示し方は2とおり</text>
+  <rect x="40" y="200" width="260" height="120" fill="#eef2f8" stroke="#8a93a3" stroke-width="1.5"/>
+  <rect x="170" y="200" width="130" height="120" fill="#f3efe6"/>
+  <rect x="40" y="200" width="260" height="120" fill="none" stroke="#8a93a3" stroke-width="1.5"/>
+  <line x1="170" y1="200" x2="170" y2="320" stroke="#1f2a44" stroke-width="6"/>
+  <circle cx="170" cy="200" r="7" fill="#c4122f"/><circle cx="170" cy="320" r="7" fill="#c4122f"/>
+  <text x="105" y="265" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">A地</text>
+  <text x="235" y="265" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">B地</text>
+  <text x="170" y="346" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">1本の線で示す</text>
+  <rect x="340" y="200" width="260" height="120" fill="#eef2f8"/>
+  <rect x="470" y="200" width="130" height="120" fill="#f3efe6"/>
+  <rect x="440" y="200" width="60" height="120" fill="#c4122f" fill-opacity="0.18"/>
+  <line x1="440" y1="200" x2="440" y2="320" stroke="#c4122f" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="500" y1="200" x2="500" y2="320" stroke="#c4122f" stroke-width="2" stroke-dasharray="6 4"/>
+  <rect x="340" y="200" width="260" height="120" fill="none" stroke="#8a93a3" stroke-width="1.5"/>
+  <text x="390" y="265" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">A地</text>
+  <text x="552" y="265" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">B地</text>
+  <text x="470" y="250" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">この範囲</text>
+  <text x="470" y="266" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">のどこか</text>
+  <text x="470" y="346" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">範囲で示すこともある</text>
+  <text x="320" y="384" font-size="14.5" text-anchor="middle" fill="#464c58">所有権の範囲を決めるものではありません。</text>
+  <text x="320" y="408" font-size="14.5" text-anchor="middle" fill="#464c58">結果に納得できなければ、<tspan font-weight="700">境界確定訴訟</tspan>（裁判）で争うことができます。</text>
+</svg>

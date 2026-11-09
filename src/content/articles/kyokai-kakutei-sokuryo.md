@@ -38,6 +38,11 @@ tags:
 6. **書面をまとめる**：確定測量図を作り、お隣と境界確認書を取り交わす
 7. **必要なら登記**：分筆や地積更正の登記を申請する
 
+<figure class="figure">
+  <a href="/images/kiso/kyokai-kakutei-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/kyokai-kakutei-nagare.svg" alt="資料集め・現地調査・役所との協議・お隣との立ち会い・境界標の設置・書面のとりまとめ・登記の7つの段階を、路線図のように縦に並べた図" width="640" height="569" loading="lazy" /></a>
+  <figcaption>境界確定測量の7つの段階。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 気をつけたいこと
 
 - お隣の持ち主が亡くなっていたり、連絡がつかなかったりすると、時間がかかります。

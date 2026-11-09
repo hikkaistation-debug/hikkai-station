@@ -60,6 +60,11 @@ tags:
 
 ※時期と内容は、おおまかな目安です。実際には登記所や図面によってちがいます。
 
+<figure class="figure">
+  <a href="/images/kiso/chiseki-sokuryozu-jidai.svg" target="_blank" rel="noopener"><img src="/images/kiso/chiseki-sokuryozu-jidai.svg" alt="一元化より前から平成17年以降まで、地積測量図の特徴と、現地に復元しやすいかを時期ごとに並べた年表の図" width="640" height="507" loading="lazy" /></a>
+  <figcaption>作られた時期が新しいほど、現地に復元しやすくなっています（目安です）。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 使う道具も、時代とともに変わってきました。平板（図板の上で現地の形を描く道具）から、角度を測るトランシット、光で距離を測るトータルステーション、そして人工衛星を使うGNSSへと進んでいます。
 
 ## 見るときのポイント

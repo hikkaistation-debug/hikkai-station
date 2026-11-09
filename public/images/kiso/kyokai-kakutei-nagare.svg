@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 569" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">境界確定測量の流れを7つの段階で示す図</title>
+  <rect width="640" height="569" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">境界確定測量が終わるまで</text>
+  <line x1="50" y1="79" x2="50" y2="457" stroke="#b45309" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="50" cy="79" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="84" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">1</text>
+  <text x="76" y="85" font-size="17" font-weight="700" fill="#1a1d24">資料を集める</text>
+  <text x="76" y="109" font-size="14.5" fill="#464c58">登記事項証明書・公図・地積測量図・役所の道路の資料など</text>
+  <circle cx="50" cy="142" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="147" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">2</text>
+  <text x="76" y="148" font-size="17" font-weight="700" fill="#1a1d24">現地を調べて測る</text>
+  <text x="76" y="172" font-size="14.5" fill="#464c58">境界標や塀の位置を測り、資料と照らし合わせる</text>
+  <circle cx="50" cy="205" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="210" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">3</text>
+  <text x="76" y="211" font-size="17" font-weight="700" fill="#1a1d24">役所と協議する</text>
+  <text x="76" y="235" font-size="14.5" fill="#464c58">道路や水路に面していれば、官民境界の協議を申し込む</text>
+  <circle cx="50" cy="268" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="273" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">4</text>
+  <text x="76" y="274" font-size="17" font-weight="700" fill="#1a1d24">お隣と立ち会う</text>
+  <text x="76" y="298" font-size="14.5" fill="#464c58">隣の土地の持ち主に、現地で境目を確認してもらう</text>
+  <circle cx="50" cy="331" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="336" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">5</text>
+  <text x="76" y="337" font-size="17" font-weight="700" fill="#1a1d24">境界標を入れる</text>
+  <text x="76" y="361" font-size="14.5" fill="#464c58">確認した位置に、杭やプレートを入れる</text>
+  <circle cx="50" cy="394" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="399" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">6</text>
+  <text x="76" y="400" font-size="17" font-weight="700" fill="#1a1d24">書面をまとめる</text>
+  <text x="76" y="424" font-size="14.5" fill="#464c58">確定測量図を作り、お隣と境界確認書を取り交わす</text>
+  <circle cx="50" cy="457" r="13" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="50" y="462" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">7</text>
+  <text x="76" y="463" font-size="17" font-weight="700" fill="#1a1d24">必要なら登記</text>
+  <text x="76" y="487" font-size="14.5" fill="#464c58">分筆や地積更正の登記を申請する</text>
+  <text x="30" y="515" font-size="14" fill="#464c58">※期間は数か月が目安。役所との協議があると半年ほどかかることも（土地の条件で大きく</text>
+  <text x="30" y="535" font-size="14" fill="#464c58">変わります）。</text>
+</svg>

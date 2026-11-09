@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 507" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">地積測量図が作られた時期ごとの特徴と、現地に復元しやすいかを示す年表の図</title>
+  <rect width="640" height="507" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">地積測量図は「いつ作られたか」が大事</text>
+  <line x1="168" y1="79" x2="168" y2="394" stroke="#0a7d3e" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="168" cy="79" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="84" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">一元化より前</text>
+  <text x="194" y="85" font-size="17" font-weight="700" fill="#1a1d24">三斜求積のための図</text>
+  <text x="194" y="109" font-size="14.5" fill="#464c58">まわりの長さはほとんど書かれていない → 復元は<tspan font-weight="700">むずかしい</tspan></text>
+  <text x="194" y="130" font-size="14.5" fill="#464c58"><tspan font-weight="700">ことが多い</tspan></text>
+  <circle cx="168" cy="163" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="168" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">一元化のあと〜</text>
+  <text x="194" y="169" font-size="17" font-weight="700" fill="#1a1d24">縮尺は原則300分の1</text>
+  <text x="194" y="193" font-size="14.5" fill="#464c58">机の上で作ったような図面もある → 復元は<tspan font-weight="700">むずかしいことが</tspan></text>
+  <text x="194" y="214" font-size="14.5" fill="#464c58"><tspan font-weight="700">多い</tspan></text>
+  <circle cx="168" cy="247" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="252" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">昭和52年ごろ〜</text>
+  <text x="194" y="253" font-size="17" font-weight="700" fill="#1a1d24">境界標があれば書く</text>
+  <text x="194" y="277" font-size="14.5" fill="#464c58">近くの動かないものとの位置関係は任意 → <tspan font-weight="700">図面による</tspan></text>
+  <circle cx="168" cy="310" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="315" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">平成5年ごろ〜</text>
+  <text x="194" y="316" font-size="17" font-weight="700" fill="#1a1d24">位置関係を書くことが義務に</text>
+  <text x="194" y="340" font-size="14.5" fill="#464c58">境界標がないときは、近くの動かないものとの位置関係を書く</text>
+  <text x="194" y="361" font-size="14.5" fill="#464c58"> → <tspan font-weight="700">しやすくなった</tspan></text>
+  <circle cx="168" cy="394" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="399" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">平成17年〜</text>
+  <text x="194" y="400" font-size="17" font-weight="700" fill="#0a7d3e">筆界点の座標値を書く</text>
+  <text x="194" y="424" font-size="14.5" fill="#464c58">分筆の残りの土地も原則として測る → <tspan font-weight="700">しやすい</tspan>（ただし絶対</text>
+  <text x="194" y="445" font-size="14.5" fill="#464c58">ではない）</text>
+  <text x="30" y="473" font-size="14" fill="#464c58">※時期と内容は、おおまかな目安です。実際には登記所や図面によってちがいます。</text>
+</svg>

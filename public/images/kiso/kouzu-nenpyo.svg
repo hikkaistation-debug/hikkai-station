@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 546" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">明治の地租改正から現在までの公図の移り変わりを示す年表の図</title>
+  <rect width="640" height="546" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">公図の移り変わり</text>
+  <line x1="168" y1="79" x2="168" y2="478" stroke="#0a7d3e" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="168" cy="79" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="84" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">明治6年〜</text>
+  <text x="194" y="85" font-size="17" font-weight="700" fill="#1a1d24">地租改正</text>
+  <text x="194" y="109" font-size="14.5" fill="#464c58">税をかけるため、村ごとに図面（字限図など）を作る。測量は</text>
+  <text x="194" y="130" font-size="14.5" fill="#464c58">住民が行った</text>
+  <circle cx="168" cy="163" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="168" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">明治18〜22年ごろ</text>
+  <text x="194" y="169" font-size="17" font-weight="700" fill="#1a1d24">地押調査</text>
+  <text x="194" y="193" font-size="14.5" fill="#464c58">図面を作り直した地域もある（更正図）</text>
+  <circle cx="168" cy="226" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="231" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">明治22年</text>
+  <text x="194" y="232" font-size="17" font-weight="700" fill="#1a1d24">土地台帳附属地図になる</text>
+  <text x="194" y="256" font-size="14.5" fill="#464c58">税務署などで管理される</text>
+  <circle cx="168" cy="289" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="294" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">昭和25年</text>
+  <text x="194" y="295" font-size="17" font-weight="700" fill="#1a1d24">登記所（法務局）へ移る</text>
+  <text x="194" y="319" font-size="14.5" fill="#464c58">土地台帳の事務が税務署から移る</text>
+  <circle cx="168" cy="352" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="357" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">昭和35年</text>
+  <text x="194" y="358" font-size="17" font-weight="700" fill="#1a1d24">一元化 →「公図」と呼ばれる</text>
+  <text x="194" y="382" font-size="14.5" fill="#464c58">土地台帳はなくなり、附属地図が登記所に残る</text>
+  <circle cx="168" cy="415" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="420" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">平成17年</text>
+  <text x="194" y="421" font-size="17" font-weight="700" fill="#1a1d24">「地図に準ずる図面」になる</text>
+  <text x="194" y="445" font-size="14.5" fill="#464c58">新しい不動産登記法の14条4項</text>
+  <circle cx="168" cy="478" r="9" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="146" y="483" font-size="14" font-weight="700" text-anchor="end" fill="#464c58">現在</text>
+  <text x="194" y="484" font-size="17" font-weight="700" fill="#0a7d3e">14条1項地図への置き換え</text>
+  <text x="194" y="508" font-size="14.5" fill="#464c58">地籍調査などで作られた地図に置き換えが進む</text>
+</svg>

@@ -39,6 +39,11 @@ tags:
 3. 納得できれば、後日（またはその場で）**境界確認書**に署名・押印する
 4. 確認した位置に境界標が入る
 
+<figure class="figure">
+  <a href="/images/kiso/kyokai-tachiai-nagare.svg" target="_blank" rel="noopener"><img src="/images/kiso/kyokai-tachiai-nagare.svg" alt="土地家屋調査士の説明・現地での確認・境界確認書への署名押印・境界標の設置という4つの段階を、縦に並べた図" width="640" height="357" loading="lazy" /></a>
+  <figcaption>立ち会いの当日は、この順に進むのがふつうです。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 持っていくとよいもの
 
 | もの | 理由 |
