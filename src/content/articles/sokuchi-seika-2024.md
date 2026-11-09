@@ -8,8 +8,6 @@ sourceUrl: https://www.gsi.go.jp/sokuchikijun/hyoko2024rev.html
 summary: 2025年4月1日に、全国の基準点の標高が「測地成果2024」に改定されました。何が変わり、何が変わっていないのかを、国土地理院の案内をもとに整理します。
 comment: 変わったのは「高さ」で、緯度・経度の値は変わっていません。測量の仕事では、改定の前後の高さがまざらないように気をつけるところです。
 tags: []
-draftNo: 28
-draft: true
 ---
 
 ## ポイント

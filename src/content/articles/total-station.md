@@ -18,8 +18,6 @@ product:
   use: 角度と距離を同時に測り、点の位置を求める
   officialUrl: https://www.gsi.go.jp/gijyutukanri/gijyutukanri41018.html
   checkedDate: 2026-11-09
-draftNo: 27
-draft: true
 ---
 
 ## トータルステーションとは

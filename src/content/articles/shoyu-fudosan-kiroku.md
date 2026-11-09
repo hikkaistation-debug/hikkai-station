@@ -11,8 +11,6 @@ tags:
   - 相続
   - 相続登記
   - 不動産登記法
-draftNo: 25
-draft: true
 ---
 
 ## ポイント
