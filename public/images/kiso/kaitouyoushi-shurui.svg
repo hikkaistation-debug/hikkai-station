@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 314" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">アガルートが無料で配っている4種類の用紙と、それぞれの使いどころを並べた図</title>
+  <rect width="640" height="314" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">配っている用紙と、使いどころ</text>
+  <rect x="20" y="58" width="293" height="99" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="20" y="58" width="8" height="99" rx="4" fill="#0f766e"/>
+  <text x="38" y="84" font-size="16" font-weight="700" fill="#0f766e">択一式の用紙</text>
+  <text x="38" y="111" font-size="14" fill="#1a1d24">マークシートの問題の練習と、まちがえた</text>
+  <text x="38" y="131" font-size="14" fill="#1a1d24">問題の見直し</text>
+  <rect x="327" y="58" width="293" height="99" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="327" y="58" width="8" height="99" rx="4" fill="#0f766e"/>
+  <text x="345" y="84" font-size="16" font-weight="700" fill="#0f766e">登記申請書の枠</text>
+  <text x="345" y="111" font-size="14" fill="#1a1d24">記述式で、申請書を書く練習（土地・建物</text>
+  <text x="345" y="131" font-size="14" fill="#1a1d24">など種類別）</text>
+  <rect x="20" y="171" width="293" height="99" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="20" y="171" width="8" height="99" rx="4" fill="#0f766e"/>
+  <text x="38" y="197" font-size="16" font-weight="700" fill="#0f766e">図面の枠</text>
+  <text x="38" y="224" font-size="14" fill="#1a1d24">記述式で、地積測量図や建物図面などを書</text>
+  <text x="38" y="244" font-size="14" fill="#1a1d24">く練習</text>
+  <rect x="327" y="171" width="293" height="99" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="327" y="171" width="8" height="99" rx="4" fill="#0f766e"/>
+  <text x="345" y="197" font-size="16" font-weight="700" fill="#0f766e">過去問用の記述の答案用紙</text>
+  <text x="345" y="224" font-size="14" fill="#1a1d24">法務省が公開している過去の問題を、答案</text>
+  <text x="345" y="244" font-size="14" fill="#1a1d24">の形で解く練習（年度ごと）</text>
+  <text x="320" y="288" font-size="13.5" text-anchor="middle" fill="#464c58">予備校が作った用紙で、本番の答案用紙と同じとは限りません。</text>
+</svg>

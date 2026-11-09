@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">登記の効力が対抗要件か効力発生要件か、公信力があるかないかで、日本・フランス・アメリカ・韓国・ドイツ・イギリス・オーストラリアを4つのますに分けた図</title>
+  <rect width="640" height="400" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">登記の効力と公信力で、国を分けると</text>
+  <text x="290" y="70" font-size="14.5" font-weight="700" text-anchor="middle" fill="#464c58">公信力がない</text>
+  <text x="510" y="70" font-size="14.5" font-weight="700" text-anchor="middle" fill="#464c58">公信力がある</text>
+  <text x="96" y="150" font-size="14.5" font-weight="700" text-anchor="middle" fill="#464c58">対抗要件</text>
+  <text x="96" y="170" font-size="11.5" text-anchor="middle" fill="#464c58">（契約で権利が移る）</text>
+  <text x="96" y="270" font-size="14.5" font-weight="700" text-anchor="middle" fill="#464c58">効力発生要件</text>
+  <text x="96" y="290" font-size="11.5" text-anchor="middle" fill="#464c58">（登記で権利が移る）</text>
+  <rect x="180" y="84" width="220" height="116" fill="#fdecef" stroke="#ffffff" stroke-width="3"/>
+  <text x="290" y="124" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24"><tspan fill="#c4122f">日本</tspan></text>
+  <text x="290" y="148" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">フランス</text>
+  <text x="290" y="172" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">アメリカ</text>
+  <rect x="400" y="84" width="220" height="116" fill="#f4f3ee" stroke="#ffffff" stroke-width="3"/>
+  <text x="510" y="148" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">―</text>
+  <rect x="180" y="200" width="220" height="116" fill="#eef2f8" stroke="#ffffff" stroke-width="3"/>
+  <text x="290" y="264" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">韓国</text>
+  <rect x="400" y="200" width="220" height="116" fill="#e8f4ec" stroke="#ffffff" stroke-width="3"/>
+  <text x="510" y="240" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">ドイツ</text>
+  <text x="510" y="264" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">イギリス</text>
+  <text x="510" y="288" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">オーストラリア※</text>
+  <text x="320" y="344" font-size="13" text-anchor="middle" fill="#464c58">※オーストラリアは「実質的にあり」。アメリカは証書登録制度で、民間の権原保険で補います。</text>
+  <text x="320" y="368" font-size="13" text-anchor="middle" fill="#464c58">日本の登記には公信力がないので、売主が本当の持ち主かも確かめることが大切です。</text>
+</svg>

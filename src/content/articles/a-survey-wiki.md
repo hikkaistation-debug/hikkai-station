@@ -26,6 +26,11 @@ relatedLines:
 | アプリ内のメニュー | 現場の管理、トラバース・杭打ち、交点・面積の計算、座標の計算、ボタンの設定 |
 | その他 | 写真、バックアップ、Bluetooth接続、一人での運用、一筆の測量のコツ |
 
+<figure class="figure">
+  <a href="/images/kiso/a-survey-wiki-menu.svg" target="_blank" rel="noopener"><img src="/images/kiso/a-survey-wiki-menu.svg" alt="非公式wikiの「はじめに」「初心者向け」「アプリ内のメニュー」「その他」の4つのメニューと、それぞれにのっていることを4枚のカードで並べた図" width="640" height="354" loading="lazy" /></a>
+  <figcaption>wikiは4つのメニューに分かれています。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 見るのは無料で、登録もいりません（2026年11月7日に確認）。
 
 ## このサイトからの補足

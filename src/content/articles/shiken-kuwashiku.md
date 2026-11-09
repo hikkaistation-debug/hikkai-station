@@ -45,6 +45,11 @@ tags:
 | 午前の部 | 100点中70.0点以上 | 60点中30.0点 | 40点中32.0点 |
 | 午後の部 | 100点中76.0点以上 | 50点中37.5点 | 50点中32.5点 |
 
+<figure class="figure">
+  <a href="/images/kiso/shiken-haiten.svg" target="_blank" rel="noopener"><img src="/images/kiso/shiken-haiten.svg" alt="午前の部と午後の部の配点を、択一式と記述式に分けた帯で示し、それぞれの基準点を赤い線で、合計の合格点を下に書いた図" width="640" height="330" loading="lazy" /></a>
+  <figcaption>令和7年度の例。合計点と、択一・記述それぞれの基準点の両方をこえる必要があります。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 基準点に1つでも届かないと、合計点が高くても不合格です。合格点は毎年変わります。
 
 ## 令和7年度の結果

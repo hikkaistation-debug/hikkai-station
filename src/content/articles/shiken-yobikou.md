@@ -22,6 +22,11 @@ tags:
 | 通信講座（動画・テキスト） | 仕事をしながら、自分のペースで学びたい人 | 一人でも計画どおり進められるか |
 | 独学（市販の本・過去問） | 費用をおさえたい人、測量や登記の基礎がある人 | 記述式（作図や書面）の書き方を、自分で身につける必要がある |
 
+<figure class="figure">
+  <a href="/images/kiso/yobikou-manabikata.svg" target="_blank" rel="noopener"><img src="/images/kiso/yobikou-manabikata.svg" alt="通学・通信講座・独学の3つの学び方を、向いている人と気をつけたいことと一緒に3枚のカードで並べた図" width="640" height="299" loading="lazy" /></a>
+  <figcaption>自分に合う学び方を選ぶのが第一歩です。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 土地家屋調査士の講座がある主な予備校
 
 | 予備校 | 特徴（公式サイトの案内から） |

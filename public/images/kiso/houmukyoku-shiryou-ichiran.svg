@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 498" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">法務局で取れる7つの資料と、それぞれでわかることを並べた図</title>
+  <rect width="640" height="498" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">法務局で取れる資料と、わかること</text>
+  <rect x="20" y="58" width="293" height="79" rx="10" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <rect x="20" y="58" width="8" height="79" rx="4" fill="#0a7d3e"/>
+  <text x="38" y="84" font-size="16" font-weight="700" fill="#0a7d3e">登記事項証明書</text>
+  <text x="38" y="111" font-size="14" fill="#1a1d24">所在・面積・持ち主・抵当権など</text>
+  <rect x="327" y="58" width="293" height="79" rx="10" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <rect x="327" y="58" width="8" height="79" rx="4" fill="#0a7d3e"/>
+  <text x="345" y="84" font-size="16" font-weight="700" fill="#0a7d3e">14条1項地図・公図</text>
+  <text x="345" y="111" font-size="14" fill="#1a1d24">土地の並び方・形・地番</text>
+  <rect x="20" y="151" width="293" height="99" rx="10" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <rect x="20" y="151" width="8" height="99" rx="4" fill="#0a7d3e"/>
+  <text x="38" y="177" font-size="16" font-weight="700" fill="#0a7d3e">地積測量図</text>
+  <text x="38" y="204" font-size="14" fill="#1a1d24">形・境目の長さ・面積・境界標（分筆など</text>
+  <text x="38" y="224" font-size="14" fill="#1a1d24">をした土地）</text>
+  <rect x="327" y="151" width="293" height="99" rx="10" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <rect x="327" y="151" width="8" height="99" rx="4" fill="#0a7d3e"/>
+  <text x="345" y="177" font-size="16" font-weight="700" fill="#0a7d3e">建物図面・各階平面図</text>
+  <text x="345" y="204" font-size="14" fill="#1a1d24">建物の位置と、各階の形・床面積</text>
+  <rect x="20" y="264" width="293" height="79" rx="10" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="20" y="264" width="8" height="79" rx="4" fill="#8a93a3"/>
+  <text x="38" y="290" font-size="16" font-weight="700" fill="#8a93a3">閉鎖登記簿・閉鎖された図面</text>
+  <text x="38" y="317" font-size="14" fill="#1a1d24">昔の登記の内容や、以前の図面</text>
+  <rect x="327" y="264" width="293" height="79" rx="10" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="327" y="264" width="8" height="79" rx="4" fill="#8a93a3"/>
+  <text x="345" y="290" font-size="16" font-weight="700" fill="#8a93a3">旧土地台帳</text>
+  <text x="345" y="317" font-size="14" fill="#1a1d24">一元化される前の土地の記録</text>
+  <rect x="20" y="357" width="293" height="117" rx="10" fill="#ffffff" stroke="#c4122f" stroke-width="2"/>
+  <rect x="20" y="357" width="8" height="117" rx="4" fill="#c4122f"/>
+  <text x="38" y="383" font-size="16" font-weight="700" fill="#c4122f">所有不動産記録証明書</text>
+  <text x="38" y="402" font-size="12.5" fill="#464c58">2026年2月から</text>
+  <text x="38" y="428" font-size="14" fill="#1a1d24">自分や亡くなった家族の名義の不動産の一</text>
+  <text x="38" y="448" font-size="14" fill="#1a1d24">覧（全国分）</text>
+  <rect x="327" y="357" width="293" height="117" rx="10" fill="#ffffff" stroke="#1f2a44" stroke-width="2"/>
+  <rect x="327" y="357" width="8" height="117" rx="4" fill="#1f2a44"/>
+  <text x="345" y="383" font-size="16" font-weight="700" fill="#1f2a44">請求のコツ</text>
+  <text x="345" y="410" font-size="14" fill="#1a1d24">住所ではなく<tspan font-weight="700">地番</tspan>で請求。公図は、となり</text>
+  <text x="345" y="430" font-size="14" fill="#1a1d24">の土地も写る範囲で</text>
+</svg>

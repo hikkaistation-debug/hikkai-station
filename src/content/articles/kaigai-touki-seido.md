@@ -39,6 +39,11 @@ tags:
 
 [国土交通省の資料](https://www.mlit.go.jp/common/001121686.pdf)によると、ドイツ・フランス・イギリス・アメリカ・オーストラリアなどでは、建物は土地の一部として扱われ、建物だけで登記や取引をすることはできません。法務省の資料でも、これらの国は「土地登記のみ」、日本と韓国は「土地・建物の登記」となっています。
 
+<figure class="figure">
+  <a href="/images/kiso/touki-seido-matrix.svg" target="_blank" rel="noopener"><img src="/images/kiso/touki-seido-matrix.svg" alt="登記の効力（対抗要件か効力発生要件か）と公信力（あるかないか）で4つのますを作り、日本・フランス・アメリカ、韓国、ドイツ・イギリス・オーストラリアを入れた図" width="640" height="400" loading="lazy" /></a>
+  <figcaption>ポイント1・2を組み合わせると、国は4つのますに分かれます（対抗要件で公信力がある国は、この表にはありません）。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 国ごとのまとめ
 
 | 国 | 登記の効力 | 公信力 | 建物 | ひとこと |

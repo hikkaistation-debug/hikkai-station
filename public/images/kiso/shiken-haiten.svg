@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">令和7年度の土地家屋調査士試験の、午前の部と午後の部の択一式・記述式の満点と基準点、合計の合格点を帯で示した図</title>
+  <rect width="640" height="330" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">配点と基準点（令和7年度）</text>
+  <text x="24" y="94" font-size="16" font-weight="700" text-anchor="start" fill="#1a1d24">午前の部</text>
+  <rect x="150" y="70" width="264" height="36" fill="#0b62b4" fill-opacity="0.16" stroke="#0b62b4" stroke-width="2"/>
+  <text x="158" y="93" font-size="13.5" font-weight="700" text-anchor="start" fill="#0b62b4">択一 60点</text>
+  <line x1="282" y1="64" x2="282" y2="112" stroke="#c4122f" stroke-width="3"/>
+  <text x="282" y="130" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">基準点 30</text>
+  <rect x="414" y="70" width="176" height="36" fill="#b45309" fill-opacity="0.16" stroke="#b45309" stroke-width="2"/>
+  <text x="422" y="93" font-size="13.5" font-weight="700" text-anchor="start" fill="#b45309">記述（作図） 40点</text>
+  <line x1="554.8" y1="64" x2="554.8" y2="112" stroke="#c4122f" stroke-width="3"/>
+  <text x="554.8" y="130" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">基準点 32</text>
+  <text x="370" y="154" font-size="14" text-anchor="middle" fill="#1a1d24">合計の合格点：100点中 <tspan font-weight="700" fill="#c4122f">70.0点以上</tspan></text>
+  <text x="24" y="214" font-size="16" font-weight="700" text-anchor="start" fill="#1a1d24">午後の部</text>
+  <rect x="150" y="190" width="220.00000000000003" height="36" fill="#0b62b4" fill-opacity="0.16" stroke="#0b62b4" stroke-width="2"/>
+  <text x="158" y="213" font-size="13.5" font-weight="700" text-anchor="start" fill="#0b62b4">択一 50点</text>
+  <line x1="315" y1="184" x2="315" y2="232" stroke="#c4122f" stroke-width="3"/>
+  <text x="315" y="250" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">基準点 37.5</text>
+  <rect x="370" y="190" width="220.00000000000003" height="36" fill="#b45309" fill-opacity="0.16" stroke="#b45309" stroke-width="2"/>
+  <text x="378" y="213" font-size="13.5" font-weight="700" text-anchor="start" fill="#b45309">記述 50点</text>
+  <line x1="513" y1="184" x2="513" y2="232" stroke="#c4122f" stroke-width="3"/>
+  <text x="513" y="250" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c4122f">基準点 32.5</text>
+  <text x="370" y="274" font-size="14" text-anchor="middle" fill="#1a1d24">合計の合格点：100点中 <tspan font-weight="700" fill="#c4122f">76.0点以上</tspan></text>
+  <text x="320" y="318" font-size="13" text-anchor="middle" fill="#464c58">赤い線（基準点）に1つでも届かないと、合計点が高くても不合格です。合格点は毎年変わります。</text>
+</svg>

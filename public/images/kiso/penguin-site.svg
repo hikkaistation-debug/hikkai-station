@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 299" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">ぺんぎんとざっくり学ぶ土地家屋調査士試験入門の3つのコーナーと、その中身を並べた図</title>
+  <rect width="640" height="299" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">サイトの3つのコーナー</text>
+  <rect x="20" y="58" width="190.66666666666666" height="177" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="20" y="58" width="8" height="177" rx="4" fill="#0f766e"/>
+  <text x="38" y="84" font-size="16" font-weight="700" fill="#0f766e">受験内容まんが</text>
+  <text x="38" y="103" font-size="12.5" fill="#464c58">3話</text>
+  <text x="38" y="129" font-size="14" fill="#1a1d24">調査士の仕事、調査士に</text>
+  <text x="38" y="149" font-size="14" fill="#1a1d24">なるまでの流れ、合格に</text>
+  <text x="38" y="169" font-size="14" fill="#1a1d24">必要な点数の考え方</text>
+  <rect x="224.66666666666666" y="58" width="190.66666666666666" height="177" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="224.66666666666666" y="58" width="8" height="177" rx="4" fill="#0f766e"/>
+  <text x="242.66666666666666" y="84" font-size="16" font-weight="700" fill="#0f766e">択一四コマまんが</text>
+  <text x="242.66666666666666" y="103" font-size="12.5" fill="#464c58">令和3〜7年度</text>
+  <text x="242.66666666666666" y="129" font-size="14" fill="#1a1d24">過去の択一式の問題の肢</text>
+  <text x="242.66666666666666" y="149" font-size="14" fill="#1a1d24">をもとにした四コマ。土</text>
+  <text x="242.66666666666666" y="169" font-size="14" fill="#1a1d24">地・建物・不動産登記法・</text>
+  <text x="242.66666666666666" y="189" font-size="14" fill="#1a1d24">民法・調査士法に分かれ</text>
+  <text x="242.66666666666666" y="209" font-size="14" fill="#1a1d24">る</text>
+  <rect x="429.3333333333333" y="58" width="190.66666666666666" height="177" rx="10" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="429.3333333333333" y="58" width="8" height="177" rx="4" fill="#8a93a3"/>
+  <text x="447.3333333333333" y="84" font-size="16" font-weight="700" fill="#8a93a3">本（一問一答）</text>
+  <text x="447.3333333333333" y="103" font-size="12.5" fill="#464c58">Amazonへのリンク</text>
+  <text x="447.3333333333333" y="129" font-size="14" fill="#1a1d24">年度別の一問一答の本の</text>
+  <text x="447.3333333333333" y="149" font-size="14" fill="#1a1d24">紹介（サイトに広告と書</text>
+  <text x="447.3333333333333" y="169" font-size="14" fill="#1a1d24">かれている）</text>
+  <text x="320" y="253" font-size="13.5" text-anchor="middle" fill="#464c58">はじめての方は受験内容まんが、受験生の方は択一四コマまんがから。解説は公式の見解ではあ</text>
+  <text x="320" y="273" font-size="13.5" text-anchor="middle" fill="#464c58">りません。</text>
+</svg>

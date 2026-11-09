@@ -44,6 +44,11 @@ Android版には、機器とつないで観測できる版と、計算だけの�
 
 ※対応する機種や機能は、公式サイトの対応表と更新履歴で確かめてください。
 
+<figure class="figure">
+  <a href="/images/kiso/a-survey-tsunagari.svg" target="_blank" rel="noopener"><img src="/images/kiso/a-survey-tsunagari.svg" alt="中央のAndroid版エーサーベイが、左のトータルステーションやGNSS受信機と矢印でつながり、右のパソコン版とデータをやりとりしている図" width="640" height="330" loading="lazy" /></a>
+  <figcaption>Android版を現場のコントローラーのように使い、パソコン版とデータをやりとりできます。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 料金と使い始め方
 
 - **有料**のソフトです。本体のほかに、機能を足すオプションがあります。料金は公式サイトの登録ページで確かめてください。

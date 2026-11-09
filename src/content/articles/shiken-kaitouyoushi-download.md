@@ -24,6 +24,11 @@ tags:
 | 図面の枠 | 記述式で、地積測量図や建物図面などを書く練習 |
 | 過去問用の記述の答案用紙 | 法務省が公開している過去の試験問題を、答案の形で解く練習（年度ごと） |
 
+<figure class="figure">
+  <a href="/images/kiso/kaitouyoushi-shurui.svg" target="_blank" rel="noopener"><img src="/images/kiso/kaitouyoushi-shurui.svg" alt="択一式の用紙・登記申請書の枠・図面の枠・過去問用の記述の答案用紙の4種類を、使いどころと一緒に4枚のカードで並べた図" width="640" height="314" loading="lazy" /></a>
+  <figcaption>配っている用紙は4種類です。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ページには、資料請求や講座の案内も一緒にのっています。用紙のダウンロードだけなら、それらに申し込む必要はありません。
 
 ## このサイトからの補足

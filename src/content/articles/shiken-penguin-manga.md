@@ -23,6 +23,11 @@ tags:
 | 択一四コマまんが | 令和3年度から令和7年度の択一式の問題をもとにした四コマ（サイトの表示で438本）。土地・建物・不動産登記法・民法・土地家屋調査士法に分かれている |
 | 本（一問一答） | 年度別の一問一答の本の紹介（Amazonへのリンク。サイトに広告と書かれています） |
 
+<figure class="figure">
+  <a href="/images/kiso/penguin-site.svg" target="_blank" rel="noopener"><img src="/images/kiso/penguin-site.svg" alt="受験内容まんが・択一四コマまんが・本（一問一答）の3つのコーナーを、中身と一緒に3枚のカードで並べた図" width="640" height="299" loading="lazy" /></a>
+  <figcaption>サイトは3つのコーナーに分かれています。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## はじめての方に：受験内容まんが
 
 3話の四コマで、試験の入口をつかめます。

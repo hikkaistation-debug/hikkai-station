@@ -27,6 +27,11 @@ tags:
 | 旧土地台帳 | 登記簿と一元化される前の土地の記録 |
 | 所有不動産記録証明書（2026年2月から） | 自分、または亡くなった家族の名義になっている不動産の一覧（全国分） |
 
+<figure class="figure">
+  <a href="/images/kiso/houmukyoku-shiryou-ichiran.svg" target="_blank" rel="noopener"><img src="/images/kiso/houmukyoku-shiryou-ichiran.svg" alt="登記事項証明書・公図・地積測量図・建物図面・閉鎖登記簿・旧土地台帳・所有不動産記録証明書と請求のコツを、それぞれわかることと一緒に8枚のカードで並べた図" width="640" height="498" loading="lazy" /></a>
+  <figcaption>どの資料で何がわかるかの早見表です。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ## 取り方
 
 | 方法 | 内容 |
