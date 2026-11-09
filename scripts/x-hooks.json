@@ -114,5 +114,15 @@
       "tag": "相続人申告登記"
     }
   },
-  "tokkyu": {}
+  "tokkyu": {},
+  "_説明_articles": "articles：記事のidごとに、X の投稿文の1行目（hook）・内容のハッシュタグ（tag、#なし）・画像にする表の見出し（tables）。scripts/article-images.mjs が使う",
+  "articles": {
+    "jishin-chizu-zahyo": {
+      "hook": "大きな地震のあと、法務局の地図の座標は、今の土地と合っている？",
+      "tag": "地積測量図",
+      "tables": [
+        "法務省の案内の比較"
+      ]
+    }
+  }
 }
