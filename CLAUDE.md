@@ -15,11 +15,14 @@
 - 入れたら、画像にして文字の重なりや切れがないか目で確かめ、運営者に一覧を見せる。
 - 発車標（`feed: true` で見出しとリンクだけ出す下書き）には、図はいらない。
 
-## 筆界ステーションチェック（/station-check/）
+## 筆界ステーションチェック（運営者の確認ページ）
 
-- 記事と図解をまとめて確認する、手元だけのページ（`npm run dev` のときだけ。`src/pages/station-check/`）。記事を足したら、ここにも自動で並ぶ。
-- 運営者に「ステーションチェックで確認して」と見てもらうときは、裏で `sh scripts/check-watch.sh station` を動かして待つ。
-- 「ステーションチェックしたよ」と言われたら、`review/station-check.json` の「直してほしい」（status: fix）とメモを読んで直す。直したら、作業ブランチまで入れて、公開は「公開して」を待つ。
+- 運営者は、Claude アプリの非公開ページ「筆界ステーションチェック」で記事と図解を確認する（スマホ・どのパソコンからでも開ける）。
+  ページ：https://claude.ai/artifact/JuCAon3XbQ6M7s9VUVFpTs（slug：90f4ea9c-5c23-4c2b-8c14-5b92d7414c82）
+- 記事や図解を変えたら、確認をたのむ前にページを作り直して出しなおす：
+  `npm run build` → `node scripts/station-check-page.mjs <出力するHTML>` → そのHTMLを `publish_files`（slug と最新の version を指定）。
+  公開中の main から変わった記事には「今回変わった」の印がつく。OK のあとで中身が変わった記事は、自動で「まだ」にもどる。
+- チェックの結果は、そのページのデータ `checks/<記事のid>`（status: ok／fix、note）に入る。`db_list`（collection: checks）で読み、「直してほしい」を直す。直したら作業ブランチまで入れ、ページを出しなおし、公開は「公開して」を待つ。
 
 ## 「公開して」と言われたあとの入れ方
 

@@ -205,80 +205,9 @@ function tsutatsuCheck() {
   };
 }
 
-// 筆界ステーションチェック（/station-check/）のしくみ。確認用画面（npm run dev）のときだけ動きます。
-//   /__station … 記事ごとのチェック結果（OK／直してほしい＋メモ）を review/station-check.json に保存／読み出し
-//   送られてきた記事の分だけ書きかえる（null は削除）。
-//   /__station/handoff … 「保存して Claude に渡す」で review/station-handoff.json に書く（待機中の Claude が読みに来る）
-//   /__station/status … Claude が待機中か（scripts/check-watch.sh station が review/.claude-watching-station を更新している）
-const stationCheckFile = fileURLToPath(new URL('./review/station-check.json', import.meta.url));
-const stationHandoffFile = fileURLToPath(new URL('./review/station-handoff.json', import.meta.url));
-const stationWatchingFile = fileURLToPath(new URL('./review/.claude-watching-station', import.meta.url));
-const stRead = (f) => {
-  try {
-    return JSON.parse(fs.readFileSync(f, 'utf8'));
-  } catch {
-    return {};
-  }
-};
-const stWrite = (f, data) => {
-  fs.mkdirSync(fileURLToPath(new URL('./review/', import.meta.url)), { recursive: true });
-  fs.writeFileSync(f, JSON.stringify(data, null, 2) + '\n');
-};
-function stationCheck() {
-  return {
-    name: 'station-check',
-    /** @param {import('vite').ViteDevServer} server */
-    configureServer(server) {
-      server.middlewares.use('/__station', (req, res) => {
-        res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        const path = (req.url ?? '/').split('?')[0];
-        if (req.method === 'GET' && path === '/status') {
-          let watching = false;
-          try {
-            watching = Date.now() - fs.statSync(stationWatchingFile).mtimeMs < 15000;
-          } catch {}
-          res.end(JSON.stringify({ watching }));
-          return;
-        }
-        if (req.method === 'GET') {
-          res.end(JSON.stringify(stRead(stationCheckFile)));
-          return;
-        }
-        if (req.method === 'POST') {
-          let body = '';
-          req.on('data', (c) => (body += c));
-          req.on('end', () => {
-            try {
-              const data = JSON.parse(body);
-              if (path === '/handoff') {
-                stWrite(stationHandoffFile, { at: new Date().toISOString(), text: String(data.text ?? '') });
-                res.end('{"ok":true}');
-                return;
-              }
-              const current = stRead(stationCheckFile);
-              for (const [id, entry] of Object.entries(data)) {
-                if (entry === null) delete current[id];
-                else current[id] = entry;
-              }
-              stWrite(stationCheckFile, current);
-              res.end(JSON.stringify(current));
-            } catch {
-              res.statusCode = 400;
-              res.end('{"ok":false}');
-            }
-          });
-          return;
-        }
-        res.statusCode = 405;
-        res.end('{}');
-      });
-    },
-  };
-}
-
 // site: 公開するときのアドレス（RSS・サイトマップ・SNS共有の表示に使います）
 export default defineConfig({
   site: 'https://hikkai-station.com',
-  integrations: [sitemap({ filter: (page) => !page.includes('/shitagaki-check/') && !page.includes('/station-check/') })],
-  vite: { plugins: [shitagakiReview(), xCheck(), tsutatsuCheck(), stationCheck()] },
+  integrations: [sitemap({ filter: (page) => !page.includes('/shitagaki-check/') })],
+  vite: { plugins: [shitagakiReview(), xCheck(), tsutatsuCheck()] },
 });
