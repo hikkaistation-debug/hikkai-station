@@ -88,7 +88,8 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   });
   body = body.replace(/href="\/(?!\/)/g, 'href="https://hikkai-station.com/');
   const figHashes = figs.map((f) => (fs.existsSync(path.join(root, 'public', f.src)) ? fs.readFileSync(path.join(root, 'public', f.src)) : '')).join('|');
-  const rev = crypto.createHash('sha1').update(md).update(figHashes).digest('hex').slice(0, 12);
+  // draft・draftNo の行は指紋に入れない（下書きを外して公開しただけで「まだ」にもどらないように）
+  const rev = crypto.createHash('sha1').update(md.replace(/^(draft|draftNo):.*\n/gm, '')).update(figHashes).digest('hex').slice(0, 12);
   const mdChanged = changed.has(`src/content/articles/${file}`);
   items.push({ id, ...fm, body, figs, rev, isChanged: mdChanged || figs.some((f) => f.isNew) });
 }
