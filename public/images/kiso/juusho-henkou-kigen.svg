@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 350" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">住所・氏名の変更登記の申請の期限を、2026年4月1日より前に変わった場合と以降に変わった場合に分けて示す図</title>
+  <rect width="640" height="350" fill="#ffffff"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b62b4"/></marker></defs>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">住所・氏名の変更登記の期限</text>
+  <line x1="40" y1="96" x2="604" y2="96" stroke="#8a93a3" stroke-width="3" marker-end="url(#a)"/>
+  <line x1="200" y1="84" x2="200" y2="108" stroke="#1f2a44" stroke-width="3"/>
+  <text x="200" y="76" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">2026年4月1日</text>
+  <text x="200" y="128" font-size="13" text-anchor="middle" fill="#464c58">義務化スタート</text>
+  <line x1="470" y1="84" x2="470" y2="108" stroke="#c4122f" stroke-width="3"/>
+  <text x="470" y="76" font-size="14" font-weight="700" text-anchor="middle" fill="#c4122f">2028年3月31日</text>
+  <rect x="20" y="150" width="600" height="64" rx="8" fill="#f3efe6" stroke="#8a93a3" stroke-width="2"/>
+  <text x="36" y="176" font-size="15" font-weight="700" text-anchor="start" fill="#1a1d24">2026年4月1日より前に変わった（まだ登記していない）</text>
+  <text x="36" y="200" font-size="14" text-anchor="start" fill="#464c58">→ <tspan font-weight="700" fill="#c4122f">2028年3月31日まで</tspan></text>
+  <rect x="20" y="226" width="600" height="64" rx="8" fill="#e7f0fa" stroke="#0b62b4" stroke-width="2"/>
+  <text x="36" y="252" font-size="15" font-weight="700" text-anchor="start" fill="#1a1d24">2026年4月1日以降に変わった</text>
+  <text x="36" y="276" font-size="14" text-anchor="start" fill="#464c58">→ 変わった日から<tspan font-weight="700" fill="#0b62b4">2年以内</tspan></text>
+  <text x="320" y="316" font-size="13.5" text-anchor="middle" fill="#464c58">正当な理由なく申請しないと、5万円以下の過料の対象になることがあります。</text>
+  <text x="320" y="338" font-size="13.5" text-anchor="middle" fill="#464c58">いきなり科されるわけではなく、まず催告書が届きます。</text>
+</svg>

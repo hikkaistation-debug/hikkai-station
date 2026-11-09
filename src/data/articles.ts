@@ -10,7 +10,10 @@ export type Article = CollectionEntry<'articles'>;
 export async function getPublishedArticles(): Promise<Article[]> {
   const all = await getCollection(
     'articles',
-    ({ id, data }) => !data.draft || (import.meta.env.DEV && !id.startsWith('inbox/') && !data.feed),
+    ({ id, data }) =>
+      !data.draft ||
+      // 確認用画面（npm run dev）と、筆界ステーションチェックのページを作るためのビルド（STATION_CHECK_DRAFTS=1）では、ふつうの下書きも記事のページにする
+      ((import.meta.env.DEV || process.env.STATION_CHECK_DRAFTS === '1') && !id.startsWith('inbox/') && !data.feed),
   );
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }

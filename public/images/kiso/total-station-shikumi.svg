@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">位置がわかっている点に据えたトータルステーションが、別の既知点で向きの基準を決め、測りたい点のプリズムまでの角度と距離を測って座標を計算するしくみを示す図</title>
+  <rect width="640" height="360" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">トータルステーションで位置を求めるしくみ</text>
+  <g transform="translate(200,210)"><line x1="0" y1="0" x2="-24" y2="56" stroke="#8a93a3" stroke-width="3"/><line x1="0" y1="0" x2="24" y2="56" stroke="#8a93a3" stroke-width="3"/><line x1="0" y1="0" x2="0" y2="56" stroke="#8a93a3" stroke-width="3"/><rect x="-16" y="-28" width="32" height="28" rx="4" fill="#be185d"/></g>
+  <circle cx="200" cy="268" r="6" fill="#c4122f"/>
+  <text x="200" y="300" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1d24">① 位置がわかっている点</text>
+  <text x="200" y="318" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1d24">に機械を据える</text>
+  <circle cx="70" cy="140" r="7" fill="#c4122f"/>
+  <line x1="70" y1="140" x2="70" y2="110" stroke="#1f2a44" stroke-width="3"/>
+  <text x="70" y="82" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1d24">② 別の既知点</text>
+  <text x="70" y="100" font-size="12.5" text-anchor="middle" fill="#464c58">（向きの基準）</text>
+  <line x1="196" y1="190" x2="76" y2="142" stroke="#1f2a44" stroke-width="2" stroke-dasharray="6 4"/>
+  <line x1="520" y1="270" x2="520" y2="150" stroke="#1f2a44" stroke-width="3"/>
+  <circle cx="520" cy="146" r="10" fill="#fff" stroke="#b45309" stroke-width="4"/>
+  <text x="520" y="124" font-size="13.5" font-weight="700" text-anchor="middle" fill="#1a1d24">③ 測りたい点のプリズム</text>
+  <line x1="214" y1="190" x2="508" y2="148" stroke="#b45309" stroke-width="3"/>
+  <text x="370" y="160" font-size="14" font-weight="700" text-anchor="middle" fill="#b45309">距離</text>
+  <path d="M150,158 A60,60 0 0,1 254,178" fill="none" stroke="#0a7d3e" stroke-width="3"/>
+  <text x="206" y="140" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d3e">角度</text>
+  <rect x="380" y="226" width="240" height="70" rx="8" fill="#e8f4ec" stroke="#0a7d3e" stroke-width="2"/>
+  <text x="500" y="254" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">④ 角度と距離から</text>
+  <text x="500" y="278" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">測った点の座標を計算</text>
+  <text x="320" y="344" font-size="13" text-anchor="middle" fill="#464c58">機械と測る点のあいだを見通せることが必要です（GNSSは空が開けた場所が得意）。</text>
+</svg>

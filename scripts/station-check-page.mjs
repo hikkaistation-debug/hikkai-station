@@ -1,5 +1,8 @@
 // 筆界ステーションチェックのページ（Claude アプリの、運営者だけが見られる非公開ページ）を作る。
-// 使い方：npm run build のあと node scripts/station-check-page.mjs <出力するHTMLのパス> [比べる相手。ふつうは origin/main]
+// 使い方：STATION_CHECK_DRAFTS=1 npx astro build --outDir <作業用のフォルダ> のあと
+//         node scripts/station-check-page.mjs <出力するHTMLのパス> [比べる相手。ふつうは origin/main] [ビルドしたフォルダ。ふつうは dist]
+//   STATION_CHECK_DRAFTS=1 でビルドすると、ふつうの下書き（発車標だけのものを除く）も記事のページになり、チェックに並ぶ。
+//   本物の公開用の dist/ には入れないこと（作業用のフォルダにビルドする）。
 //   dist/ の記事ページから本文を取り出し、図解（SVG）はページの中に埋めこむ。
 //   比べる相手（ふつうは公開中の main）から変わった記事には「今回変わった」の印をつける。
 //   記事ごとに「中身の指紋（rev）」を入れておき、OK のあとで中身が変わったら、もう一度「まだ」にもどす。
@@ -12,6 +15,7 @@ import { execSync } from 'node:child_process';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const out = process.argv[2];
 const base = process.argv[3] ?? 'origin/main';
+const distDir = path.resolve(process.argv[4] ?? path.join(root, 'dist'));
 if (!out) {
   console.error('使い方：node scripts/station-check-page.mjs <出力するHTMLのパス> [比べる相手]');
   process.exit(1);
@@ -26,7 +30,7 @@ function front(md) {
     const r = m?.[1].match(new RegExp(`^${k}:\\s*(.*)$`, 'm'));
     return r ? r[1].replace(/\s+#.*$/, '').replace(/^["']|["']$/g, '').trim() : '';
   };
-  return { title: get('title'), category: get('category'), level: get('level'), draft: get('draft') === 'true', feed: get('feed') === 'true', summary: get('summary'), pubDate: get('pubDate') };
+  return { title: get('title'), category: get('category'), level: get('level'), draft: get('draft') === 'true', feed: get('feed') === 'true', summary: get('summary'), pubDate: get('pubDate'), draftNo: get('draftNo') };
 }
 
 // <div class="prose"> の中身を取り出す（div の入れ子を数える）
@@ -68,8 +72,8 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   const id = file.replace(/\.md$/, '');
   const md = fs.readFileSync(path.join(dir, file), 'utf8');
   const fm = front(md);
-  if (fm.draft) continue; // 下書き（発車標だけのものを含む）は記事のページがないので出さない
-  const htmlFile = path.join(root, 'dist/articles', id, 'index.html');
+  if (fm.feed && fm.draft) continue; // 発車標だけの下書きは記事ではないので出さない（図解もいらない）
+  const htmlFile = path.join(distDir, 'articles', id, 'index.html');
   if (!fs.existsSync(htmlFile)) continue;
   let body = prose(fs.readFileSync(htmlFile, 'utf8'));
   const figs = [];
@@ -88,7 +92,7 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
   const mdChanged = changed.has(`src/content/articles/${file}`);
   items.push({ id, ...fm, body, figs, rev, isChanged: mdChanged || figs.some((f) => f.isNew) });
 }
-items.sort((a, b) => Number(b.isChanged) - Number(a.isChanged) || (b.pubDate > a.pubDate ? 1 : -1));
+items.sort((a, b) => Number(b.draft) - Number(a.draft) || Number(b.isChanged) - Number(a.isChanged) || (b.pubDate > a.pubDate ? 1 : -1));
 
 const made = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
 const nChanged = items.filter((i) => i.isChanged).length;
@@ -96,12 +100,13 @@ const nChanged = items.filter((i) => i.isChanged).length;
 const cards = items
   .map((it, n) => {
     const [ln, lc] = LINES[it.category] ?? [it.category, '#1f2a44'];
-    return `<article class="card" id="a-${it.id}" data-id="${it.id}" data-rev="${it.rev}" data-changed="${it.isChanged ? 1 : 0}" data-title="${esc(it.title)}">
+    return `<article class="card" id="a-${it.id}" data-id="${it.id}" data-rev="${it.rev}" data-changed="${it.isChanged ? 1 : 0}" data-draft="${it.draft ? 1 : 0}" data-title="${esc(it.title)}">
   <div class="head">
     <span class="num">${n + 1}</span>
     <span class="badge" style="background:${lc}">${esc(ln)}</span>
     <span class="badge badge--soft">${LEVELS[it.level] ?? ''}</span>
-    ${it.isChanged ? '<span class="badge badge--new">今回変わった</span>' : ''}
+    ${it.draft ? `<span class="badge badge--draft">下書き${it.draftNo ? ` No.${it.draftNo}` : ''}</span>` : ''}
+    ${it.isChanged && !it.draft ? '<span class="badge badge--new">今回変わった</span>' : ''}
     <span class="state" data-state></span>
   </div>
   <h2>${esc(it.title)}</h2>
@@ -112,7 +117,7 @@ const cards = items
       return data ? `<figure${f.isNew ? ' class="is-new"' : ''}><img src="${data}" alt="${esc(f.alt)}">${f.isNew ? '<figcaption>新しい図</figcaption>' : ''}</figure>` : '';
     })
     .join('')}${it.figs.length ? '' : '<p class="nofig">図解がありません</p>'}</div>
-  <details class="body"><summary>本文を読む</summary><div class="prose">${it.body}</div><p class="open"><a href="https://hikkai-station.com/articles/${it.id}/">サイトで見る（公開中の内容）</a></p></details>
+  <details class="body"><summary>本文を読む</summary><div class="prose">${it.body}</div>${it.draft ? '' : `<p class="open"><a href="https://hikkai-station.com/articles/${it.id}/">サイトで見る（公開中の内容）</a></p>`}</details>
   <div class="actions">
     <button type="button" class="ok" data-act="ok">OK</button>
     <button type="button" class="fix" data-act="fix">直してほしい</button>
@@ -156,6 +161,7 @@ const page = `<!DOCTYPE html>
   .badge { font-size:0.75rem; font-weight:700; color:#fff; border-radius:99px; padding:0.05rem 0.55rem; }
   .badge--soft { background:#eef0f4; color:var(--soft); }
   .badge--new { background:#f59e0b; color:#1a1d24; }
+  .badge--draft { background:#c4122f; }
   .state { margin-left:auto; font-size:0.8rem; font-weight:800; }
   .card[data-s="ok"] .state { color:var(--ok); }
   .card[data-s="fix"] .state { color:var(--fix); }
@@ -192,11 +198,12 @@ const page = `<!DOCTYPE html>
 <body>
 <header class="top">
   <h1>筆界ステーションチェック</h1>
-  <p class="meta">記事 ${items.length}本（うち今回変わった ${nChanged}本）・${esc(made)} に作成</p>
+  <p class="meta">記事 ${items.length}本（下書き ${items.filter((i) => i.draft).length}本・今回変わった ${nChanged}本）・${esc(made)} に作成</p>
   <div class="bar"><span id="bar"></span></div>
   <p class="count" id="count">読み込み中…</p>
   <div class="tabs" role="group" aria-label="しぼりこみ">
     <button type="button" data-tab="todo" aria-pressed="true">まだ</button>
+    <button type="button" data-tab="draft" aria-pressed="false">下書き</button>
     <button type="button" data-tab="changed" aria-pressed="false">今回変わった</button>
     <button type="button" data-tab="fix" aria-pressed="false">直してほしい</button>
     <button type="button" data-tab="ok" aria-pressed="false">OK</button>
@@ -232,7 +239,7 @@ const page = `<!DOCTYPE html>
       c.querySelector('[data-state]').textContent = s.status === 'ok' ? '✓ OK' : s.status === 'fix' ? '直してほしい' : s.stale ? '変わったので もう一度' : '';
       if (s.status === 'ok') ok++;
       if (s.status === 'fix') fix++;
-      const show = keep.has(c.dataset.id) || tab === 'all' || (tab === 'todo' && !s.status) || (tab === 'changed' && c.dataset.changed === '1') || (tab === s.status);
+      const show = keep.has(c.dataset.id) || tab === 'all' || (tab === 'todo' && !s.status) || (tab === 'changed' && c.dataset.changed === '1') || (tab === 'draft' && c.dataset.draft === '1') || (tab === s.status);
       c.hidden = !show;
       if (show) shown++;
     }

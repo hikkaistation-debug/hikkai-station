@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">地震で広い範囲の地面がまとまって動く地殻変動では座標の値が現在の値とずれることがあり、液状化した地盤が横に流れる側方流動では地図の筆界と実際の土地の使われ方がずれることを比べる図</title>
+  <rect width="640" height="380" fill="#ffffff"/>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b45309"/></marker></defs>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">地面の動き方は、大きく2つ</text>
+  <rect x="16" y="56" width="296" height="232" rx="12" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <text x="164" y="84" font-size="17" font-weight="700" text-anchor="middle" fill="#1a1d24">地殻変動</text>
+  <text x="164" y="106" font-size="13" text-anchor="middle" fill="#464c58">広い範囲がまとまって動く</text>
+  <g fill="none" stroke="#8a93a3" stroke-width="2.5" stroke-dasharray="6 4"><rect x="56" y="130" width="90" height="70"/><rect x="146" y="130" width="90" height="70"/></g>
+  <g fill="none" stroke="#1f2a44" stroke-width="2.5"><rect x="96" y="152" width="90" height="70"/><rect x="186" y="152" width="90" height="70"/></g>
+  <line x1="100" y1="160" x2="134" y2="180" stroke="#b45309" stroke-width="3" marker-end="url(#a)"/>
+  <text x="164" y="256" font-size="13" text-anchor="middle" fill="#464c58">座標の値が、今の値とずれることがある</text>
+  <rect x="328" y="56" width="296" height="232" rx="12" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <text x="476" y="84" font-size="17" font-weight="700" text-anchor="middle" fill="#1a1d24">側方流動</text>
+  <text x="476" y="106" font-size="13" text-anchor="middle" fill="#464c58">液状化した地盤が横に流れる</text>
+  <g fill="none" stroke="#8a93a3" stroke-width="2.5" stroke-dasharray="6 4"><rect x="386" y="130" width="90" height="70"/><rect x="476" y="130" width="90" height="70"/></g>
+  <path d="M386,130 L476,130 L476,200 L386,200 Z M476,130 L566,130 L566,200 L476,200" fill="none" stroke="none"/>
+  <path d="M396,136 Q440,150 500,140 L556,140 L556,196 L500,196 Q440,206 396,196 Z" fill="#b45309" fill-opacity="0.12" stroke="#1f2a44" stroke-width="2.5"/>
+  <line x1="500" y1="140" x2="500" y2="196" stroke="#1f2a44" stroke-width="2.5"/>
+  <text x="476" y="226" font-size="12" text-anchor="middle" fill="#464c58">点線＝地図の筆界　実線＝今の使われ方</text>
+  <text x="476" y="256" font-size="13" text-anchor="middle" fill="#464c58">地図の筆界と、使われ方がずれる</text>
+  <text x="164" y="312" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">熊本地震（2016年）</text>
+  <text x="164" y="334" font-size="13" text-anchor="middle" fill="#464c58">地図などの座標値が、今の値と</text>
+  <text x="164" y="352" font-size="13" text-anchor="middle" fill="#464c58">ちがう可能性がある、と案内</text>
+  <text x="476" y="312" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">能登半島地震（2024年）</text>
+  <text x="476" y="334" font-size="13" text-anchor="middle" fill="#464c58">ずれを直す分筆と所有権移転の</text>
+  <text x="476" y="352" font-size="13" text-anchor="middle" fill="#464c58">登記に、登録免許税の特例</text>
+</svg>
