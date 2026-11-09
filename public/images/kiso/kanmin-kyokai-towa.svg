@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">道路や水路など国や市の土地（官有地）と、個人や会社の土地（民有地）との境目が官民境界であることを示す図</title>
+  <rect width="640" height="330" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">「官民境界」は、官有地と民有地の境目</text>
+  <rect x="40" y="60" width="440" height="150" fill="#f3efe6" stroke="#8a93a3" stroke-width="1.5"/>
+  <line x1="260" y1="60" x2="260" y2="210" stroke="#8a93a3" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="150" y="140" font-size="18" font-weight="700" text-anchor="middle" fill="#1a1d24">民有地</text>
+  <text x="370" y="140" font-size="18" font-weight="700" text-anchor="middle" fill="#1a1d24">民有地</text>
+  <text x="150" y="164" font-size="13" text-anchor="middle" fill="#464c58">（個人や会社の土地）</text>
+  <text x="370" y="164" font-size="13" text-anchor="middle" fill="#464c58">（個人や会社の土地）</text>
+  <rect x="40" y="210" width="440" height="56" fill="#d9dde4"/>
+  <text x="260" y="244" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">道路（官有地）</text>
+  <rect x="480" y="60" width="44" height="206" fill="#cfe3f5"/>
+  <text x="502" y="170" font-size="15" font-weight="700" text-anchor="middle" fill="#0b62b4">水</text>
+  <text x="502" y="190" font-size="15" font-weight="700" text-anchor="middle" fill="#0b62b4">路</text>
+  <polyline points="40,210 480,210 480,60" fill="none" stroke="#c4122f" stroke-width="6"/>
+  <line x1="540" y1="120" x2="486" y2="120" stroke="#c4122f" stroke-width="1.5"/>
+  <text x="546" y="118" font-size="14" font-weight="700" text-anchor="start" fill="#c4122f">官民境界</text>
+  <text x="546" y="138" font-size="12.5" text-anchor="start" fill="#464c58">（赤い線）</text>
+  <text x="320" y="296" font-size="13.5" text-anchor="middle" fill="#464c58">測量や分筆の登記の前に、市などと境目を確かめる「官民境界の協議」を行うことがあります。</text>
+</svg>

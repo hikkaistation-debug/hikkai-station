@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 386" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">ベトナムの世帯の名義の土地と、日本の共有の土地で、名義のつけ方と土地全体を売るときにだれがかかわるかを比べる図</title>
+  <rect width="640" height="386" fill="#ffffff"/>
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a93a3"/></marker></defs>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">「世帯の名義」と「共有」</text>
+  <rect x="20" y="58" width="290" height="58" rx="8" fill="#b45309"/>
+  <text x="165" y="84" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">ベトナム</text>
+  <text x="165" y="105" font-size="13" text-anchor="middle" fill="#fff">（記事より）</text>
+  <rect x="20" y="130" width="290" height="39" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+  <text x="34" y="155" font-size="14.5" fill="#1a1d24">証明書の名義：「○○さんの世帯」</text>
+  <line x1="165" y1="171" x2="165" y2="189" stroke="#8a93a3" stroke-width="3" marker-end="url(#ar)"/>
+  <rect x="20" y="193" width="290" height="81" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+  <text x="34" y="218" font-size="14.5" fill="#1a1d24">夫1人だけが署名した契約で申請したら、</text>
+  <text x="34" y="239" font-size="14.5" fill="#1a1d24">代表して売る権限が示されていないと言</text>
+  <text x="34" y="260" font-size="14.5" fill="#1a1d24">われた</text>
+  <line x1="165" y1="276" x2="165" y2="294" stroke="#8a93a3" stroke-width="3" marker-end="url(#ar)"/>
+  <rect x="20" y="298" width="290" height="60" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+  <text x="34" y="323" font-size="14.5" fill="#1a1d24">権利を持つ世帯員<tspan font-weight="700">全員</tspan>か、権限のある代</text>
+  <text x="34" y="344" font-size="14.5" fill="#1a1d24">理人が譲り渡す</text>
+  <rect x="330" y="58" width="290" height="58" rx="8" fill="#0a7d3e"/>
+  <text x="475" y="84" font-size="17" font-weight="700" text-anchor="middle" fill="#fff">日本</text>
+  <text x="475" y="105" font-size="13" text-anchor="middle" fill="#fff">（民法・不動産登記法）</text>
+  <rect x="330" y="130" width="290" height="60" rx="8" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <text x="344" y="155" font-size="14.5" fill="#1a1d24">「世帯」の名義はない。共有者一人ひと</text>
+  <text x="344" y="176" font-size="14.5" fill="#1a1d24">りの名前と持分が登記される</text>
+  <line x1="475" y1="192" x2="475" y2="210" stroke="#8a93a3" stroke-width="3" marker-end="url(#ar)"/>
+  <rect x="330" y="214" width="290" height="60" rx="8" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <text x="344" y="239" font-size="14.5" fill="#1a1d24">土地全体を売るには、ふつう共有者<tspan font-weight="700">全員</tspan></text>
+  <text x="344" y="260" font-size="14.5" fill="#1a1d24"><tspan font-weight="700"></tspan>がかかわる</text>
+  <line x1="475" y1="276" x2="475" y2="294" stroke="#8a93a3" stroke-width="3" marker-end="url(#ar)"/>
+  <rect x="330" y="298" width="290" height="60" rx="8" fill="#ffffff" stroke="#0a7d3e" stroke-width="2"/>
+  <text x="344" y="323" font-size="14.5" fill="#1a1d24">登記は、買主と売主が共同で申請するの</text>
+  <text x="344" y="344" font-size="14.5" fill="#1a1d24">が原則</text>
+</svg>

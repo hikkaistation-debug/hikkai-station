@@ -15,6 +15,12 @@
 - 入れたら、画像にして文字の重なりや切れがないか目で確かめ、運営者に一覧を見せる。
 - 発車標（`feed: true` で見出しとリンクだけ出す下書き）には、図はいらない。
 
+## 筆界ステーションチェック（/station-check/）
+
+- 記事と図解をまとめて確認する、手元だけのページ（`npm run dev` のときだけ。`src/pages/station-check/`）。記事を足したら、ここにも自動で並ぶ。
+- 運営者に「ステーションチェックで確認して」と見てもらうときは、裏で `sh scripts/check-watch.sh station` を動かして待つ。
+- 「ステーションチェックしたよ」と言われたら、`review/station-check.json` の「直してほしい」（status: fix）とメモを読んで直す。直したら、作業ブランチまで入れて、公開は「公開して」を待つ。
+
 ## 「公開して」と言われたあとの入れ方
 
 - `git fetch origin main` のあと、main が作業ブランチの祖先なら `git push origin HEAD:main`（早送り）。

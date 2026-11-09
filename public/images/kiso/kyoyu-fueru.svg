@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">相続登記をしないまま代替わりすると、どの家も子どもが3人いる仮の例で、共有者が1人から3人、9人、27人と増えていくことを示す図</title>
+  <rect width="640" height="330" fill="#ffffff"/>
+  <text x="320" y="36" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">相続登記をしないと、共有者が増えていく</text>
+  <text x="24" y="83" font-size="14.5" font-weight="700" text-anchor="start" fill="#1a1d24">はじめ（1人で購入）</text>
+  <text x="212" y="83" font-size="17" font-weight="700" text-anchor="end" fill="#c4122f">1人</text>
+  <circle cx="430.0" cy="78" r="11" fill="#0b62b4"/>
+  <text x="24" y="141" font-size="14.5" font-weight="700" text-anchor="start" fill="#1a1d24">1回目の相続</text>
+  <text x="212" y="141" font-size="17" font-weight="700" text-anchor="end" fill="#c4122f">3人</text>
+  <circle cx="370.0" cy="136" r="11" fill="#0b62b4"/>
+  <circle cx="430.0" cy="136" r="11" fill="#0b62b4"/>
+  <circle cx="490.0" cy="136" r="11" fill="#0b62b4"/>
+  <text x="24" y="199" font-size="14.5" font-weight="700" text-anchor="start" fill="#1a1d24">2回目の相続</text>
+  <text x="212" y="199" font-size="17" font-weight="700" text-anchor="end" fill="#c4122f">9人</text>
+  <circle cx="310.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="340.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="370.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="400.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="430.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="460.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="490.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="520.0" cy="194" r="8" fill="#0b62b4"/>
+  <circle cx="550.0" cy="194" r="8" fill="#0b62b4"/>
+  <text x="24" y="257" font-size="14.5" font-weight="700" text-anchor="start" fill="#1a1d24">3回目の相続</text>
+  <text x="212" y="257" font-size="17" font-weight="700" text-anchor="end" fill="#c4122f">27人</text>
+  <circle cx="241.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="256.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="270.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="285.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="299.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="314.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="328.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="343.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="357.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="372.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="386.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="401.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="415.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="430.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="444.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="459.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="473.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="488.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="502.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="517.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="531.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="546.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="560.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="575.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="589.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="604.0" cy="252" r="5.5" fill="#0b62b4"/>
+  <circle cx="618.5" cy="252" r="5.5" fill="#0b62b4"/>
+  <text x="320" y="300" font-size="13" text-anchor="middle" fill="#464c58">※どの家も子どもが3人いる、という仮の例です。土地全体を売るには、共有者全員の同意が必要です。</text>
+</svg>

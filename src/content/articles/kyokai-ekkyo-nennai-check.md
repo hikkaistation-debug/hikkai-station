@@ -31,4 +31,9 @@ draft: true
 | 木の持ち主がわからない、またはどこにいるかわからない | 空き家で、持ち主に連絡がつかない |
 | 急いで切る必要がある | 台風で枝が折れて、家に当たりそう |
 
+<figure class="figure">
+  <a href="/images/kiso/ekkyo-eda.svg" target="_blank" rel="noopener"><img src="/images/kiso/ekkyo-eda.svg" alt="お隣の木の枝が境界を越えて自分の土地に伸びている絵と、自分で切り取れる3つの場合を番号つきで並べた図" width="640" height="400" loading="lazy" /></a>
+  <figcaption>まずはお隣と話し合い、3つのどれかに当てはまるときに自分で切り取れます。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 ※元のコラムには、筆者の会社の宣伝も含まれています。このサイトは、特定の会社をおすすめするものではありません。

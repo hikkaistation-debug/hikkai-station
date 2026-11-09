@@ -1,0 +1,322 @@
+---
+// 筆界ステーションチェックのページ（手元の確認用画面だけ。本物のサイトには作られません）
+// アドレス：http://localhost:4321/station-check/
+// 記事を全部（公開中・下書き・発車標だけのもの）並べ、図解と本文をその場で見ながら
+// 「OK／直してほしい＋メモ」を review/station-check.json に自動保存します（astro.config.mjs の stationCheck）。
+// 「保存して Claude に渡す」で review/station-handoff.json に書きます（sh scripts/check-watch.sh station で待機中の Claude に届く）。
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StationSign from '../../components/StationSign.astro';
+import LineBadge from '../../components/LineBadge.astro';
+import LevelBadge from '../../components/LevelBadge.astro';
+import { TERMINAL } from '../../data/site';
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { p: undefined } }] : [];
+}
+
+const all = await getCollection('articles', ({ id }) => !id.startsWith('inbox/'));
+const kind = (d: { draft: boolean; feed: boolean }) => (!d.draft ? 'public' : d.feed ? 'feed' : 'draft');
+const KIND_LABEL = { public: '公開中', draft: '下書き', feed: '発車標だけ（下書き）' } as const;
+const ORDER = { draft: 0, feed: 1, public: 2 } as const;
+const items = await Promise.all(
+  all
+    .sort((a, b) => ORDER[kind(a.data)] - ORDER[kind(b.data)] || b.data.pubDate.getTime() - a.data.pubDate.getTime())
+    .map(async (a) => {
+      const k = kind(a.data);
+      const figs = [...(a.body ?? '').matchAll(/<img src="(\/images\/[^"]+)"[^>]*alt="([^"]*)"/g)].map((m) => ({ src: m[1], alt: m[2] }));
+      const { Content } = await render(a);
+      // 記事のページがあるのは、公開中と、ふつうの下書き（確認用画面だけ）。発車標だけのものはページがない。
+      return { a, k, figs, Content, hasPage: k !== 'feed' };
+    }),
+);
+const count = (k: string) => items.filter((i) => i.k === k).length;
+const noFig = items.filter((i) => i.figs.length === 0).length;
+---
+<BaseLayout title="筆界ステーションチェック（手元だけ）" description="記事と図解をまとめて確認するページ">
+  <StationSign kicker="手元だけのページ" title="筆界ステーションチェック" sub="STATION CHECK" color="#1f2a44" prev={TERMINAL} />
+
+  <aside class="notice notice--sample">
+    <p class="notice__title">このページは、手元の確認用画面だけにあります</p>
+    <p>サイトの記事を全部（公開中・下書き・発車標だけのもの）並べています。図解はその場で見られ、「本文を読む」を開くと記事の中身も読めます。記事ごとに「OK」か「直してほしい」を選び、直してほしいところをメモに書いてください。選んだ結果は自動で保存されます。終わったら下の「保存して Claude に渡す」を押してください。Claude が待機中なら自動で届きます。待機していないときは、チャットで「ステーションチェックしたよ」とだけ送れば、保存した内容を Claude が読んで直します。</p>
+  </aside>
+
+  <div class="sc-top">
+    <p class="sc-summary" id="sc-summary">全{items.length}本</p>
+    <div class="sc-filter" role="group" aria-label="しぼりこみ">
+      <label><input type="radio" name="sc-filter" value="all" checked /> すべて（{items.length}）</label>
+      <label><input type="radio" name="sc-filter" value="draft" /> 下書き（{count('draft') + count('feed')}）</label>
+      <label><input type="radio" name="sc-filter" value="public" /> 公開中（{count('public')}）</label>
+      <label><input type="radio" name="sc-filter" value="nofig" /> 図なし（{noFig}）</label>
+      <label><input type="radio" name="sc-filter" value="todo" /> チェックまだ</label>
+      <label><input type="radio" name="sc-filter" value="fix" /> 直してほしい</label>
+    </div>
+  </div>
+
+  <ol class="sc-list">
+    {items.map(({ a, k, figs, Content, hasPage }) => (
+      <li class="sc-item" data-id={a.id} data-kind={k} data-figs={figs.length} data-title={a.data.title}>
+        <div class="sc-head">
+          <span class={`sc-kind sc-kind--${k}`}>{KIND_LABEL[k]}{a.data.draftNo ? ` No.${a.data.draftNo}` : ''}</span>
+          <LineBadge id={a.data.category} short />
+          <LevelBadge level={a.data.level} compact />
+          <span class={figs.length ? 'sc-figcount' : 'sc-figcount sc-figcount--none'}>{figs.length ? `図解 ${figs.length}枚` : '図解なし'}</span>
+        </div>
+        <h2 class="sc-title">
+          {hasPage ? <a href={`/articles/${a.id}/`} target="_blank" rel="noopener">{a.data.title}</a> : a.data.title}
+        </h2>
+        <p class="sc-summary-text">{a.data.summary}</p>
+        {figs.length > 0 && (
+          <div class="sc-figs">
+            {figs.map((f) => (
+              <a href={f.src} target="_blank" rel="noopener"><img src={f.src} alt={f.alt} loading="lazy" /></a>
+            ))}
+          </div>
+        )}
+        <details class="sc-body">
+          <summary>本文を読む</summary>
+          <div class="prose"><Content /></div>
+          <p class="sc-source">出典：{a.data.sourceUrl ? <a href={a.data.sourceUrl} target="_blank" rel="noopener">{a.data.sourceName}</a> : a.data.sourceName}</p>
+        </details>
+        <fieldset class="sc-status">
+          <legend>チェック</legend>
+          <label><input type="radio" name={`s-${a.id}`} value="" checked /> まだ</label>
+          <label><input type="radio" name={`s-${a.id}`} value="ok" /> OK</label>
+          <label><input type="radio" name={`s-${a.id}`} value="fix" /> 直してほしい</label>
+        </fieldset>
+        <label class="sc-note">
+          直してほしいところ（任意。図解のことも、本文のことも）
+          <textarea rows="2" placeholder="例：2枚目の図の「期間の目安」を〇〇に"></textarea>
+        </label>
+      </li>
+    ))}
+  </ol>
+
+  <div class="sc-bar">
+    <span class="sc-watch" id="sc-watch" data-on="false">Claude の待機を確認中…</span>
+    <p class="sc-saved" id="sc-saved" aria-live="polite"></p>
+    <button type="button" class="sc-save-btn" id="sc-save-btn">保存</button>
+    <button type="button" class="sc-handoff-btn" id="sc-handoff-btn">保存して Claude に渡す</button>
+  </div>
+
+  <section class="sc-handoff" id="sc-handoff" hidden aria-live="polite">
+    <p class="sc-handoff__result" id="sc-handoff-result"></p>
+  </section>
+</BaseLayout>
+
+<style>
+  .sc-top { display: grid; gap: 0.4rem; }
+  .sc-summary { font-weight: 700; margin: 0; }
+  .sc-filter { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; font-size: 0.9rem; }
+  .sc-filter label { display: inline-flex; align-items: center; gap: 0.25rem; font-weight: 700; cursor: pointer; }
+  .sc-list { list-style: none; padding: 0; display: grid; gap: 0.9rem; margin-top: 0.8rem; }
+  .sc-item { background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--line); border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .sc-item[data-status='ok'] { border-left-color: #1a7f37; }
+  .sc-item[data-status='fix'] { border-left-color: #c4122f; }
+  .sc-item[data-hide='true'] { display: none; }
+  .sc-head { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+  .sc-kind { font-size: 0.8rem; font-weight: 700; border-radius: 999px; padding: 0.1rem 0.6rem; background: #1a7f37; color: #fff; }
+  .sc-kind--draft { background: #c4122f; }
+  .sc-kind--feed { background: #b45309; }
+  .sc-figcount { font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); }
+  .sc-figcount--none { color: #c4122f; }
+  .sc-title { font-size: 1.05rem; margin: 0.5rem 0 0.2rem; }
+  .sc-summary-text { font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 0.4rem; }
+  .sc-figs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0; }
+  .sc-figs img { display: block; width: 300px; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  .sc-body { margin: 0.4rem 0; }
+  .sc-body summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+  .sc-body .prose { border-top: 1px dashed var(--line); margin-top: 0.4rem; padding-top: 0.4rem; }
+  .sc-source { font-size: 0.85rem; color: var(--ink-soft); }
+  .sc-status { border: 0; padding: 0; margin: 0.4rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; }
+  .sc-status legend { font-size: 0.85rem; color: var(--ink-soft); padding: 0; margin-bottom: 0.2rem; }
+  .sc-status label { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 700; cursor: pointer; }
+  .sc-note { display: block; font-size: 0.85rem; color: var(--ink-soft); }
+  .sc-note textarea { display: block; width: 100%; margin-top: 0.25rem; font: inherit; font-size: 0.95rem; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0.45rem 0.6rem; box-sizing: border-box; }
+  .sc-bar { position: sticky; bottom: 0.5rem; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.4rem 0.8rem; margin-top: 1rem; padding: 0.5rem 0.7rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 2px 8px rgb(0 0 0 / 0.08); }
+  .sc-watch { font-size: 0.8rem; font-weight: 700; border-radius: 999px; padding: 0.15rem 0.7rem; background: #eee; color: #464c58; }
+  .sc-watch[data-on='true'] { background: #e6f4ea; color: #1a7f37; }
+  .sc-saved { margin: 0 auto 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+  .sc-save-btn { font: inherit; font-weight: 700; color: #1f2a44; background: #fff; border: 2px solid #1f2a44; border-radius: 999px; padding: 0.4rem 1.1rem; cursor: pointer; }
+  .sc-handoff-btn { font: inherit; font-weight: 700; color: #fff; background: #1f2a44; border: 0; border-radius: 999px; padding: 0.5rem 1.1rem; cursor: pointer; }
+  .sc-handoff { margin-top: 0.8rem; background: var(--card); border: 1px solid var(--line); border-left: 8px solid #1f2a44; border-radius: var(--radius); padding: 0.8rem 1rem; }
+  .sc-handoff[data-ok='false'] { border-left-color: #c4122f; }
+  .sc-handoff__result { font-weight: 700; margin: 0; white-space: pre-line; }
+</style>
+
+<script>
+  type Entry = { title: string; status: '' | 'ok' | 'fix'; note: string; updated: string };
+  const items = [...document.querySelectorAll<HTMLLIElement>('.sc-item')];
+  const savedEl = document.getElementById('sc-saved')!;
+  const summaryEl = document.getElementById('sc-summary')!;
+  let state: Record<string, Entry> = {};
+
+  const read = (li: HTMLLIElement): Entry => ({
+    title: li.dataset.title ?? '',
+    status: (li.querySelector<HTMLInputElement>('.sc-status input:checked')?.value ?? '') as Entry['status'],
+    note: li.querySelector<HTMLTextAreaElement>('.sc-note textarea')!.value.trim(),
+    updated: new Date().toISOString(),
+  });
+
+  const filterValue = () => document.querySelector<HTMLInputElement>('input[name=sc-filter]:checked')?.value ?? 'all';
+  const paint = () => {
+    let ok = 0, fix = 0;
+    const f = filterValue();
+    for (const li of items) {
+      const e = read(li);
+      li.dataset.status = e.status;
+      if (e.status === 'ok') ok++;
+      if (e.status === 'fix') fix++;
+      const k = li.dataset.kind;
+      const show =
+        f === 'all' ||
+        (f === 'draft' && k !== 'public') ||
+        (f === 'public' && k === 'public') ||
+        (f === 'nofig' && li.dataset.figs === '0') ||
+        (f === 'todo' && e.status === '') ||
+        (f === 'fix' && e.status === 'fix');
+      li.dataset.hide = String(!show);
+    }
+    summaryEl.textContent = `全${items.length}本：OK ${ok}本／直してほしい ${fix}本／チェックまだ ${items.length - ok - fix}本`;
+  };
+  document.querySelectorAll('input[name=sc-filter]').forEach((r) => r.addEventListener('change', paint));
+
+  // 保存は「変えた記事の分だけ」送る（Claude がファイルを直しても、画面の古い内容で上書きしない）
+  let pending: Record<string, Entry> = {};
+  const flush = async () => {
+    const body = pending;
+    pending = {};
+    if (!Object.keys(body).length) return true;
+    const res = await fetch('/__station', { method: 'POST', body: JSON.stringify(body) });
+    if (!res.ok) {
+      pending = { ...body, ...pending };
+      return false;
+    }
+    state = await res.json();
+    return true;
+  };
+  let timer: number | undefined;
+  const save = () => {
+    window.clearTimeout(timer);
+    savedEl.textContent = '保存中…';
+    timer = window.setTimeout(async () => {
+      try {
+        savedEl.textContent = (await flush()) ? `保存しました（${new Date().toLocaleTimeString('ja-JP')}）` : '保存できませんでした';
+      } catch {
+        savedEl.textContent = '保存できませんでした（確認用画面が止まっているかもしれません）';
+      }
+    }, 500);
+  };
+  const onChange = (li: HTMLLIElement) => {
+    pending[li.dataset.id!] = read(li);
+    paint();
+    save();
+  };
+  // 画面とファイルのちがう分を、送る分に入れる
+  const collect = () => {
+    for (const li of items) {
+      const e = read(li);
+      const s = state[li.dataset.id!];
+      const touched = s || e.status || e.note;
+      const same = s && s.status === e.status && (s.note ?? '') === e.note;
+      if (touched && !same) pending[li.dataset.id!] = e;
+    }
+  };
+
+  // Claude が待機しているか（scripts/check-watch.sh station が動いていると「待機中」）
+  const watchEl = document.getElementById('sc-watch')!;
+  const checkWatch = async () => {
+    try {
+      const { watching } = await (await fetch('/__station/status', { cache: 'no-store' })).json();
+      watchEl.dataset.on = String(Boolean(watching));
+      watchEl.textContent = watching ? 'Claude が待機中（押すと自動で届きます）' : 'Claude は待機していません';
+      return Boolean(watching);
+    } catch {
+      watchEl.dataset.on = 'false';
+      watchEl.textContent = '確認用画面に つながりません';
+      return false;
+    }
+  };
+  checkWatch();
+  window.setInterval(checkWatch, 10000);
+
+  document.getElementById('sc-save-btn')!.addEventListener('click', async () => {
+    window.clearTimeout(timer);
+    collect();
+    try {
+      savedEl.textContent = (await flush()) ? `✓ 保存しました（${new Date().toLocaleTimeString('ja-JP')}）` : '保存できませんでした';
+    } catch {
+      savedEl.textContent = '保存できませんでした（確認用画面が止まっているかもしれません）';
+    }
+  });
+
+  // 「保存して Claude に渡す」：すぐ保存 → ファイルを読み直して画面と一致するか確かめる → review/station-handoff.json に書く
+  const handoffBtn = document.getElementById('sc-handoff-btn') as HTMLButtonElement;
+  const handoffBox = document.getElementById('sc-handoff')!;
+  const handoffResult = document.getElementById('sc-handoff-result')!;
+  handoffBtn.addEventListener('click', async () => {
+    handoffBtn.disabled = true;
+    window.clearTimeout(timer);
+    collect();
+    let saved: Record<string, Entry> = {};
+    try {
+      if (!(await flush())) throw new Error();
+      saved = await (await fetch('/__station', { cache: 'no-store' })).json();
+    } catch {
+      handoffBox.hidden = false;
+      handoffBox.dataset.ok = 'false';
+      handoffResult.textContent = '保存できませんでした。確認用画面（npm run dev）が止まっているかもしれません。';
+      handoffBtn.disabled = false;
+      return;
+    }
+    savedEl.textContent = `保存しました（${new Date().toLocaleTimeString('ja-JP')}）`;
+    const mismatch: string[] = [];
+    const lines: string[] = [];
+    let ok = 0;
+    for (const li of items) {
+      const e = read(li);
+      const f = saved[li.dataset.id!];
+      if ((f?.status ?? '') !== e.status || (f?.note ?? '') !== e.note) mismatch.push(`「${e.title}」`);
+      if (e.status === 'ok') ok++;
+      if (e.status === 'fix') lines.push(`・${li.dataset.id}「${e.title}」→ 直してほしい${e.note ? `：${e.note.replace(/\s+/g, ' ')}` : ''}`);
+    }
+    const text = [
+      `筆界ステーションチェックの結果です（OK ${ok}本・直してほしい ${lines.length}本）。review/station-check.json を見て、「直してほしい」を直してください。`,
+      ...(lines.length ? lines : ['（直してほしいものはありません）']),
+    ].join('\n');
+    const watching = await checkWatch();
+    let sent = false;
+    try {
+      sent = (await fetch('/__station/handoff', { method: 'POST', body: JSON.stringify({ text }) })).ok;
+    } catch {}
+    handoffBox.hidden = false;
+    handoffBox.dataset.ok = String(mismatch.length === 0);
+    const check = mismatch.length === 0 ? '✓ 保存しました（ファイルと画面が一致）。' : `⚠ 画面とファイルが一致しません：${mismatch.slice(0, 5).join('、')}${mismatch.length > 5 ? ' ほか' : ''}。もう一度押してください。`;
+    handoffResult.textContent =
+      check +
+      '\n' +
+      (sent && watching
+        ? 'Claude に自動で渡しました。'
+        : 'Claude が待機していないので、チャットで「ステーションチェックしたよ」とだけ送ってください（保存した内容を Claude が読みます）。');
+    handoffBtn.disabled = false;
+  });
+
+  (async () => {
+    try {
+      state = await (await fetch('/__station')).json();
+    } catch {
+      state = {};
+    }
+    for (const li of items) {
+      const e = state[li.dataset.id!];
+      if (e) {
+        const r = li.querySelector<HTMLInputElement>(`.sc-status input[value="${e.status ?? ''}"]`);
+        if (r) r.checked = true;
+        li.querySelector<HTMLTextAreaElement>('.sc-note textarea')!.value = e.note ?? '';
+      }
+      li.querySelectorAll('.sc-status input').forEach((r) => r.addEventListener('change', () => onChange(li)));
+      li.querySelector('.sc-note textarea')!.addEventListener('input', () => onChange(li));
+    }
+    paint();
+  })();
+</script>

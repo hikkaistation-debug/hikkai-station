@@ -34,6 +34,11 @@ draft: true
 | 登記を見られる人 | だれでも見られる | だれでも、手数料を払えば登記事項証明書をもらえる（不動産登記法第119条第1項） |
 | 家にいながら見る方法 | インターネットの登記所 | 「登記情報提供サービス」で、登記の内容をパソコンで見られる |
 
+<figure class="figure">
+  <a href="/images/kiso/kaigai-seoul-touki.svg" target="_blank" rel="noopener"><img src="/images/kiso/kaigai-seoul-touki.svg" alt="韓国と日本について、登記を扱うところ・見られる人・家から見る方法を、左右に並べて比べた図" width="640" height="318" loading="lazy" /></a>
+  <figcaption>韓国と日本の登記のしくみのちがい。（図を押すと大きく表示します）</figcaption>
+</figure>
+
 - 日本の登記事項証明書の読み方は [登記事項証明書の見方](/articles/touki-jikou-shomeisho-mikata/)、法務局で取れる資料は [法務局で取れる資料](/articles/houmukyoku-shiryou/) にまとめています。
 
 ※韓国の制度については、この記事の内容をもとに紹介しています。くわしい運用は現地の公的な情報で確かめてください。
