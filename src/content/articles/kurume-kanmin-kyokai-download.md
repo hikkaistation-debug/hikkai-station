@@ -27,8 +27,3 @@ draft: true
 ## 「官民境界」とは
 
 道路や水路など、国や市の土地（官有地）と、個人や会社の土地（民有地）との境目のことです。土地の測量や分筆の登記の前に、市などと境目を確認する「官民境界の協議」を行うことがあります。
-
-<figure class="figure">
-  <a href="/images/kiso/kanmin-kyokai-towa.svg" target="_blank" rel="noopener"><img src="/images/kiso/kanmin-kyokai-towa.svg" alt="2つの民有地が道路と水路に面していて、民有地と道路・水路との境目が赤い線（官民境界）で示されている図" width="640" height="330" loading="lazy" /></a>
-  <figcaption>道路や水路（官有地）と、個人や会社の土地（民有地）との境目が官民境界です。（図を押すと大きく表示します）</figcaption>
-</figure>

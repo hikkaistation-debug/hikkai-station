@@ -35,11 +35,6 @@ draft: true
 | 3回目の相続 | 27人 |
 - 2024年4月から、相続登記は義務になっています。
 
-<figure class="figure">
-  <a href="/images/kiso/kyoyu-fueru.svg" target="_blank" rel="noopener"><img src="/images/kiso/kyoyu-fueru.svg" alt="代替わりごとに共有者を青い丸で表し、1人・3人・9人・27人と増えていく様子を並べた図" width="640" height="330" loading="lazy" /></a>
-  <figcaption>どの家も子どもが3人いる仮の例。相続登記をしないと、共有者はどんどん増えていきます。（図を押すと大きく表示します）</figcaption>
-</figure>
-
 ## 関連する記事
 
 - [相続登記の申請が義務になりました（2024年4月から）](/articles/souzoku-touki-gimuka/)
