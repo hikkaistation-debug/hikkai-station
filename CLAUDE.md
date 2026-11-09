@@ -20,7 +20,8 @@
 - 運営者は、Claude アプリの非公開ページ「筆界ステーションチェック」で記事と図解を確認する（スマホ・どのパソコンからでも開ける）。
   ページ：https://claude.ai/artifact/JuCAon3XbQ6M7s9VUVFpTs（slug：90f4ea9c-5c23-4c2b-8c14-5b92d7414c82）
 - 記事や図解を変えたら、確認をたのむ前にページを作り直して出しなおす：
-  `npm run build` → `node scripts/station-check-page.mjs <出力するHTML>` → そのHTMLを `publish_files`（slug と最新の version を指定）。
+  変更を作業ブランチにコミットしてから、`STATION_CHECK_DRAFTS=1 npx astro build --outDir <作業用のフォルダ>`（下書きも並べるためのビルド。公開用の dist には入れない）→ `node scripts/station-check-page.mjs <出力するHTML> origin/main <作業用のフォルダ>` → そのHTMLを `publish_files`（slug と最新の version を指定）。
+  下書き（`draft: true`。発車標だけのものは除く）も「下書き」の印つきで並ぶ。
   公開中の main から変わった記事には「今回変わった」の印がつく。OK のあとで中身が変わった記事は、自動で「まだ」にもどる。
 - チェックの結果は、そのページのデータ `checks/<記事のid>`（status: ok／fix、note）に入る。`db_list`（collection: checks）で読み、「直してほしい」を直す。直したら作業ブランチまで入れ、ページを出しなおし、公開は「公開して」を待つ。
 
