@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">側方流動で筆界と今の土地の形がずれた土地を、今の形に合わせる2つの方法。分筆の登記をしてずれた部分の所有権を合意でとなりの所有者に移す方法と、土地区画整理事業の換地処分で新しい筆界をつくる方法</title>
+  <rect width="640" height="360" fill="#ffffff"/>
+  <text x="320" y="32" font-size="19" font-weight="700" text-anchor="middle" fill="#1a1d24">筆界が動かない地域で、今の形に合わせる方法</text>
+
+  <!-- 上：ずれた状態 -->
+  <text x="40" y="66" font-size="13" font-weight="700" fill="#1a1d24">側方流動のあと</text>
+  <g fill="none" stroke="#8a93a3" stroke-width="2.5" stroke-dasharray="6 4"><rect x="40" y="78" width="70" height="50"/><rect x="110" y="78" width="70" height="50"/></g>
+  <path d="M110,78 L134,78 L134,128 L110,128 Z" fill="#b45309" fill-opacity="0.25"/>
+  <line x1="134" y1="78" x2="134" y2="128" stroke="#1f2a44" stroke-width="2.5"/>
+  <text x="75" y="108" font-size="13" font-weight="700" text-anchor="middle" fill="#1a1d24">A</text>
+  <text x="157" y="108" font-size="13" font-weight="700" text-anchor="middle" fill="#1a1d24">B</text>
+  <text x="200" y="92" font-size="12" fill="#464c58">点線＝筆界（動いていない）</text>
+  <text x="200" y="110" font-size="12" fill="#464c58">実線＝今の境目</text>
+  <text x="200" y="128" font-size="12" fill="#464c58">色の部分＝筆界ではBなのに、Aが使っている</text>
+
+  <!-- 方法1 -->
+  <rect x="16" y="148" width="296" height="196" rx="12" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <text x="164" y="176" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">① 分筆と所有権の移転</text>
+  <text x="32" y="204" font-size="13" fill="#1a1d24">1. 色の部分を分筆する</text>
+  <text x="32" y="228" font-size="13" fill="#1a1d24">2. 合意（売買・贈与など）で、</text>
+  <text x="48" y="248" font-size="13" fill="#1a1d24">その部分をAの所有者に移す</text>
+  <line x1="32" y1="264" x2="296" y2="264" stroke="#c9ced8" stroke-width="1.5"/>
+  <text x="32" y="286" font-size="12" fill="#464c58">分筆は、所有者の申請のほか、地籍調査の</text>
+  <text x="32" y="306" font-size="12" fill="#464c58">成果をもとに、登記官が職権で行う方法もある</text>
+  <text x="32" y="326" font-size="12" fill="#464c58">（職権なら測量費用・登記費用はかからない）</text>
+
+  <!-- 方法2 -->
+  <rect x="328" y="148" width="296" height="196" rx="12" fill="#ffffff" stroke="#8a93a3" stroke-width="2"/>
+  <text x="476" y="176" font-size="16" font-weight="700" text-anchor="middle" fill="#1a1d24">② 土地区画整理事業</text>
+  <text x="344" y="204" font-size="13" fill="#1a1d24">換地処分によって、</text>
+  <text x="344" y="228" font-size="13" fill="#1a1d24">今の形に合わせた</text>
+  <text x="344" y="252" font-size="13" fill="#1a1d24">新しい筆界をつくる</text>
+  <g fill="none" stroke="#1f2a44" stroke-width="2.5"><rect x="484" y="196" width="60" height="44"/><rect x="544" y="196" width="60" height="44"/></g>
+  <text x="514" y="223" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1d24">A′</text>
+  <text x="574" y="223" font-size="12" font-weight="700" text-anchor="middle" fill="#1a1d24">B′</text>
+  <line x1="344" y1="264" x2="608" y2="264" stroke="#c9ced8" stroke-width="1.5"/>
+  <text x="344" y="286" font-size="12" fill="#464c58">どちらも、筆界が動いたとするのではなく、</text>
+  <text x="344" y="306" font-size="12" fill="#464c58">今の形に合わせて新しい筆界をつくる方法</text>
+</svg>

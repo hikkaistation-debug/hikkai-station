@@ -2,6 +2,7 @@
 // 使い方：node scripts/article-images.mjs jishin-chizu-zahyo
 //         node scripts/article-images.mjs jishin-chizu-zahyo --text-only（投稿文だけ作り直す）
 // 投稿文の1行目と内容のタグは scripts/x-hooks.json の "articles"（記事のidごとに1行）
+//   hook：1行目／tag：内容のタグ／tables：画像にする表の見出し／lead: false で1枚目の要約をはぶく／figureTables: true で図と同じ見出しの表も図の1枚にのせる
 // できる場所：brand/x/articles/<記事の公開日>/（GitHub には送りません）
 //   その中に <id>-1.png, <id>-2.png … と、投稿文（<id>.txt）
 // 画像の中身：1枚目＝題名・要約・ポイント／2枚目から＝記事の図解（figure の SVG）と、x-hooks.json の tables で選んだ表／最後に「ひとこと」
@@ -54,7 +55,12 @@ const figures = [...body.matchAll(/<figure[\s\S]*?<img src="([^"]+)"[\s\S]*?<fig
   caption: f[2].replace(/（図を押すと大きく表示します）/, '').trim(),
 }));
 const tableOf = (title) => {
-  const rows = (sections[title] ?? []).filter((l) => /^\|/.test(l) && !/^\|\s*-/.test(l));
+  // その見出しの中の、最初の表だけ（表のあとの文や、別の表はふくめない）
+  const lines = sections[title] ?? [];
+  const start = lines.findIndex((l) => /^\|/.test(l));
+  if (start < 0) return [];
+  const end = lines.findIndex((l, i) => i > start && !/^\|/.test(l));
+  const rows = lines.slice(start, end < 0 ? undefined : end).filter((l) => !/^\|\s*-/.test(l));
   return rows.map((r) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim()));
 };
 const tables = (conf?.tables ?? []).map((title) => ({ title, rows: tableOf(title) })).filter((t) => t.rows.length);
@@ -96,17 +102,20 @@ const [t1, t2] = (() => {
   const i = data.title.search(/[？?]\s/);
   return i > 0 ? [data.title.slice(0, i + 1), data.title.slice(i + 2)] : [data.title, ''];
 })();
+// 題名が長いときは、1行に収まるように文字を小さくする（38〜42px）
+const titleSize = Math.max(38, Math.min(42, Math.floor(952 / [...t1].length)));
 const pagesHtml = [];
 pagesHtml.push(`<div class="head"><span class="kind">${esc(lineName)}</span><span class="series">筆界ステーションの記事</span>
-<div class="title">${esc(t1)}</div>${t2 ? `<div class="sub">${esc(t2)}</div>` : ''}</div>
-<div class="body"><p class="lead">${inline(data.summary)}</p>${points.length ? `<h2>ポイント</h2><ul>${points.map((p) => `<li>${inline(p)}</li>`).join('')}</ul>` : ''}</div>`);
+<div class="title" style="font-size:${titleSize}px">${esc(t1)}</div>${t2 ? `<div class="sub">${esc(t2)}</div>` : ''}</div>
+<div class="body">${conf?.lead === false ? '' : `<p class="lead">${inline(data.summary)}</p>`}${points.length ? `<h2>ポイント</h2><ul>${points.map((p) => `<li>${inline(p)}</li>`).join('')}</ul>` : ''}</div>`);
 const tableHtml = (rows) => {
   const [head, ...rest] = rows;
   return `<table><thead><tr>${head.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead>
 <tbody>${rest.map((r) => `<tr>${r.map((c, i) => (i === 0 ? `<th>${inline(c)}</th>` : `<td>${inline(c)}</td>`)).join('')}</tr>`).join('')}</tbody></table>`;
 };
 for (const f of figures) {
-  const rows = f.section ? tableOf(f.section) : [];
+  // figureTables: true のときだけ、図のある見出しの表も同じ1枚にのせる
+  const rows = conf?.figureTables && f.section ? tableOf(f.section) : [];
   pagesHtml.push(`<div class="body">${f.section ? `<h2>${esc(f.section)}</h2>` : ''}${rows.length ? tableHtml(rows) : ''}
 <div class="fig" style="margin-top:${rows.length ? 30 : 0}px">${f.svg}</div><p class="cap">${inline(f.caption)}</p></div>`);
 }
