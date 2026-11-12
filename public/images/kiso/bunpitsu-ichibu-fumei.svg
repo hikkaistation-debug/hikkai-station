@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">存続期間が満了し、地上権者が見つからないときの道を比べる図。分筆と一緒に消す法40条は、承諾か裁判が要るのでできない。法70条2項は、相当の調査、公示催告、除権決定のあと単独で抹消できる。収用は法118条で、裁決のあと単独の申請か職権で抹消される。裁判は、確定判決のあと法63条1項で単独で申請できる</title>
+  <rect width="640" height="400" fill="#ffffff"/>
+  <text x="320" y="30" font-size="18" font-weight="700" text-anchor="middle" fill="#1a1d24">期間満了の地上権、地上権者が見つからないときは？</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+  <g font-size="12" fill="#1a1d24">
+    <!-- row 1: NG -->
+    <rect x="16" y="50" width="608" height="70" rx="10" fill="#fff3f4" stroke="#c4122f" stroke-width="2"/>
+    <rect x="28" y="68" width="56" height="34" rx="6" fill="#ffffff" stroke="#c4122f" stroke-width="2"/>
+    <text x="56" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="#c4122f">×不可</text>
+    <text x="98" y="78" font-size="14" font-weight="700">分筆と一緒に消す（法40条・規則104条）</text>
+    <text x="98" y="100">地上権者の承諾か、対抗できる裁判が要る。分筆の申請者だけではできない</text>
+    <!-- row 2 -->
+    <rect x="16" y="132" width="608" height="80" rx="10" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
+    <rect x="28" y="155" width="56" height="34" rx="6" fill="#0a7d3e"/>
+    <text x="56" y="177" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">○可</text>
+    <text x="98" y="156" font-size="14" font-weight="700">法70条2項・3項（期間満了の抹消）</text>
+    <g transform="translate(98,170)">
+      <rect width="104" height="30" rx="5" fill="#ffffff" stroke="#0a7d3e"/><text x="52" y="20" text-anchor="middle">相当の調査</text>
+      <line x1="106" y1="15" x2="122" y2="15" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="126" width="96" height="30" rx="5" fill="#ffffff" stroke="#0a7d3e"/><text x="174" y="20" text-anchor="middle">公示催告</text>
+      <line x1="224" y1="15" x2="240" y2="15" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="244" width="96" height="30" rx="5" fill="#ffffff" stroke="#0a7d3e"/><text x="292" y="20" text-anchor="middle">除権決定</text>
+      <line x1="342" y1="15" x2="358" y2="15" stroke="#464c58" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="362" width="150" height="30" rx="5" fill="#0a7d3e"/><text x="437" y="20" text-anchor="middle" fill="#ffffff" font-weight="700">単独で抹消</text>
+    </g>
+    <!-- row 3 -->
+    <rect x="16" y="224" width="608" height="70" rx="10" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
+    <rect x="28" y="242" width="56" height="34" rx="6" fill="#0a7d3e"/>
+    <text x="56" y="264" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">○可</text>
+    <text x="98" y="252" font-size="14" font-weight="700">収用（法118条3項・4項）</text>
+    <text x="98" y="274">裁決のあと、起業者の単独の申請（国・自治体は嘱託）か、登記官の職権で抹消</text>
+    <!-- row 4 -->
+    <rect x="16" y="306" width="608" height="70" rx="10" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
+    <rect x="28" y="324" width="56" height="34" rx="6" fill="#0a7d3e"/>
+    <text x="56" y="346" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">○可</text>
+    <text x="98" y="334" font-size="14" font-weight="700">裁判（法63条1項）</text>
+    <text x="98" y="356">抹消登記手続を命ずる確定判決があれば、単独で申請できる</text>
+  </g>
+  <text x="320" y="392" font-size="11" text-anchor="middle" fill="#464c58">法70条2項・収用・裁判は、分筆とは別の手続きです。期間満了なら、先に抹消してから分筆すると写されません。</text>
+</svg>
