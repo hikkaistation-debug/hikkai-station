@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
-  <title id="t">地上権の登記がある1番の土地を、1番1と1番2に分筆する図。何もしなければ、地上権は1番1と1番2の両方に写される（規則102条）。地上権者の承諾を出せば、1番2では地上権が消滅し、1番1だけに残る（法40条・規則104条）</title>
+  <title id="t">抵当権の登記がある1番の土地を、1番1と1番2に分筆する図。何もしなければ、抵当権は1番1と1番2の両方に写される（規則102条）。抵当権者の承諾を出せば、1番2では抵当権が消滅し、1番1だけに残る（法40条・規則104条）</title>
   <rect width="640" height="340" fill="#ffffff"/>
-  <text x="320" y="30" font-size="19" font-weight="700" text-anchor="middle" fill="#1a1d24">分筆すると、地上権の登記はどうなる？</text>
+  <text x="320" y="30" font-size="19" font-weight="700" text-anchor="middle" fill="#1a1d24">分筆すると、抵当権の登記はどうなる？</text>
   <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
   <!-- 分筆前 -->
   <text x="90" y="62" font-size="14" font-weight="700" text-anchor="middle" fill="#1a1d24">分筆前</text>
   <rect x="20" y="74" width="140" height="190" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2.5"/>
   <text x="90" y="150" font-size="18" font-weight="700" text-anchor="middle" fill="#1a1d24">1番</text>
   <rect x="38" y="168" width="104" height="30" rx="6" fill="#0a7d3e"/>
-  <text x="90" y="188" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">地上権あり</text>
+  <text x="90" y="188" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">抵当権あり</text>
   <!-- arrows -->
   <path d="M166,140 C190,140 190,105 214,105" fill="none" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
   <path d="M166,200 C190,200 190,240 214,240" fill="none" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
@@ -18,11 +18,11 @@
   <rect x="240" y="84" width="120" height="74" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
   <text x="300" y="108" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">1番1</text>
   <rect x="254" y="118" width="92" height="26" rx="6" fill="#0a7d3e"/>
-  <text x="300" y="136" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">地上権あり</text>
+  <text x="300" y="136" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">抵当権あり</text>
   <rect x="360" y="84" width="120" height="74" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
   <text x="420" y="108" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">1番2</text>
   <rect x="374" y="118" width="92" height="26" rx="6" fill="#0a7d3e"/>
-  <text x="420" y="136" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">地上権あり</text>
+  <text x="420" y="136" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">抵当権あり</text>
   <text x="552" y="112" font-size="12" text-anchor="middle" fill="#464c58">分けても</text>
   <text x="552" y="130" font-size="12" text-anchor="middle" fill="#464c58">範囲は同じ</text>
   <!-- 下段：法40条 -->
@@ -31,13 +31,13 @@
   <rect x="240" y="216" width="120" height="74" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
   <text x="300" y="240" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">1番1</text>
   <rect x="254" y="250" width="92" height="26" rx="6" fill="#0a7d3e"/>
-  <text x="300" y="268" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">地上権あり</text>
+  <text x="300" y="268" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">抵当権あり</text>
   <rect x="360" y="216" width="120" height="74" fill="#ffffff" stroke="#0a7d3e" stroke-width="2" stroke-dasharray="6 4"/>
   <text x="420" y="240" font-size="15" font-weight="700" text-anchor="middle" fill="#1a1d24">1番2</text>
   <rect x="374" y="250" width="92" height="26" rx="6" fill="#ffffff" stroke="#c4122f" stroke-width="2"/>
-  <text x="420" y="268" font-size="12" font-weight="700" text-anchor="middle" fill="#c4122f">地上権 消滅</text>
-  <text x="552" y="236" font-size="12" text-anchor="middle" fill="#464c58">地上権者の</text>
+  <text x="420" y="268" font-size="12" font-weight="700" text-anchor="middle" fill="#c4122f">抵当権 消滅</text>
+  <text x="552" y="236" font-size="12" text-anchor="middle" fill="#464c58">抵当権者の</text>
   <text x="552" y="254" font-size="12" text-anchor="middle" fill="#464c58">承諾が要る</text>
   <text x="552" y="272" font-size="11" text-anchor="middle" fill="#464c58">（または裁判）</text>
-  <text x="320" y="326" font-size="12" text-anchor="middle" fill="#464c58">地上権に抵当権がついているなど、第三者の権利の登記があれば、その第三者の承諾も要ります。</text>
+  <text x="320" y="326" font-size="12" text-anchor="middle" fill="#464c58">抵当権を目的とする転抵当など、第三者の権利の登記があれば、その第三者の承諾も要ります。</text>
 </svg>
