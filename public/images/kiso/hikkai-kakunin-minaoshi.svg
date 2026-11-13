@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">筆界確認情報の取扱いの、これまでと見直し後をくらべた図</title>
+  <rect width="640" height="420" fill="#ffffff"/>
+  <text x="320" y="34" font-size="20" font-weight="700" text-anchor="middle" fill="#1a1d24">筆界確認情報の取扱い：これまでと見直し後</text>
+
+  <rect x="20" y="56" width="285" height="44" rx="8" fill="#464c58"/>
+  <text x="162" y="85" font-size="17" font-weight="700" text-anchor="middle" fill="#ffffff">これまで</text>
+  <rect x="335" y="56" width="285" height="44" rx="8" fill="#c4122f"/>
+  <text x="477" y="85" font-size="17" font-weight="700" text-anchor="middle" fill="#ffffff">見直し後（令和4年度から）</text>
+
+  <rect x="20" y="108" width="285" height="292" rx="8" fill="#f4f5f7" stroke="#464c58" stroke-width="1.5"/>
+  <rect x="335" y="108" width="285" height="292" rx="8" fill="#fdf2f4" stroke="#c4122f" stroke-width="1.5"/>
+
+  <!-- 行1 -->
+  <text x="36" y="138" font-size="14.5" font-weight="700" fill="#1a1d24">筆界の認定の中心</text>
+  <text x="36" y="160" font-size="14" fill="#464c58">隣の人と取り交わした</text>
+  <text x="36" y="180" font-size="14" fill="#464c58">筆界確認情報を重く見る</text>
+  <text x="351" y="138" font-size="14.5" font-weight="700" fill="#1a1d24">筆界の認定の中心</text>
+  <text x="351" y="160" font-size="14" fill="#464c58">登記官が現地の調査や登記所の</text>
+  <text x="351" y="180" font-size="14" fill="#464c58">資料を生かして、積極的に認定</text>
+
+  <line x1="36" y1="196" x2="289" y2="196" stroke="#d5d8de"/>
+  <line x1="351" y1="196" x2="604" y2="196" stroke="#efc6cf"/>
+
+  <!-- 行2 -->
+  <text x="36" y="222" font-size="14.5" font-weight="700" fill="#1a1d24">筆界確認情報</text>
+  <text x="36" y="244" font-size="14" fill="#464c58">添付を求める取扱いが</text>
+  <text x="36" y="264" font-size="14" fill="#464c58">一般的</text>
+  <text x="351" y="222" font-size="14.5" font-weight="700" fill="#1a1d24">筆界確認情報</text>
+  <text x="351" y="244" font-size="14" fill="#464c58">現地を復元できる地図・図面があれば</text>
+  <text x="351" y="264" font-size="14" fill="#464c58">原則求めない。求めるときも最小限</text>
+
+  <line x1="36" y1="280" x2="289" y2="280" stroke="#d5d8de"/>
+  <line x1="351" y1="280" x2="604" y2="280" stroke="#efc6cf"/>
+
+  <!-- 行3 -->
+  <text x="36" y="306" font-size="14.5" font-weight="700" fill="#1a1d24">相続人・押印・印鑑証明書</text>
+  <text x="36" y="328" font-size="14" fill="#464c58">印鑑証明書の添付を</text>
+  <text x="36" y="348" font-size="14" fill="#464c58">求める場合もあった</text>
+  <text x="351" y="306" font-size="14.5" font-weight="700" fill="#1a1d24">相続人・押印・印鑑証明書</text>
+  <text x="351" y="328" font-size="14" fill="#464c58">相続人のうち現に占有する人だけで</text>
+  <text x="351" y="348" font-size="14" fill="#464c58">足りる場合も。隣の人の押印や</text>
+  <text x="351" y="368" font-size="14" fill="#464c58">印鑑証明書は求めない</text>
+</svg>
