@@ -124,9 +124,10 @@
       "lead": false
     },
     "bunpitsu-ichibu-masshou": {
-      "hook": "土地を分筆したら、抵当権は両方の土地に写る。片方の土地だけ外すには？",
+      "hook": "土地を分筆したら、抵当権は片方の土地だけ外せる？",
       "tag": "分筆",
-      "tables": []
+      "tables": [],
+      "lead": false
     }
   }
 }
