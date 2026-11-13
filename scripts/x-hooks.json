@@ -122,6 +122,11 @@
       "tag": "筆界",
       "tables": [],
       "lead": false
+    },
+    "bunpitsu-ichibu-masshou": {
+      "hook": "土地を分筆したら、抵当権は両方の土地に写る。片方の土地だけ外すには？",
+      "tag": "分筆",
+      "tables": []
     }
   }
 }
