@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">旧宗教法人から新宗教法人への移り方の年表。昭和20年の宗教法人令による旧宗教法人。昭和26年4月3日に宗教法人法が施行。施行から1年6か月以内に認証を申請し、設立の登記をすると新宗教法人になり、権利義務を承継し、旧宗教法人の登記用紙は閉鎖される。申請しなかったときや認証を受けられなかったときは解散する</title>
+  <rect width="640" height="400" fill="#ffffff"/>
+  <text x="320" y="34" font-size="19" font-weight="700" text-anchor="middle" fill="#1a1d24">旧宗教法人から今の宗教法人へ（宗教法人法の附則）</text>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#464c58"/></marker></defs>
+
+  <line x1="50" y1="80" x2="50" y2="214" stroke="#0a7d3e" stroke-width="8" stroke-linecap="round"/>
+
+  <circle cx="50" cy="80" r="12" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="76" y="76" font-size="13.5" font-weight="700" fill="#0a7d3e">昭和20年</text>
+  <text x="76" y="98" font-size="16" font-weight="700" fill="#1a1d24">宗教法人令による法人（旧宗教法人）</text>
+
+  <circle cx="50" cy="146" r="12" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="76" y="142" font-size="13.5" font-weight="700" fill="#0a7d3e">昭和26年（1951年）4月3日</text>
+  <text x="76" y="164" font-size="16" font-weight="700" fill="#1a1d24">宗教法人法が施行</text>
+  <text x="250" y="164" font-size="13.5" fill="#464c58">旧宗教法人は、そのまま存続できる（附則3項）</text>
+
+  <circle cx="50" cy="214" r="12" fill="#0a7d3e" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="76" y="210" font-size="13.5" font-weight="700" fill="#0a7d3e">施行から1年6か月以内（附則15項）</text>
+  <text x="76" y="232" font-size="16" font-weight="700" fill="#1a1d24">規則の認証を申請したか？</text>
+
+  <path d="M50,228 L50,252 L165,252 L165,274" fill="none" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+  <path d="M165,252 L475,252 L475,274" fill="none" stroke="#464c58" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <rect x="20" y="280" width="290" height="104" rx="10" fill="#e8f5ee" stroke="#0a7d3e" stroke-width="2"/>
+  <text x="34" y="302" font-size="14" font-weight="700" fill="#0a7d3e">申請して認証、設立の登記をした</text>
+  <text x="34" y="326" font-size="13.5" fill="#1a1d24">・新宗教法人になる（附則5項）</text>
+  <text x="34" y="348" font-size="13.5" fill="#1a1d24">・権利義務を承継する（附則18項）</text>
+  <text x="34" y="370" font-size="13.5" fill="#1a1d24">・古い登記用紙は閉鎖（附則19項）</text>
+
+  <rect x="330" y="280" width="290" height="104" rx="10" fill="#fff3f4" stroke="#c4122f" stroke-width="2"/>
+  <text x="344" y="302" font-size="14" font-weight="700" fill="#c4122f">申請しなかった・認証されなかった</text>
+  <text x="344" y="326" font-size="13.5" fill="#1a1d24">・解散する（附則17項）</text>
+  <text x="344" y="348" font-size="13.5" fill="#1a1d24">・今の宗教法人とはつながらない</text>
+</svg>
