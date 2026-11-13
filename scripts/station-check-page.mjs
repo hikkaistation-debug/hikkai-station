@@ -554,7 +554,7 @@ const page = `<!DOCTYPE html>
   </section>
 
   <section data-section="xposts" hidden>
-    <p class="lead">車内の読み物の話ごとに、X に投稿（予約）したかの印をつけます。投稿文と画像はパソコンの brand/x/stories/ にあります。もう一度押すと印が外れます。</p>
+    <p class="lead">車内の読み物の話ごとに、X に投稿（予約）したかの印をつけます。投稿文と画像はパソコンの brand/x/<作った日>/ にあります。もう一度押すと印が外れます。</p>
     <div class="progress" data-progress="xposts"><div class="bar"><span></span></div><p class="count"></p>
       <div class="filters"><button type="button" data-f="todo" aria-pressed="true">まだ</button><button type="button" data-f="posted">投稿した</button><button type="button" data-f="all">すべて</button></div></div>
     ${storyCards}

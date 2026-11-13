@@ -3,7 +3,7 @@
 //         node scripts/article-images.mjs jishin-chizu-zahyo --text-only（投稿文だけ作り直す）
 // 投稿文の1行目と内容のタグは scripts/x-hooks.json の "articles"（記事のidごとに1行）
 //   hook：1行目／tag：内容のタグ／tables：画像にする表の見出し／lead: false で1枚目の要約をはぶく／figureTables: true で図と同じ見出しの表も図の1枚にのせる
-// できる場所：brand/x/articles/<記事の公開日>/（GitHub には送りません）
+// できる場所：brand/x/<画像を作った日>/（GitHub には送りません。scripts/x-folder.mjs）
 //   その中に <id>-1.png, <id>-2.png … と、投稿文（<id>.txt）
 // 画像の中身：1枚目＝題名・要約・ポイント／2枚目から＝記事の図解（figure の SVG）と、x-hooks.json の tables で選んだ表／最後に「ひとこと」
 // 本文に書いてあることだけを画像にする（記事の図と同じ決まり）。
@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { todayDir, findX, imagesBeside } from './x-folder.mjs';
 import { createRequire } from 'node:module';
 import { parse } from 'yaml';
 
@@ -125,11 +126,16 @@ while (pagesHtml.length > 4) pagesHtml.splice(pagesHtml.length - 1, 1);
 const lastIdx = pagesHtml.length - 1;
 pagesHtml[lastIdx] = pagesHtml[lastIdx].replace(/<\/div>$/, `<div class="point" style="margin-top:30px"><span class="t">📍 ひとこと</span>${inline(data.comment)}</div><p class="more">くわしくは、サイトの記事で ▶</p></div>`);
 
-const outDir = path.join(root, 'brand/x/articles', pub);
-fs.mkdirSync(outDir, { recursive: true });
+// 画像を作った日のフォルダ（brand/x/<作った日>/。scripts/x-folder.mjs）。--text-only のときは、前に作ったフォルダを探す
 const textOnly = process.argv.includes('--text-only');
+const prevTxt = textOnly ? findX(`${id}.txt`) : null;
+if (textOnly && !prevTxt) {
+  console.error('前に作った画像が brand/x に見つかりません。--text-only をはずして作ってください');
+  process.exit(1);
+}
+const outDir = prevTxt ? path.dirname(prevTxt) : todayDir();
 const files = textOnly
-  ? fs.readdirSync(outDir).filter((f) => f.startsWith(`${id}-`) && f.endsWith('.png')).sort().map((f) => path.join(outDir, f))
+  ? imagesBeside(prevTxt, `${id}-`)
   : [];
 if (!textOnly) {
   const edge = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => fs.existsSync(p));

@@ -2,14 +2,15 @@
 // 使い方：node scripts/story-images.mjs kakueki 01
 //         node scripts/story-images.mjs kakueki 01 --text-only（投稿文だけ作り直す）
 // 投稿文の1行目は scripts/x-hooks.json（新しい話を書いたら、そこにも1行足す）
-// できる場所：brand/x/stories/<投稿する日>/（GitHub には送りません）
-//   投稿する日＝その話の公開日（pubDate）。例：brand/x/stories/2026-11-05/
+// できる場所：brand/x/<画像を作った日>/（GitHub には送りません。scripts/x-folder.mjs）
+//   例：brand/x/2026-11-13/（前に作った brand/x/stories/<公開日>/ のものも、--text-only やXチェックで見つけます）
 //   その中に kakueki-03-1.png, kakueki-03-2.png … と、投稿文（kakueki-03.txt）
 // Microsoft Edge を使って画像にします。
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { todayDir, findX, imagesBeside } from './x-folder.mjs';
 import { parse } from 'yaml';
 
 const [train, no] = process.argv.slice(2);
@@ -76,13 +77,18 @@ body{background:#f7f6f2;color:#1a1d24;font-family:'Yu Mincho','YuMincho','Hiragi
 .foot .brand{display:flex;align-items:center;gap:12px}
 .foot .mark{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#1f2a44;color:#fff;font-weight:800}
 `;
-const outDir = path.join(root, 'brand/x/stories', pub);
-fs.mkdirSync(outDir, { recursive: true });
+// 画像を作った日のフォルダ（brand/x/<作った日>/。scripts/x-folder.mjs）。--text-only のときは、前に作ったフォルダを探す
+const textOnly = process.argv.includes('--text-only');
+const prevTxt = textOnly ? findX(`${train}-${no}.txt`) : null;
+if (textOnly && !prevTxt) {
+  console.error('前に作った画像が brand/x に見つかりません。--text-only をはずして作ってください');
+  process.exit(1);
+}
+const outDir = prevTxt ? path.dirname(prevTxt) : todayDir();
 const edge = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find((p) => fs.existsSync(p));
 // --text-only を付けると、画像は作り直さず、投稿文（txt）だけ作り直す
-const textOnly = process.argv.includes('--text-only');
 const files = textOnly
-  ? fs.readdirSync(outDir).filter((f) => f.startsWith(`${train}-${no}-`) && f.endsWith('.png')).sort().map((f) => path.join(outDir, f))
+  ? imagesBeside(prevTxt, `${train}-${no}-`)
   : [];
 if (!textOnly) pages.forEach((ps, i) => {
   const isLast = i === pages.length - 1;

@@ -1,10 +1,12 @@
 ---
 // X 投稿チェックのページ（手元の確認用画面だけ。本物のサイトには作られません）
 // アドレス：http://localhost:4321/x-check/
-// 小説の投稿文（brand/x/stories/<日付>/kakueki-NN.txt）と画像を並べ、
+// 小説の投稿文（brand/x/<作った日>/kakueki-NN.txt。前の brand/x/stories/<公開日>/ も探す）と画像を並べ、
 // 「投稿済み」「投稿文・画像のチェック（OK／直してほしい＋メモ）」を review/x-check.json に自動保存します
 // （astro.config.mjs の xCheck）。
 import fs from 'node:fs';
+import path from 'node:path';
+import { findX, imagesBeside, xRoot } from '../../../scripts/x-folder.mjs';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import StationSign from '../../components/StationSign.astro';
@@ -14,7 +16,6 @@ export function getStaticPaths() {
   return import.meta.env.DEV ? [{ params: { p: undefined } }] : [];
 }
 
-const dir = new URL('../../../brand/x/stories/', import.meta.url);
 const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
 const stories = (await getCollection('stories', ({ data }) => data.train === 'kakueki' && !data.draft)).sort(
   (a, b) => a.data.no - b.data.no,
@@ -22,21 +23,20 @@ const stories = (await getCollection('stories', ({ data }) => data.train === 'ka
 const items = stories.map((s) => {
   const pub = s.data.pubDate.toISOString().slice(0, 10);
   const nn = String(s.data.no).padStart(2, '0');
-  const folder = new URL(`${pub}/`, dir);
-  const txtUrl = new URL(`kakueki-${nn}.txt`, folder);
+  // 投稿文と画像は brand/x/<作った日>/ に（前の brand/x/stories/<公開日>/ にあるものも探す。scripts/x-folder.mjs）
+  const txtFile = findX(`kakueki-${nn}.txt`);
   let body = '';
   let imgs: string[] = [];
-  if (fs.existsSync(txtUrl)) {
-    const t = fs.readFileSync(txtUrl, 'utf8').replace(/\r\n/g, '\n');
+  let folder = '';
+  if (txtFile) {
+    const t = fs.readFileSync(txtFile, 'utf8').replace(/\r\n/g, '\n');
     body = (t.split(/■ 本文[^\n]*\n/)[1] ?? '').split('\n\n■')[0].trim();
-    imgs = fs
-      .readdirSync(folder)
-      .filter((f) => f.startsWith(`kakueki-${nn}-`) && f.endsWith('.png'))
-      .sort();
+    folder = path.relative(xRoot, path.dirname(txtFile)).split(path.sep).join('/');
+    imgs = imagesBeside(txtFile, `kakueki-${nn}-`).map((f) => path.basename(f));
   }
   const [y, m, d] = pub.split('-').map(Number);
   const wd = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
-  return { id: s.id, no: s.data.no, title: s.data.title, pub, date: `${m}/${d}（${wd}）`, body, imgs };
+  return { id: s.id, no: s.data.no, title: s.data.title, pub, date: `${m}/${d}（${wd}）`, body, imgs, folder };
 });
 ---
 <BaseLayout title="X投稿チェック（手元だけ）" description="X の投稿文の確認用ページ">
@@ -66,12 +66,12 @@ const items = stories.map((s) => {
             <pre class="xc-body">{it.body}</pre>
             <div class="xc-actions">
               <button type="button" class="xc-copy">コピー</button>
-              <span class="xc-folder">画像{it.imgs.length}枚：brand/x/stories/{it.pub}/</span>
+              <span class="xc-folder">画像{it.imgs.length}枚：brand/x/{it.folder}/</span>
             </div>
             <div class="xc-imgs">
               {it.imgs.map((f) => (
-                <a href={`/__xstories/${it.pub}/${f}`} target="_blank" rel="noopener">
-                  <img src={`/__xstories/${it.pub}/${f}`} alt={f} loading="lazy" width="108" height="135" />
+                <a href={`/__xstories/${it.folder}/${f}`} target="_blank" rel="noopener">
+                  <img src={`/__xstories/${it.folder}/${f}`} alt={f} loading="lazy" width="108" height="135" />
                 </a>
               ))}
             </div>

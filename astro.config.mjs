@@ -45,12 +45,12 @@ function shitagakiReview() {
 //   /__xcheck … 投稿済み・チェック結果を review/x-check.json に保存／読み出し（送られてきた話の分だけ書きかえる）
 //   /__xcheck/handoff … 「保存して Claude に渡す」で review/x-handoff.json に書く（待機中の Claude が読みに来る）
 //   /__xcheck/status … Claude が待機中か（scripts/check-watch.sh x が review/.claude-watching-x を更新している）
-//   /__xstories/<日付>/<画像> … brand/x/stories/ の画像を見せる（GitHub には送らない画像）
+//   /__xstories/<フォルダ>/<画像> … brand/x/ の画像を見せる（brand/x/<作った日>/ と、前の brand/x/stories/<公開日>/。GitHub には送らない画像）
 const xReviewDir = fileURLToPath(new URL('./review/', import.meta.url));
 const xCheckFile = `${xReviewDir}x-check.json`;
 const xHandoffFile = `${xReviewDir}x-handoff.json`;
 const xWatchingFile = `${xReviewDir}.claude-watching-x`;
-const xStoriesDir = fileURLToPath(new URL('./brand/x/stories/', import.meta.url));
+const xDir = fileURLToPath(new URL('./brand/x/', import.meta.url)); // X の画像（brand/x/<作った日>/ や、前の brand/x/stories/<公開日>/）
 const xRead = (f) => {
   try {
     return JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -111,8 +111,9 @@ function xCheck() {
         res.end('{}');
       });
       server.middlewares.use('/__xstories', (req, res) => {
-        const m = decodeURIComponent((req.url ?? '').split('?')[0]).match(/^\/(\d{4}-\d\d-\d\d)\/([\w-]+\.png)$/);
-        const file = m && `${xStoriesDir}${m[1]}/${m[2]}`;
+        // /__xstories/<brand/x の中のフォルダ>/<画像>.png（フォルダは日付か、stories/日付・articles/日付）
+        const m = decodeURIComponent((req.url ?? '').split('?')[0]).match(/^\/((?:(?:stories|articles)\/)?\d{4}-\d\d-\d\d)\/([\w-]+\.png)$/);
+        const file = m && `${xDir}${m[1]}/${m[2]}`;
         if (!file || !fs.existsSync(file)) {
           res.statusCode = 404;
           res.end();
