@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" font-family="'Hiragino Sans','Yu Gothic','Meiryo','Noto Sans JP',sans-serif" role="img" aria-labelledby="t">
+  <title id="t">昔の神社名義の土地を分筆するときの流れ。1 名義の中身を確かめる、2 今の宗教法人と同じ法人であることを示す、3 名称・住所が違うときの扱い、4 代表役員の権限を示す、5 境界の確認。分筆のあとに売却などをするときは、宗教法人法23条の公告と責任役員会の議決が必要</title>
+  <rect width="640" height="470" fill="#ffffff"/>
+  <text x="320" y="34" font-size="19" font-weight="700" text-anchor="middle" fill="#1a1d24">昔の神社名義の土地を分筆するときの流れ</text>
+  <line x1="50" y1="74" x2="50" y2="372" stroke="#0a7d3e" stroke-width="8" stroke-linecap="round"/>
+
+  <circle cx="50" cy="74" r="13" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="50" y="79" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d3e">1</text>
+  <text x="76" y="80" font-size="16.5" font-weight="700" fill="#1a1d24">名義の中身を確かめる</text>
+  <text x="76" y="102" font-size="14" fill="#464c58">登記事項証明書で名義の書き方と住所を見る。旧土地台帳・閉鎖登記簿も</text>
+
+  <circle cx="50" cy="140" r="13" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="50" y="145" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d3e">2</text>
+  <text x="76" y="146" font-size="16.5" font-weight="700" fill="#1a1d24">今の宗教法人と同じ法人であることを示す</text>
+  <text x="76" y="168" font-size="14" fill="#464c58">法人の登記事項証明書（閉鎖登記簿）・規則と認証書・所管庁や包括法人</text>
+  <text x="76" y="187" font-size="14" fill="#464c58">の証明。足りないところは代表役員の上申書で補う</text>
+
+  <circle cx="50" cy="224" r="13" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="50" y="229" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d3e">3</text>
+  <text x="76" y="230" font-size="16.5" font-weight="700" fill="#1a1d24">名称・住所が今と違うときの扱い</text>
+  <text x="76" y="252" font-size="14" fill="#464c58">変更を証する情報をつければ、表示の変更の登記を先にしなくて済む扱い</text>
+  <text x="76" y="271" font-size="14" fill="#464c58">が一般的</text>
+
+  <circle cx="50" cy="306" r="13" fill="#fff" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="50" y="311" font-size="14" font-weight="700" text-anchor="middle" fill="#0a7d3e">4</text>
+  <text x="76" y="312" font-size="16.5" font-weight="700" fill="#1a1d24">代表役員の権限を示す</text>
+  <text x="76" y="334" font-size="14" fill="#464c58">委任状と、法人の登記事項証明書（または会社法人等番号）</text>
+
+  <circle cx="50" cy="372" r="13" fill="#0a7d3e" stroke="#0a7d3e" stroke-width="4"/>
+  <text x="50" y="377" font-size="14" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+  <text x="76" y="378" font-size="16.5" font-weight="700" fill="#0a7d3e">境界を確かめて、分筆を申請</text>
+  <text x="76" y="400" font-size="14" fill="#464c58">筆界確認書の当事者も、宗教法人の代表役員</text>
+
+  <rect x="20" y="420" width="600" height="38" rx="8" fill="#fff8ec" stroke="#b45309" stroke-width="1.5"/>
+  <text x="34" y="444" font-size="13.5" fill="#1a1d24"><tspan font-weight="700">分筆のあとに売却などをするなら</tspan>：宗教法人法23条の公告と責任役員会の議決が必要</text>
+</svg>
